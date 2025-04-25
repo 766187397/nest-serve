@@ -3,6 +3,12 @@ import * as dotenv from "dotenv";
 const envFilePath = `.env.${process.env.NODE_ENV || "development"}`;
 dotenv.config({ path: envFilePath });
 
+// 项目地址端口
+const port = process.env.PORT || 3000;
+const host = process.env.HOST || "localhost";
+const url = `http://${host}:${port}`;
+global.url = url;
+
 import { NestFactory, Reflector } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { SwaggerModule } from "@nestjs/swagger";
@@ -28,11 +34,6 @@ async function bootstrap() {
   );
   // 使用 ClassSerializerInterceptor
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-
-  const port = process.env.PORT || 3000;
-  const host = process.env.HOST || "localhost";
-  const url = `http://${host}:${port}`;
-  global.url = url;
   await app.listen(port).then((res) => {
     console.log(`当前环境为：${envFilePath}`);
     console.log(`server to ${url}`);

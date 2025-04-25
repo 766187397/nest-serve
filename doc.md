@@ -111,12 +111,12 @@ yarn add mysql2 sqlite3 typeorm @nestjs/typeorm
 
 
 
-## 过滤字段返回
+## 过滤字段返回表单校验
 
 > 部分保存的格式和返回的格式一样，或者某些字段不返回
 
 ```bash
-npm i class-transformer dayjs
+npm i class-transformer dayjs class-validator
 ```
 
 
@@ -126,41 +126,107 @@ npm i class-transformer dayjs
 > 后续的大多数实例基础这个实例
 
 ```typescript
-import {
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  DeleteDateColumn,
-} from 'typeorm';
-import { Exclude, Transform } from 'class-transformer';
-import dayjs from 'dayjs';
+import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
+import { Exclude, Transform } from "class-transformer";
+import dayjs from "dayjs";
 
 export abstract class BaseEntity {
-  @PrimaryGeneratedColumn({ comment: 'ID' })
+  @PrimaryGeneratedColumn({ comment: "ID" })
   id: number;
 
-  @Column({ default: 1, comment: '排序' })
+  @Column({ default: 1, comment: "排序" })
   sort: number;
 
-  @Column({ default: 1, comment: '1 - 启用，0 - 禁用，根据业务定义' })
+  @Column({ default: 1, comment: "1 - 启用，0 - 禁用，根据业务定义" })
   status: number;
 
   @Exclude({ toPlainOnly: true })
-  @Column({ default: 'web', comment: '平台标识（如admin/web/app/mini）' })
+  @Column({ default: "web", comment: "平台标识（如admin/web/app/mini）" })
   platform: string;
 
-  @CreateDateColumn({ comment: '创建时间' })
-  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
+  @CreateDateColumn({ comment: "创建时间" })
+  @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
   createdAt: Date;
 
-  @UpdateDateColumn({ comment: '更新时间' })
-  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
+  @UpdateDateColumn({ comment: "更新时间" })
+  @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
   updatedAt: Date;
 
-  @DeleteDateColumn({ comment: '删除时间' })
-  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
+  @DeleteDateColumn({ comment: "删除时间" })
+  @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
   deletedAt: Date;
+}
+
+```
+
+
+
+## 创建公共的DTO
+
+> 将公共的请求参数抽离处理方便后续使用
+
+```typescript
+import { ApiProperty } from "@nestjs/swagger";
+import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsStringOrNumber } from "@/common/utils/class-validator";
+
+/**
+ * 创建基础数据
+ */
+export class CreateBaseDto {
+  @ApiProperty({ description: "排序", required: false, example: 1 })
+  @IsOptional()
+  @IsNumber({}, { message: "排序值必须为数字" })
+  sort?: number;
+
+  @ApiProperty({ description: "状态；1 - 启用，2 - 禁用；根据模块业务定义", required: false, example: 1 })
+  @IsOptional()
+  @IsNumber({}, { message: "状态值必须为数字" })
+  status?: number;
+}
+
+/**
+ * 查询参数
+ */
+export class FindByParameter {
+  @ApiProperty({ description: "id", required: false, example: 1 })
+  @IsOptional()
+  @IsStringOrNumber()
+  id?: number | string;
+
+  @ApiProperty({
+    description: "排序: ASC - 升序，DESC - 降序",
+    required: false,
+    enum: ["ASC", "DESC"],
+    default: "DESC",
+  })
+  @IsOptional()
+  @IsString({ message: "排序值必须为字符串" })
+  sort?: string;
+
+  @ApiProperty({ description: "状态；1 - 启用，2 - 禁用；根据模块业务定义", required: false, example: 1 })
+  @IsStringOrNumber()
+  status?: number | string;
+
+  @ApiProperty({ description: "时间范围(根据创建时间查询)", required: false, example: "2020-01-01" })
+  @IsOptional()
+  @IsArray({ message: "时间范围必须为数组" })
+  time?: Date[] | string[];
+}
+
+/**
+ * 分页查询
+ */
+export class FindByPage extends FindByParameter {
+  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
+  @IsOptional()
+  @IsStringOrNumber()
+  page?: string;
+
+  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
+  @IsOptional()
+  @IsStringOrNumber()
+  pageSize?: string;
 }
 
 ```
@@ -225,5 +291,122 @@ export class SwaggerConfig {
     .addServer(global.url, "项目地址")
     .build();
 }
+```
+
+
+
+## 主文件中使用
+
+```typescript
+import * as dotenv from "dotenv";
+// 根据环境加载对应的 .env 文件
+const envFilePath = `.env.${process.env.NODE_ENV || "development"}`;
+dotenv.config({ path: envFilePath });
+
+// 项目地址端口
+const port = process.env.PORT || 3000;
+const host = process.env.HOST || "localhost";
+const url = `http://${host}:${port}`;
+global.url = url;
+
+import { NestFactory, Reflector } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import { SwaggerModule } from "@nestjs/swagger";
+import { SwaggerConfig } from "./config/swagger";
+import { ClassSerializerInterceptor, ValidationPipe } from "@nestjs/common";
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  // 创建 Swagger 文档
+  const document = SwaggerModule.createDocument(app, SwaggerConfig.swaggerOptions);
+  // 将 Swagger 文档存储在全局对象中
+  global.swaggerDocument = document;
+  // 设置 Swagger UI 路由
+  SwaggerModule.setup("swagger", app, document);
+
+  // 启用全局校验管道
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true, // 自动转换类型
+      whitelist: true, // 只允许 DTO 中声明的字段 仅对DTO中的生效
+      forbidNonWhitelisted: true, // 如果有非法字段，抛出异常 仅对DTO中的生效
+    })
+  );
+  // 使用 ClassSerializerInterceptor
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  await app.listen(port).then((res) => {
+    console.log(`当前环境为：${envFilePath}`);
+    console.log(`server to ${url}`);
+    console.log(`swagger to ${url}/swagger`);
+    console.log(`knife4j to ${url}/api/doc?v=1`);
+  });
+}
+bootstrap();
+
+```
+
+
+
+## 设置user的文档通用说明
+
+> 在路由最上层设置后面的会继承，如果有不一样的就在子模块上设置会覆盖
+>
+> 修改Controller中的地址为：api/v1/backend/users
+>
+> api：请求
+>
+> v1：版本
+>
+> backend：平台-后台
+>
+> users：模块
+>
+> *：具体的请求
+
+```typescript
+import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { UsersService } from "./users.service";
+import { CreateUserDto, UpdateUserDto } from "./dto/index";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+
+@ApiTags("用户管理")
+@ApiResponse({ status: 200, description: "操作成功" })
+@ApiResponse({ status: 201, description: "操作成功，无返回内容" })
+@ApiResponse({ status: 400, description: "参数错误" })
+@ApiResponse({ status: 401, description: "token失效，请重新登录" })
+@ApiResponse({ status: 403, description: "权限不足" })
+@ApiResponse({ status: 404, description: "请求资源不存在" })
+@ApiResponse({ status: 500, description: "服务器异常，请联系管理员" })
+@Controller("users")
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  @ApiOperation({ summary: "创建用户" })
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
+
+  @Get(":id")
+  findOne(@Param("id") id: string) {
+    return this.usersService.findOne(+id);
+  }
+
+  @Patch(":id")
+  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
+  }
+
+  @Delete(":id")
+  remove(@Param("id") id: string) {
+    return this.usersService.remove(+id);
+  }
+}
+
 ```
 

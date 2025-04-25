@@ -50,13 +50,13 @@ export class FindByParameter {
  * 分页查询
  */
 export class FindByPage extends FindByParameter {
-  @ApiProperty({ description: "页码", required: false, example: 1, default: 1 })
+  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()
   @IsStringOrNumber()
-  page?: number | string;
+  page?: string;
 
-  @ApiProperty({ description: "每页条数", required: false, example: 10, default: 10 })
+  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
   @IsOptional()
   @IsStringOrNumber()
-  pageSize?: number | string;
+  pageSize?: string;
 }

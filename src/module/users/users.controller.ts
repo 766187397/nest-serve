@@ -11,7 +11,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 @ApiResponse({ status: 403, description: "权限不足" })
 @ApiResponse({ status: 404, description: "请求资源不存在" })
 @ApiResponse({ status: 500, description: "服务器异常，请联系管理员" })
-@Controller("users")
+@Controller("api/v1/backend/users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
