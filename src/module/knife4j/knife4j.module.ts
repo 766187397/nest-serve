@@ -9,7 +9,7 @@ import { join } from "path";
     ServeStaticModule.forRoot(
       {
         rootPath: join(__dirname, "../../../", "knife4j/index.html"),
-        serveRoot: "/doc", // 主文件访问路径
+        serveRoot: "/doc.html", // 主文件访问路径
         serveStaticOptions: {
           maxAge: "1y", // 设置缓存时间
         },

@@ -807,7 +807,7 @@ import { ServeStaticModule } from "@nestjs/serve-static";
     ServeStaticModule.forRoot(
       {
         rootPath: "knife4j/index.html",
-        serveRoot: "/doc", // 主文件访问路径
+        serveRoot: "/doc.html", // 主文件访问路径
         serveStaticOptions: {
           maxAge: "1y", // 设置缓存时间
         },
@@ -844,3 +844,9 @@ export class Knife4jService {
 }
 
 ```
+
+
+
+**在运行代码加上打印console.log(`knife4j to ${url}/doc.html`);**
+
+**此时运行代码可以看到knife4j的地址：knife4j to http://localhost:3000/doc.html**
