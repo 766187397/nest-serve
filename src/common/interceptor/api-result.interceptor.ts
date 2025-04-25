@@ -13,8 +13,8 @@ export class ApiResultInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       map((data) => {
-        // 如果已经是 ApiResult 实例，直接使用它的状态码和消息
-        if (data instanceof ApiResult) {
+        if (data.__isApiResult) {
+          delete data.__isApiResult;
           response.status(data.code);
           return {
             code: data.code,

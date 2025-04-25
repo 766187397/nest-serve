@@ -8,6 +8,8 @@ interface Result<T> {
   dto?: any;
 }
 export class ApiResult<T> {
+  readonly __isApiResult = true;
+
   constructor(
     public code: number = 200,
     public message: string = "操作成功",

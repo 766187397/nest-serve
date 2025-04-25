@@ -1,6 +1,6 @@
 import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
 import { Exclude, Transform } from "class-transformer";
-import dayjs from "dayjs";
+import * as dayjs from "dayjs";
 
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn({ comment: "ID" })
