@@ -18,6 +18,7 @@ export function filterQuery<T extends FindByParameter & FindByPage & { [key: str
   query: T
 ): FilterQueryOptions {
   let { page = 1, pageSize = 10, sort, ...rest } = query;
+  
   let where: { [key: string]: any } = ObjectFilterAbnormal(rest); // 删除空值
   let order: { [key: string]: any } = {
     createdAt: sort || "DESC",

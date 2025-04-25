@@ -433,6 +433,8 @@ interface Result<T> {
   dto?: any;
 }
 export class ApiResult<T> {
+  readonly __isApiResult = true;
+
   constructor(
     public code: number = 200,
     public message: string = "操作成功",
@@ -490,15 +492,14 @@ import { ApiResult } from "@/common/utils/result";
 @Injectable()
 export class ApiResultInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    console.log("context :>> ", context);
     const ctx = context.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse();
 
     return next.handle().pipe(
       map((data) => {
-        // 如果已经是 ApiResult 实例，直接使用它的状态码和消息
-        if (data instanceof ApiResult) {
+        if (data.__isApiResult) {
+          delete data.__isApiResult;
           response.status(data.code);
           return {
             code: data.code,
@@ -506,7 +507,7 @@ export class ApiResultInterceptor implements NestInterceptor {
             data: data.data,
           };
         }
-        // 如果请求路径以 /api/ 开头，则包装成成功的响应
+        // 如果请求路径以 /api 开头，则包装成成功的响应
         else if (request.url.startsWith("/api/")) {
           // 否则包装成成功的响应
           response.status(HttpStatus.OK);

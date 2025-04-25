@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { CreateUserDto, UpdateUserDto } from "./dto/index";
+import { CreateUserDto, FindUserDto, UpdateUserDto } from "./dto/index";
 import { ApiResult } from "@/common/utils/result";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { Repository } from "typeorm";
+import { filterQuery } from "@/common/utils/tool";
 
 @Injectable()
 export class UsersService {
@@ -12,7 +13,12 @@ export class UsersService {
     private userRepository: Repository<User> // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  /**
+   * 创建用户
+   * @param {CreateUserDto} createUserDto  创建用户DTO
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async create(createUserDto: CreateUserDto): Promise<ApiResult<any>> {
     try {
       // 查询数据库，确保 userName, phoneNumber, email 不存在
       const { userName = null, phoneNumber = null, email = null } = createUserDto;
@@ -40,8 +46,13 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(findUserDto?: FindUserDto): Promise<ApiResult<any>> {
+    try {
+      let data = await this.userRepository.find(); // 查询所有用户并返回;
+      return ApiResult.success({ data });
+    } catch (error) {
+      return ApiResult.error(error || "用户查询失败，请稍后再试");
+    }
   }
 
   findOne(id: number) {

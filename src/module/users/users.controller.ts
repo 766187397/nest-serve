@@ -22,6 +22,7 @@ export class UsersController {
   }
 
   @Get()
+  @ApiOperation({ summary: "查询用户列表" })
   findAll() {
     return this.usersService.findAll();
   }

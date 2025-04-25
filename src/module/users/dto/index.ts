@@ -1,4 +1,4 @@
-import { CreateBaseDto } from "@/common/dto/base";
+import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 
@@ -79,4 +79,26 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   avatar?: string | undefined;
+}
+
+export class FindUserDto extends FindByParameter {
+  @ApiProperty({ description: "用户名", example: "admin" })
+  @IsOptional()
+  @IsString()
+  userName?: string | undefined;
+
+  @ApiProperty({ description: "昵称", example: "管理员" })
+  @IsOptional()
+  @IsString()
+  nickName?: string | undefined;
+
+  @ApiProperty({ description: "邮箱", required: false, example: "admin@qq.com" })
+  @IsOptional()
+  @IsEmail({}, { message: "邮箱格式错误" })
+  email?: string | undefined;
+
+  @ApiProperty({ description: "手机号", required: false, example: "13800138000" })
+  @IsOptional()
+  @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" })
+  phoneNumber?: string | undefined;
 }
