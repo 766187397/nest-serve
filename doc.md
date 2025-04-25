@@ -410,3 +410,437 @@ export class UsersController {
 
 ```
 
+
+
+**当前运行代码可以在http://localhost:3000/swagger看到swagger接口文档**
+
+
+
+## 封装统一返回结构和拦截器
+
+> 方便维护对接以及判断
+
+### 统一返回结构
+
+```typescript
+import { HttpException } from "@nestjs/common";
+import { plainToInstance } from "class-transformer";
+
+interface Result<T> {
+  code?: number;
+  message?: string;
+  data?: T | null;
+  dto?: any;
+}
+export class ApiResult<T> {
+  constructor(
+    public code: number = 200,
+    public message: string = "操作成功",
+    public data: T | null = null
+  ) {}
+
+  static success<T>({ data = null, message = "操作成功", code = 200, dto }: Result<T>): ApiResult<T> {
+    if (dto) {
+      data = plainToInstance(dto, data);
+    }
+    return new ApiResult<T>(code, message, data);
+  }
+
+  static error<T>(param: Error | string | Result<T>): ApiResult<T> {
+    let message = "操作失败",
+      code = 500,
+      data: T | null = null;
+    if (param instanceof HttpException) {
+      // 获取 HttpException 的响应内容和状态码
+      const response = param.getResponse();
+      // 如果是对象，直接使用其中的 message 字段，否则使用默认的 message
+      const errorMessage = typeof response === "object" && response["message"] ? response["message"] : message;
+      const statusCode = param.getStatus() || code; // 获取 HttpException 的状态码，默认使用传入的 code
+      return new ApiResult<T>(statusCode, errorMessage, null);
+    } else if (typeof param === "string") {
+      // 如果是字符串类型，认为它是错误消息
+      message = param;
+    } else if (param instanceof Error) {
+      // 处理 Error 对象类型
+      message = param.message; // 使用 Error 的 message 属性
+    } else {
+      // 否则认为是一个包含 code, message, data 的对象
+      // 处理包含 code, message, data 的对象
+      if (param.code) code = param.code;
+      if (param.message) message = param.message;
+      if (param.data) data = param.data;
+    }
+    return new ApiResult<T>(code, message, data);
+  }
+}
+
+```
+
+
+
+### 拦截器
+
+```typescript
+// api-result.interceptor.ts
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpStatus } from "@nestjs/common";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { ApiResult } from "@/common/utils/result";
+
+@Injectable()
+export class ApiResultInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    console.log("context :>> ", context);
+    const ctx = context.switchToHttp();
+    const request = ctx.getRequest();
+    const response = ctx.getResponse();
+
+    return next.handle().pipe(
+      map((data) => {
+        // 如果已经是 ApiResult 实例，直接使用它的状态码和消息
+        if (data instanceof ApiResult) {
+          response.status(data.code);
+          return {
+            code: data.code,
+            message: data.message,
+            data: data.data,
+          };
+        }
+        // 如果请求路径以 /api/ 开头，则包装成成功的响应
+        else if (request.url.startsWith("/api/")) {
+          // 否则包装成成功的响应
+          response.status(HttpStatus.OK);
+          return {
+            code: HttpStatus.OK,
+            message: "操作成功",
+            data,
+          };
+        }
+        return data;
+      })
+    );
+  }
+}
+
+```
+
+
+
+### 在跟模块中使用
+
+```typescript
+import { Module } from "@nestjs/common";
+import { UsersModule } from "./module/users/users.module";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { join } from "path";
+import { Knife4jModule } from "./module/knife4j/knife4j.module";
+import { ApiResultInterceptor } from "@/common/interceptor/api-result.interceptor";
+import { APP_INTERCEPTOR } from "@nestjs/core";
+
+@Module({
+  imports: [
+    // 配置 ConfigModule 作为全局模块，并根据 NODE_ENV 加载相应的 .env 文件
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV || "development"}`,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        const dbType = configService.get<string>("DB_TYPE") as "mysql" | "sqlite";
+        if (dbType === "sqlite") {
+          return {
+            type: dbType,
+            database: configService.get("DB_DATABASE"),
+            synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
+            logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
+            entities: [join(__dirname, "**", "*.entity{.ts,.js}")], // 匹配所有 .entity.ts 或 .entity.js 文件
+            migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
+          };
+        } else {
+          return {
+            type: dbType,
+            host: configService.get("DB_HOST"),
+            port: configService.get<number>("DB_PORT"),
+            username: configService.get("DB_USER"),
+            password: configService.get("DB_PASSWORD"),
+            database: configService.get("DB_DATABASE"),
+            synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
+            logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
+            entities: [join(__dirname, "**", "*.entity{.ts,.js}")], // 匹配所有 .entity.ts 或 .entity.js 文件
+            migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
+          };
+        }
+      },
+      inject: [ConfigService],
+    }),
+    UsersModule,
+    Knife4jModule,
+  ],
+  controllers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ApiResultInterceptor,
+    },
+  ],
+})
+export class AppModule {}
+
+```
+
+
+
+## knife4j
+
+> knife4j是在java项目中才比较常用的接口文档插件，对UI页面进行了美化和功能的增加，但是没有node版本，如果需要使用则需要将swagger生成的文档手动编写接口
+
+## 使用knife4j
+
+> knife4j是在java项目中才比较常用的接口文档插件，对UI页面进行了美化和功能的增加，但是没有node版本，如果需要使用则需要将swagger生成的文档手动编写接口
+
+### 下载前端文件
+
+- 下载代码
+
+  ```bash
+  git clone https://gitee.com/xiaoym/knife4j.git
+  ```
+
+- 进入前端版本knife4j-vue
+
+- 安装依赖后打包复制到项目的根目录（和src同级，可以改改名称和ico文件，我当前改为public、index.html）
+
+- 编写代码...
+
+
+
+### 安装@nestjs/serve-static
+
+> 将静态文件暴露出来
+
+```bash
+npm i @nestjs/serve-static
+```
+
+
+
+### 在根路径暴露swagger的数据
+
+```typescript
+// 将 Swagger 文档存储在全局对象中
+global.swaggerDocument = document;
+```
+
+
+
+### 生成CRUD
+
+```bash
+nest g resource module/knife4j --no-spec
+```
+
+`删除dto文件和entities`
+
+
+
+### 编写接口并通过路由指定静态文件
+
+knife4j.controller.ts
+
+```typescript
+import { Controller, Get, Param, Res } from "@nestjs/common";
+import { Knife4jService } from "./knife4j.service";
+import { Response } from "express"; // 导入 Express 的 Response 类型
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
+
+@ApiTags("接口文档")
+@Controller("")
+export class Knife4jController {
+  constructor(private readonly knife4jService: Knife4jService) {}
+
+  @Get("json")
+  @ApiOperation({ summary: "获取 Swagger JSON" })
+  getSwagger() {
+    return this.knife4jService.getSwagger();
+  }
+
+  @Get("download")
+  @ApiOperation({ summary: "下载 Swagger JSON" })
+  download(@Res({ passthrough: true }) res: Response) {
+    let swaggerJson = this.knife4jService.getSwagger();
+    // 设置响应头，告诉浏览器这是一个附件（即文件下载）
+    res.set({
+      "Content-Type": "application/json",
+      "Content-Disposition": "attachment; filename=swagger.json",
+    });
+
+    // 如果你想要直接发送 JSON 字符串而不是从文件系统读取，可以这样做：
+    return JSON.stringify(swaggerJson.data);
+  }
+
+  @Get("v3/api-docs/swagger-config")
+  @ApiOperation({ summary: "knife4j 接口文档配置" })
+  getSwaggerConfig(@Res({ passthrough: true }) res: Response) {
+    let swaggerDocs = this.knife4jService.getSwagger().data;
+    const groups = [
+      {
+        name: "全部",
+        location: `/api-docs/全部`,
+        url: `/api-docs/全部`,
+        swaggerVersion: "3.0.0",
+        servicePath: "",
+      },
+    ];
+
+    // 遍历所有路径，提取分组信息
+    const uniqueTags = new Set();
+    for (const path in swaggerDocs.paths) {
+      const pathObject = swaggerDocs.paths[path];
+      for (const method in pathObject) {
+        const operation = pathObject[method];
+        if (operation && operation.tags) {
+          operation.tags.forEach((tag: string) => {
+            uniqueTags.add(tag);
+          });
+        }
+      }
+    }
+
+    // 生成分组资源
+    uniqueTags.forEach((tag) => {
+      groups.push({
+        name: tag as string,
+        location: `/api-docs/${tag}`,
+        url: `/api-docs/${tag}`,
+        swaggerVersion: "3.0.0",
+        servicePath: "",
+      });
+    });
+    swaggerDocs.urls = groups;
+    res.setHeader("Content-Type", "application/json");
+    return swaggerDocs
+  }
+
+  @Get("swagger-resources")
+  @ApiOperation({ summary: "knife4j 接口文档配置" })
+  getSwaggerResources(@Res({ passthrough: true }) res: Response) {
+    let swaggerDocs = this.knife4jService.getSwagger().data;
+    const groups = [
+      {
+        name: "全部",
+        location: `/api-docs/全部`,
+        url: `/api-docs/全部`,
+        swaggerVersion: "3.0.0",
+        servicePath: "",
+      },
+    ];
+
+    // 遍历所有路径，提取分组信息
+    const uniqueTags = new Set();
+    for (const path in swaggerDocs.paths) {
+      const pathObject = swaggerDocs.paths[path];
+      for (const method in pathObject) {
+        const operation = pathObject[method];
+        if (operation && operation.tags) {
+          operation.tags.forEach((tag: string) => {
+            uniqueTags.add(tag);
+          });
+        }
+      }
+    }
+
+    // 生成分组资源
+    uniqueTags.forEach((tag) => {
+      groups.push({
+        name: tag as string,
+        location: `/api-docs/${tag}`,
+        url: `/api-docs/${tag}`,
+        swaggerVersion: "3.0.0",
+        servicePath: "",
+      });
+    });
+
+    res.json(groups);
+  }
+
+  @Get("api-docs/:groupName")
+  @ApiOperation({ summary: "knife4j 分组接口文档" })
+  getSwaggerByGroup(@Param("groupName") groupName: string) {
+    let swaggerJson = this.knife4jService.getSwagger();
+    let swaggerDocs = swaggerJson.data;
+    let paths = swaggerDocs.paths;
+    let groupPaths = {};
+    if (groupName === "全部") {
+      return swaggerDocs;
+    }
+    for (let path in paths) {
+      let pathObject = paths[path];
+      for (let method in pathObject) {
+        let operation = pathObject[method];
+        if (operation && operation.tags && operation.tags.includes(groupName)) {
+          groupPaths[path] = groupPaths[path] || {};
+          groupPaths[path][method] = operation;
+        }
+      }
+    }
+    swaggerDocs.paths = groupPaths;
+    return swaggerDocs;
+  }
+}
+
+```
+
+
+
+knife4j.module.ts
+
+```typescript
+import { Module } from "@nestjs/common";
+import { Knife4jService } from "./knife4j.service";
+import { Knife4jController } from "./knife4j.controller";
+import { ServeStaticModule } from "@nestjs/serve-static";
+
+@Module({
+  imports: [
+    ServeStaticModule.forRoot(
+      {
+        rootPath: "knife4j/index.html",
+        serveRoot: "/doc", // 主文件访问路径
+        serveStaticOptions: {
+          maxAge: "1y", // 设置缓存时间
+        },
+      },
+      {
+        rootPath: "knife4j",
+        serveRoot: "/", // 设置静态文件访问路径
+        serveStaticOptions: {
+          maxAge: "1y", // 设置缓存时间
+        },
+      }
+    ),
+  ],
+  controllers: [Knife4jController],
+  providers: [Knife4jService],
+})
+export class Knife4jModule {}
+
+```
+
+
+
+knife4j.service.ts
+
+```typescript
+import { Injectable } from "@nestjs/common";
+import { ApiResult } from "@/common/utils/result";
+
+@Injectable()
+export class Knife4jService {
+  getSwagger() {
+    return ApiResult.success<any>({ data: global.swaggerDocument });
+  }
+}
+
+```

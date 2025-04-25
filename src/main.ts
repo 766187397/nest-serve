@@ -38,7 +38,7 @@ async function bootstrap() {
     console.log(`当前环境为：${envFilePath}`);
     console.log(`server to ${url}`);
     console.log(`swagger to ${url}/swagger`);
-    console.log(`knife4j to ${url}/api/doc?v=1`);
+    console.log(`knife4j to ${url}/doc`);
   });
 }
 bootstrap();
