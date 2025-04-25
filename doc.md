@@ -126,35 +126,41 @@ npm i class-transformer dayjs
 > 后续的大多数实例基础这个实例
 
 ```typescript
-import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { Exclude, Transform } from "class-transformer";
-import * as dayjs from "dayjs";
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
+import { Exclude, Transform } from 'class-transformer';
+import dayjs from 'dayjs';
 
 export abstract class BaseEntity {
-  @PrimaryGeneratedColumn({ comment: "ID" })
+  @PrimaryGeneratedColumn({ comment: 'ID' })
   id: number;
 
-  @Column({ default: 1, comment: "排序" })
+  @Column({ default: 1, comment: '排序' })
   sort: number;
 
-  @Column({ default: 1, comment: "1 - 启用，0 - 禁用，根据业务定义" })
+  @Column({ default: 1, comment: '1 - 启用，0 - 禁用，根据业务定义' })
   status: number;
 
   @Exclude({ toPlainOnly: true })
-  @Column({ default: false, comment: "是否删除（软删除）" })
-  isDeleted: boolean;
-
-  @Exclude({ toPlainOnly: true })
-  @Column({ default: "web", comment: "平台标识（如admin/web/app/mini）" })
+  @Column({ default: 'web', comment: '平台标识（如admin/web/app/mini）' })
   platform: string;
 
-  @CreateDateColumn({ comment: "创建时间" })
-  @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
+  @CreateDateColumn({ comment: '创建时间' })
+  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
   createdAt: Date;
 
-  @UpdateDateColumn({ comment: "更新时间" })
-  @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
+  @UpdateDateColumn({ comment: '更新时间' })
+  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
   updatedAt: Date;
+
+  @DeleteDateColumn({ comment: '删除时间' })
+  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
+  deletedAt: Date;
 }
 
 ```
@@ -167,5 +173,57 @@ export abstract class BaseEntity {
 
 ```bash
 nest g resource module/users --no-spec
+```
+
+
+
+## 配置路径别名
+
+> 如果使用相对路径引用会很不方便，后续修改复制等都不适用，配置项目的路径别名方便引用文件
+
+tsconfig.build.json
+
+```json
+"compilerOptions": {
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+```
+
+tsconfig.json
+
+```json
+"paths": {
+      "@/*": ["src/*"]
+    }
+```
+
+
+
+## 生成接口文档（swagger）
+
+### 安装
+
+```bash
+yarn add @nestjs/swagger swagger-ui-express
+```
+
+
+
+### 增加配置文件
+
+> config/swagger.ts
+
+```typescript
+import { DocumentBuilder } from "@nestjs/swagger";
+export class SwaggerConfig {
+  static swaggerOptions = new DocumentBuilder()
+    .setTitle("NestJS API") // API 文档的标题
+    .setDescription("NestJS API description") // API 文档的描述
+    .setVersion("1.0") // API 的版本
+    .addServer(global.url, "项目地址")
+    .build();
+}
 ```
 
