@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CreateUserDto, FindUserDto, UpdateUserDto } from "./dto/index";
+import { CreateUserDto, FindUserDto, FindUserDtoByPage, UpdateUserDto } from "./dto/index";
 import { ApiResult } from "@/common/utils/result";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
@@ -48,6 +48,39 @@ export class UsersService extends BaseService {
     }
   }
 
+  async findByPage(findUserDtoByPage?: FindUserDtoByPage): Promise<ApiResult<any>> {
+    try {
+      let { take, skip } = this.buildCommonPaging(findUserDtoByPage?.page, findUserDtoByPage?.pageSize);
+      let where = this.buildCommonQuery(findUserDtoByPage);
+      let order = this.buildCommonSort(findUserDtoByPage);
+      // 查询符合条件的用户
+      const [data, total] = await this.userRepository.findAndCount({
+        where: {
+          ...where,
+        },
+        order: {
+          ...order,
+        },
+        skip, // 跳过的条数
+        take, // 每页条数
+      });
+
+      // 计算总页数
+      const totalPages = Math.ceil(total / take);
+      return ApiResult.success({
+        data: {
+          data,
+          total,
+          totalPages,
+          page: findUserDtoByPage?.page || 1,
+          pageSize: findUserDtoByPage?.pageSize || 10,
+        },
+      });
+    } catch (error) {
+      return ApiResult.error(error || "用户查询失败，请稍后再试");
+    }
+  }
+
   async findAll(findUserDto?: FindUserDto): Promise<ApiResult<any>> {
     try {
       let where = this.buildCommonQuery(findUserDto);
@@ -67,14 +100,29 @@ export class UsersService extends BaseService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    try {
+      let data = this.userRepository.findOne({ where: { id } });
+      return ApiResult.success({ data });
+    } catch (error) {
+      return ApiResult.error(error || "用户查询失败，请稍后再试");
+    }
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    try {
+      let data = this.userRepository.update(id, updateUserDto);
+      return ApiResult.success({ data });
+    } catch (error) {
+      return ApiResult.error(error || "用户更新失败，请稍后再试");
+    }
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    try {
+      let data = this.userRepository.softDelete(id);
+      return ApiResult.success({ data });
+    } catch (error) {
+      return ApiResult.error(error || "用户删除失败，请稍后再试");
+    }
   }
 }

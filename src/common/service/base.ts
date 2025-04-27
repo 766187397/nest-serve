@@ -43,17 +43,17 @@ export class BaseService {
    * @returns {Object} {take:number,skip:number}
    * @throws {Error} page和pageSize必须为正整数或字符串形式的正整数
    */
-  buildCommonPaging(page: number | string = 1, pageSize: number | string = 10): { take: number; skip: number } | Error {
+  buildCommonPaging(page: number | string = 1, pageSize: number | string = 10): { take: number; skip: number } {
     page = +page;
     pageSize = +pageSize;
     if (!Number.isInteger(page) || !Number.isInteger(pageSize)) {
       throw new Error("page和pageSize必须为正整数或字符串形式的正整数");
     }
     if (page < 1) {
-      return new Error("page不能小于1");
+      throw new Error("page不能小于1");
     }
     if (pageSize < 1) {
-      return new Error("pageSize不能小于1");
+      throw new Error("pageSize不能小于1");
     }
     // 计算take和skip
     const take = pageSize;

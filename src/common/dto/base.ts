@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 import { IsStringOrNumber } from "@/common/utils/class-validator";
 import { FindOptionsOrderValue } from "typeorm";
 
@@ -58,21 +58,6 @@ export class FindByParameter {
     example: "2025-1-1 10:10:10,2025-1-2 23:59:59",
   })
   @IsOptional()
-  @IsString({message: "time必须为字符串"})
+  @IsString({ message: "time必须为字符串" })
   time?: string;
-}
-
-/**
- * 分页查询
- */
-export class FindByPage extends FindByParameter {
-  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
-  @IsOptional()
-  @IsStringOrNumber()
-  page?: string;
-
-  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
-  @IsOptional()
-  @IsStringOrNumber()
-  pageSize?: string;
 }

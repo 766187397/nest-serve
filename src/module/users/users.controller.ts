@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
 import { UsersService } from "./users.service";
-import { CreateUserDto, UpdateUserDto, FindUserDto } from "./dto/index";
+import { ProcessDataThroughID } from "@/common/dto/base";
+import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage } from "./dto/index";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("用户管理")
@@ -21,6 +22,12 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @Get("/page")
+  @ApiOperation({ summary: "查询用户列表(分页)" })
+  findByPage(@Query() findUserDtoByPage: FindUserDtoByPage) {
+    return this.usersService.findByPage(findUserDtoByPage);
+  }
+
   @Get()
   @ApiOperation({ summary: "查询用户列表(不分页)" })
   findAll(@Query() findUserDto: FindUserDto) {
@@ -28,16 +35,19 @@ export class UsersController {
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
+  @ApiOperation({ summary: "查询用户详情" })
+  findOne(@Param("id") id: ProcessDataThroughID) {
     return this.usersService.findOne(+id);
   }
 
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+  @ApiOperation({ summary: "更新用户信息" })
+  update(@Param("id") id: ProcessDataThroughID, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(":id")
+  @ApiOperation({ summary: "删除用户" })
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
   }

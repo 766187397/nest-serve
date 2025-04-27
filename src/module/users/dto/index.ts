@@ -102,3 +102,15 @@ export class FindUserDto extends FindByParameter {
   @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" })
   phone?: string | undefined;
 }
+
+export class FindUserDtoByPage extends FindUserDto {
+  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
+  @IsOptional()
+  @IsString({ message: "page必须是字符串" })
+  page?: string;
+
+  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
+  @IsOptional()
+  @IsString({ message: "pageSize必须是字符串" })
+  pageSize?: string;
+}
