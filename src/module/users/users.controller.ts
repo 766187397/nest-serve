@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
 import { UsersService } from "./users.service";
-import { CreateUserDto, UpdateUserDto } from "./dto/index";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { CreateUserDto, UpdateUserDto, FindUserDto } from "./dto/index";
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("用户管理")
 @ApiResponse({ status: 200, description: "操作成功" })
@@ -22,9 +22,9 @@ export class UsersController {
   }
 
   @Get()
-  @ApiOperation({ summary: "查询用户列表" })
-  findAll() {
-    return this.usersService.findAll();
+  @ApiOperation({ summary: "查询用户列表(不分页)" })
+  findAll(@Query() findUserDto: FindUserDto) {
+    return this.usersService.findAll(findUserDto);
   }
 
   @Get(":id")

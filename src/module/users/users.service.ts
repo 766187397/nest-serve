@@ -4,14 +4,16 @@ import { ApiResult } from "@/common/utils/result";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { Repository } from "typeorm";
-import { filterQuery } from "@/common/utils/tool";
+import { BaseService } from "@/common/service/base";
 
 @Injectable()
-export class UsersService {
+export class UsersService extends BaseService {
   constructor(
     @InjectRepository(User) // NestJS 会根据这个装饰器将 UserRepository 自动注入到 userRepository 变量中。
     private userRepository: Repository<User> // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
-  ) {}
+  ) {
+    super();
+  }
 
   /**
    * 创建用户
@@ -20,13 +22,13 @@ export class UsersService {
    */
   async create(createUserDto: CreateUserDto): Promise<ApiResult<any>> {
     try {
-      // 查询数据库，确保 userName, phoneNumber, email 不存在
-      const { userName = null, phoneNumber = null, email = null } = createUserDto;
+      // 查询数据库，确保 userName, phone, email 不存在
+      const { userName = null, phone = null, email = null } = createUserDto;
 
       // 构建查询条件
       const queryBuilder = this.userRepository.createQueryBuilder("user");
       userName && queryBuilder.andWhere("user.userName = :userName", { userName });
-      phoneNumber && queryBuilder.orWhere("user.phoneNumber = :phoneNumber", { phoneNumber });
+      phone && queryBuilder.orWhere("user.phone = :phone", { phone });
       email && queryBuilder.orWhere("user.email = :email", { email });
       // 执行查询
       const existingUser = await queryBuilder.getOne();
@@ -48,7 +50,16 @@ export class UsersService {
 
   async findAll(findUserDto?: FindUserDto): Promise<ApiResult<any>> {
     try {
-      let data = await this.userRepository.find(); // 查询所有用户并返回;
+      let where = this.buildCommonQuery(findUserDto);
+      let order = this.buildCommonSort(findUserDto);
+      let data = await this.userRepository.find({
+        where: {
+          ...where,
+        },
+        order: {
+          ...order,
+        },
+      }); // 查询所有用户并返回;
       return ApiResult.success({ data });
     } catch (error) {
       return ApiResult.error(error || "用户查询失败，请稍后再试");

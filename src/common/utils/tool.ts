@@ -1,45 +1,3 @@
-import { Between } from "typeorm";
-import { FindByParameter, FindByPage } from "@/common/dto/base";
-import dayjs from "dayjs";
-
-interface FilterQueryOptions {
-  where: { [key: string]: any };
-  order: { [key: string]: any };
-  take?: number;
-  skip?: number;
-}
-
-/**
- * 查询条件初步处理
- * @param query 查询条件 需要将DTO继承于FindByParameter或FindByPage
- * @returns {FilterQueryOptions} 初步处理后的结构
- */
-export function filterQuery<T extends FindByParameter & FindByPage & { [key: string]: any }>(
-  query: T
-): FilterQueryOptions {
-  let { page = 1, pageSize = 10, sort, ...rest } = query;
-  
-  let where: { [key: string]: any } = ObjectFilterAbnormal(rest); // 删除空值
-  let order: { [key: string]: any } = {
-    createdAt: sort || "DESC",
-  };
-
-  const take = +pageSize;
-  const skip = (+page - 1) * +pageSize;
-  if (!query || Object.keys(query).length === 0) {
-    return { where, order, take, skip };
-  }
-  if (query.id) {
-    where.id = +query.id;
-  }
-  if (query.time && query.time.length === 2) {
-    let start = dayjs(query.time[0]).startOf("day").toDate();
-    let end = dayjs(query.time[1]).endOf("day").toDate();
-    where.createdAt = Between(start, end);
-  }
-  return { where, order, take, skip };
-}
-
 /**
  * 传入Object对象，删除空值
  * @param {Object} obj Object对象
@@ -53,4 +11,32 @@ export function ObjectFilterAbnormal<T extends object>(obj: T): T {
     }
   }
   return obj;
+}
+
+/**
+ * 统一计算分页函数
+ * @param {number|string} page 页码
+ * @param {number|string} pageSize 每页数量
+ * @returns {Object} {take:number,skip:number}
+ * @throws {Error} page和pageSize必须为正整数或字符串形式的正整数
+ */
+export function calculatePagination(
+  page: number | string = 1,
+  pageSize: number | string = 10
+): { take: number; skip: number } | Error {
+  page = +page;
+  pageSize = +pageSize;
+  if (!Number.isInteger(page) || !Number.isInteger(pageSize)) {
+    throw new Error("page和pageSize必须为正整数或字符串形式的正整数");
+  }
+  if (page < 1) {
+    return new Error("page不能小于1");
+  }
+  if (pageSize < 1) {
+    return new Error("pageSize不能小于1");
+  }
+  // 计算take和skip
+  const take = pageSize;
+  const skip = (page - 1) * pageSize;
+  return { take, skip };
 }

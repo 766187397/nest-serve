@@ -20,7 +20,7 @@ export class User extends BaseEntity {
   email: string;
 
   @Column({ type: "varchar", name: "phone_number", default: "", length: 11, comment: "手机号码" })
-  phoneNumber: string;
+  phone: string;
 
   //0男 1女 2未知
   @Column({ type: "varchar", name: "sex", default: "0", length: 1, comment: "性别" })

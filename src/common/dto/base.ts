@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
 import { IsStringOrNumber } from "@/common/utils/class-validator";
+import { FindOptionsOrderValue } from "typeorm";
 
 /**
  * 创建基础数据
@@ -18,14 +19,18 @@ export class CreateBaseDto {
 }
 
 /**
+ * 通过ID处理数据
+ */
+export class ProcessDataThroughID {
+  @ApiProperty({ description: "id", required: true, example: 1 })
+  @IsStringOrNumber()
+  id: number | string;
+}
+
+/**
  * 查询参数
  */
 export class FindByParameter {
-  @ApiProperty({ description: "id", required: false, example: 1 })
-  @IsOptional()
-  @IsStringOrNumber()
-  id?: number | string;
-
   @ApiProperty({
     description: "排序: ASC - 升序，DESC - 降序",
     required: false,
@@ -34,16 +39,27 @@ export class FindByParameter {
   })
   @IsOptional()
   @IsString({ message: "排序值必须为字符串" })
-  sort?: string;
+  sort?: FindOptionsOrderValue;
 
-  @ApiProperty({ description: "状态；1 - 启用，2 - 禁用；根据模块业务定义", required: false, example: 1 })
+  @ApiProperty({
+    type: "string",
+    description: "状态；1 - 启用，2 - 禁用；根据模块业务定义",
+    required: false,
+    example: 1,
+  })
+  @IsOptional()
   @IsStringOrNumber()
   status?: number | string;
 
-  @ApiProperty({ description: "时间范围(根据创建时间查询)", required: false, example: "2020-01-01" })
+  @ApiProperty({
+    type: "string",
+    description: "时间范围(根据创建时间查询)以逗号分隔",
+    required: false,
+    example: "2025-1-1 10:10:10,2025-1-2 23:59:59",
+  })
   @IsOptional()
-  @IsArray({ message: "时间范围必须为数组" })
-  time?: Date[] | string[];
+  @IsString({message: "time必须为字符串"})
+  time?: string;
 }
 
 /**

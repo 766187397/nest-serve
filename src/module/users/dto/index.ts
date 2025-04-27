@@ -29,7 +29,7 @@ export class CreateUserDto extends CreateBaseDto {
   @ApiProperty({ description: "手机号", required: false, example: "13800138000" })
   @IsOptional()
   @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" }) // 正则校验
-  phoneNumber?: string;
+  phone?: string;
 
   @ApiProperty({ description: "性别 0男 1女 2未知", required: false, example: "0", enum: ["0", "1", "2"] })
   @IsOptional()
@@ -68,7 +68,7 @@ export class UpdateUserDto {
   @ApiProperty({ description: "手机号", required: false, example: "13800138000" })
   @IsOptional()
   @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" })
-  phoneNumber?: string | undefined;
+  phone?: string | undefined;
 
   @ApiProperty({ description: "性别 0男 1女 2未知", required: false, example: "0", enum: ["0", "1", "2"] })
   @IsOptional()
@@ -82,23 +82,23 @@ export class UpdateUserDto {
 }
 
 export class FindUserDto extends FindByParameter {
-  @ApiProperty({ description: "用户名", example: "admin" })
+  @ApiProperty({ type: "string", description: "用户名", required: false, example: "admin" })
   @IsOptional()
   @IsString()
   userName?: string | undefined;
 
-  @ApiProperty({ description: "昵称", example: "管理员" })
+  @ApiProperty({ type: "string", description: "昵称", required: false, example: "管理员" })
   @IsOptional()
   @IsString()
   nickName?: string | undefined;
 
-  @ApiProperty({ description: "邮箱", required: false, example: "admin@qq.com" })
+  @ApiProperty({ type: "string", description: "邮箱", required: false, example: "admin@qq.com" })
   @IsOptional()
   @IsEmail({}, { message: "邮箱格式错误" })
   email?: string | undefined;
 
-  @ApiProperty({ description: "手机号", required: false, example: "13800138000" })
+  @ApiProperty({ type: "string", description: "手机号", required: false, example: "13800138000" })
   @IsOptional()
   @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" })
-  phoneNumber?: string | undefined;
+  phone?: string | undefined;
 }
