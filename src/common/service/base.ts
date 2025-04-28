@@ -23,6 +23,11 @@ export class BaseService {
     return where;
   }
 
+  /**
+   * 处理默认排序 处理createdAt和id
+   * @param {{ [key: string]: any }} sort DESC | ASC
+   * @returns {{[key: string]: FindOptionsOrderValue}} 处理后的排序条件
+   */
   buildCommonSort(sort: { [key: string]: any } | undefined): {
     [key: string]: FindOptionsOrderValue;
   } {

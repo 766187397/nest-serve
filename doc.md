@@ -128,7 +128,7 @@ npm i class-transformer dayjs class-validator
 ```typescript
 import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
 import { Exclude, Transform } from "class-transformer";
-import dayjs from "dayjs";
+import * as dayjs from "dayjs";
 
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn({ comment: "ID" })
@@ -152,6 +152,7 @@ export abstract class BaseEntity {
   @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
   updatedAt: Date;
 
+  @Exclude({ toPlainOnly: true })
   @DeleteDateColumn({ comment: "删除时间" })
   @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
   deletedAt: Date;
@@ -167,8 +168,9 @@ export abstract class BaseEntity {
 
 ```typescript
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 import { IsStringOrNumber } from "@/common/utils/class-validator";
+import { FindOptionsOrderValue } from "typeorm";
 
 /**
  * 创建基础数据
@@ -186,14 +188,18 @@ export class CreateBaseDto {
 }
 
 /**
+ * 通过ID处理数据
+ */
+export class ProcessDataThroughID {
+  @ApiProperty({ description: "id", required: true, example: 1 })
+  @IsStringOrNumber()
+  id: number | string;
+}
+
+/**
  * 查询参数
  */
 export class FindByParameter {
-  @ApiProperty({ description: "id", required: false, example: 1 })
-  @IsOptional()
-  @IsStringOrNumber()
-  id?: number | string;
-
   @ApiProperty({
     description: "排序: ASC - 升序，DESC - 降序",
     required: false,
@@ -202,31 +208,27 @@ export class FindByParameter {
   })
   @IsOptional()
   @IsString({ message: "排序值必须为字符串" })
-  sort?: string;
+  sort?: FindOptionsOrderValue;
 
-  @ApiProperty({ description: "状态；1 - 启用，2 - 禁用；根据模块业务定义", required: false, example: 1 })
+  @ApiProperty({
+    type: "string",
+    description: "状态；1 - 启用，2 - 禁用；根据模块业务定义",
+    required: false,
+    example: 1,
+  })
+  @IsOptional()
   @IsStringOrNumber()
   status?: number | string;
 
-  @ApiProperty({ description: "时间范围(根据创建时间查询)", required: false, example: "2020-01-01" })
+  @ApiProperty({
+    type: "string",
+    description: "时间范围(根据创建时间查询)以逗号分隔",
+    required: false,
+    example: "2025-1-1 10:10:10,2025-1-2 23:59:59",
+  })
   @IsOptional()
-  @IsArray({ message: "时间范围必须为数组" })
-  time?: Date[] | string[];
-}
-
-/**
- * 分页查询
- */
-export class FindByPage extends FindByParameter {
-  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
-  @IsOptional()
-  @IsStringOrNumber()
-  page?: string;
-
-  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
-  @IsOptional()
-  @IsStringOrNumber()
-  pageSize?: string;
+  @IsString({ message: "time必须为字符串" })
+  time?: string;
 }
 
 ```
@@ -487,7 +489,6 @@ export class ApiResult<T> {
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpStatus } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { ApiResult } from "@/common/utils/result";
 
 @Injectable()
 export class ApiResultInterceptor implements NestInterceptor {
@@ -507,7 +508,7 @@ export class ApiResultInterceptor implements NestInterceptor {
             data: data.data,
           };
         }
-        // 如果请求路径以 /api 开头，则包装成成功的响应
+        // 如果请求路径以 /api/ 开头，则包装成成功的响应，/api/基本上是当前自己开发接口的前缀如果后续有其他的可以再来改这个判断
         else if (request.url.startsWith("/api/")) {
           // 否则包装成成功的响应
           response.status(HttpStatus.OK);
@@ -851,3 +852,545 @@ export class Knife4jService {
 **在运行代码加上打印console.log(`knife4j to ${url}/doc.html`);**
 
 **此时运行代码可以看到knife4j的地址：knife4j to http://localhost:3000/doc.html**
+
+
+
+## 封装空值管道校验
+
+> 防止查询条件传入空值查询为空
+
+common/interceptor/filterEmptyPipe.ts
+
+```typescript
+import { PipeTransform, Injectable, ArgumentMetadata } from "@nestjs/common";
+
+/** 过滤空值：空字符串、null、undefined */
+@Injectable()
+export class FilterEmptyPipe implements PipeTransform {
+  transform(value: any, metadata: ArgumentMetadata) {
+    if (typeof value === "object") {
+      return Object.keys(value).reduce((acc, key) => {
+        if (value[key] !== "" && value[key] !== null && value[key] !== undefined) {
+          acc[key] = this.transform(value[key], metadata);
+        }
+        return acc;
+      }, {});
+    }
+    return value;
+  }
+}
+
+```
+
+
+
+## 封装BaseService
+
+> 内置一些方法方便后面统一使用，后续开发的service，继承这个类，统一使用这里的方法方便后续维护
+
+```typescript
+import * as dayjs from "dayjs";
+import { Between, FindOptionsOrderValue } from "typeorm";
+
+export class BaseService {
+  /**
+   * 通用的处理查询条件
+   * @param {object} query 查询条件
+   * @returns {{ [key: string]: any }} 处理后的查询条件
+   */
+  buildCommonQuery(query: { [key: string]: any } | undefined): { [key: string]: any } {
+    if (typeof query === "undefined") {
+      return {};
+    }
+    let where: { [key: string]: any } = {};
+    if (query.status) {
+      where.status = query.status;
+    }
+    if (query.time && query.time.length === 2) {
+      let start = dayjs(query.time[0]).startOf("day").toDate();
+      let end = dayjs(query.time[1]).endOf("day").toDate();
+      where.createdAt = Between(start, end);
+    }
+    return where;
+  }
+
+  /**
+   * 处理默认排序 处理createdAt和id
+   * @param {{ [key: string]: any }} sort DESC | ASC
+   * @returns {{[key: string]: FindOptionsOrderValue}} 处理后的排序条件
+   */
+  buildCommonSort(sort: { [key: string]: any } | undefined): {
+    [key: string]: FindOptionsOrderValue;
+  } {
+    if (!sort || typeof sort === "undefined") {
+      return { createdAt: "DESC", id: "DESC" };
+    }
+
+    return {
+      createdAt: "DESC",
+      id: "DESC",
+    };
+  }
+
+  /**
+   * 统一计算分页函数
+   * @param {number|string} page 页码
+   * @param {number|string} pageSize 每页数量
+   * @returns {Object} {take:number,skip:number}
+   * @throws {Error} page和pageSize必须为正整数或字符串形式的正整数
+   */
+  buildCommonPaging(page: number | string = 1, pageSize: number | string = 10): { take: number; skip: number } {
+    page = +page;
+    pageSize = +pageSize;
+    if (!Number.isInteger(page) || !Number.isInteger(pageSize)) {
+      throw new Error("page和pageSize必须为正整数或字符串形式的正整数");
+    }
+    if (page < 1) {
+      throw new Error("page不能小于1");
+    }
+    if (pageSize < 1) {
+      throw new Error("pageSize不能小于1");
+    }
+    // 计算take和skip
+    const take = pageSize;
+    const skip = (page - 1) * pageSize;
+    return { take, skip };
+  }
+}
+
+```
+
+
+
+## 用户的CRUD
+
+> 主要还是记录抽离的封装的内容，也是给后面作为参照
+
+- dto/index.ts
+
+  - 删除里面的所有文件，新建index.ts，这里的创建用户和更新查询等都有继承最开始封装的，并且加上了表单校验以及swagger文档生成
+
+    ```typescript
+    import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
+    import { ApiProperty } from "@nestjs/swagger";
+    import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+    
+    /**
+     * 用户创建Dto
+     */
+    export class CreateUserDto extends CreateBaseDto {
+      @ApiProperty({ description: "用户名", example: "admin" })
+      @IsString({ message: "用户名字符串" })
+      @IsNotEmpty({ message: "用户名是必填项" }) // 必填校验
+      userName: string;
+    
+      @ApiProperty({ description: "昵称", example: "管理员" })
+      @IsString({ message: "昵称字符串" })
+      @IsNotEmpty({ message: "昵称是必填项" })
+      nickName: string;
+    
+      @ApiProperty({ description: "密码", example: "123456" })
+      @IsString({ message: "密码字符串" })
+      @IsNotEmpty({ message: "密码是必填项" })
+      password: string;
+    
+      @ApiProperty({ description: "邮箱", required: false, example: "admin@qq.com" })
+      @IsOptional() // 可选
+      @IsEmail({}, { message: "邮箱格式错误" })
+      email?: string;
+    
+      @ApiProperty({ description: "手机号", required: false, example: "13800138000" })
+      @IsOptional()
+      @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" }) // 正则校验
+      phone?: string;
+    
+      @ApiProperty({ description: "性别 0未知 1男 2女", required: false, example: "0", enum: ["0", "1", "2"] })
+      @IsOptional()
+      @IsIn(["0", "1", "2"], { message: "性别只能是0、1、2" }) // 枚举校验
+      sex?: string;
+    
+      @ApiProperty({ description: "头像", required: false, example: "" })
+      @IsOptional()
+      @IsString()
+      avatar?: string;
+    }
+    
+    /**
+     * 用户更新Dto
+     */
+    export class UpdateUserDto {
+      @ApiProperty({ description: "用户名", example: "admin" })
+      @IsOptional()
+      @IsString()
+      userName?: string | undefined;
+    
+      @ApiProperty({ description: "昵称", example: "管理员" })
+      @IsOptional()
+      @IsString()
+      nickName?: string | undefined;
+    
+      @ApiProperty({ description: "密码", example: "123456" })
+      @IsString()
+      password?: string | undefined;
+    
+      @ApiProperty({ description: "邮箱", required: false, example: "admin@qq.com" })
+      @IsOptional()
+      @IsEmail({}, { message: "邮箱格式错误" })
+      email?: string | undefined;
+    
+      @ApiProperty({ description: "手机号", required: false, example: "13800138000" })
+      @IsOptional()
+      @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" })
+      phone?: string | undefined;
+    
+      @ApiProperty({ description: "性别 0未知 1男 2女", required: false, example: "0", enum: ["0", "1", "2"] })
+      @IsOptional()
+      @IsIn(["0", "1", "2"], { message: "性别只能是0、1、2" })
+      sex?: string | undefined;
+    
+      @ApiProperty({ description: "头像", required: false, example: "" })
+      @IsOptional()
+      @IsString()
+      avatar?: string | undefined;
+    }
+    
+    /**
+     * 查询所有用户信息
+     */
+    export class FindUserDto extends FindByParameter {
+      @ApiProperty({ type: "string", description: "用户名", required: false, example: "admin" })
+      @IsOptional()
+      @IsString()
+      userName?: string | undefined;
+    
+      @ApiProperty({ type: "string", description: "昵称", required: false, example: "管理员" })
+      @IsOptional()
+      @IsString()
+      nickName?: string | undefined;
+    
+      @ApiProperty({ type: "string", description: "邮箱", required: false, example: "admin@qq.com" })
+      @IsOptional()
+      @IsEmail({}, { message: "邮箱格式错误" })
+      email?: string | undefined;
+    
+      @ApiProperty({ type: "string", description: "手机号", required: false, example: "13800138000" })
+      @IsOptional()
+      @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" })
+      phone?: string | undefined;
+    }
+    
+    /**
+     * 分页查询用户信息
+     */
+    export class FindUserDtoByPage extends FindUserDto {
+      @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
+      @IsOptional()
+      @IsString({ message: "page必须是字符串" })
+      page?: string;
+    
+      @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
+      @IsOptional()
+      @IsString({ message: "pageSize必须是字符串" })
+      pageSize?: string;
+    }
+    
+    ```
+
+- entities/user.entity.ts
+
+  - 用户表的信息，并且继承了最开始封装的BaseEntity，加上了复合索引（据说是优化查询的）
+
+    ```typescript
+    import { BaseEntity } from "@/common/entities/base";
+    import { Column, Entity, Index } from "typeorm";
+    import { Exclude } from "class-transformer";
+    
+    @Entity("users", { comment: "用户信息表" })
+    // 复合索引 优化同时查询id和deletedAt的情况
+    @Index("IDX_users_id_deletedAt", ["id", "deletedAt"])
+    export class User extends BaseEntity {
+      @Column({ type: "varchar", name: "user_name", length: 30, nullable: false, comment: "用户账号" })
+      userName: string;
+    
+      @Column({ type: "varchar", name: "nick_name", length: 30, nullable: false, comment: "用户昵称" })
+      nickName: string;
+    
+      @Exclude({ toPlainOnly: true }) // 输出屏蔽密码
+      @Column({ type: "varchar", name: "password", length: 255, nullable: false, default: "", comment: "用户登录密码" })
+      password: string;
+    
+      @Column({ type: "varchar", name: "email", length: 50, default: "", comment: "邮箱" })
+      email: string;
+    
+      @Column({ type: "varchar", name: "phone_number", default: "", length: 11, comment: "手机号码" })
+      phone: string;
+    
+      //0未知 1男 2女
+      @Column({ type: "varchar", name: "sex", default: "0", length: 1, comment: "性别" })
+      sex: string;
+    
+      @Column({ type: "varchar", name: "avatar", default: "", comment: "头像地址" })
+      avatar: string;
+    }
+    
+    ```
+
+- users.controller.ts
+
+  - 用户管理的控制器，入口最上面的ApiResponse是下面所有接口的请求文档描述，api/v1/backend/users是个人自定义的接口地址，并且这里也使用到了上封装的FilterEmptyPipe来处理空值，+id是转为我数字
+
+    ```typescript
+    import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
+    import { UsersService } from "./users.service";
+    import { ProcessDataThroughID } from "@/common/dto/base";
+    import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage } from "./dto/index";
+    import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+    import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
+    
+    @ApiTags("用户管理")
+    @ApiResponse({ status: 200, description: "操作成功" })
+    @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
+    @ApiResponse({ status: 400, description: "参数错误" })
+    @ApiResponse({ status: 401, description: "token失效，请重新登录" })
+    @ApiResponse({ status: 403, description: "权限不足" })
+    @ApiResponse({ status: 404, description: "请求资源不存在" })
+    @ApiResponse({ status: 500, description: "服务器异常，请联系管理员" })
+    @Controller("api/v1/backend/users")
+    export class UsersController {
+      constructor(private readonly usersService: UsersService) {}
+    
+      @Post()
+      @ApiOperation({ summary: "创建用户" })
+      create(@Body() createUserDto: CreateUserDto) {
+        return this.usersService.create(createUserDto);
+      }
+    
+      @Get("/page")
+      @ApiOperation({ summary: "查询用户列表(分页)" })
+      findByPage(@Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage) {
+        return this.usersService.findByPage(findUserDtoByPage);
+      }
+    
+      @Get()
+      @ApiOperation({ summary: "查询用户列表(不分页)" })
+      findAll(@Query(new FilterEmptyPipe()) findUserDto: FindUserDto) {
+        return this.usersService.findAll(findUserDto);
+      }
+    
+      @Get(":id")
+      @ApiOperation({ summary: "查询用户详情" })
+      findOne(@Param("id") id: ProcessDataThroughID) {
+        return this.usersService.findOne(+id);
+      }
+    
+      @Patch(":id")
+      @ApiOperation({ summary: "更新用户信息" })
+      update(@Param("id") id: ProcessDataThroughID, @Body() updateUserDto: UpdateUserDto) {
+        return this.usersService.update(+id, updateUserDto);
+      }
+    
+      @Delete(":id")
+      @ApiOperation({ summary: "删除用户" })
+      remove(@Param("id") id: string) {
+        return this.usersService.remove(+id);
+      }
+    }
+    
+    ```
+
+- users.module.ts
+
+  - users的模块管理文件，只有在这里导入了的模块才能正常使用否则报错
+
+    ```typescript
+    import { Module } from "@nestjs/common";
+    import { UsersService } from "./users.service";
+    import { UsersController } from "./users.controller";
+    import { User } from "./entities/user.entity";
+    import { TypeOrmModule } from "@nestjs/typeorm";
+    
+    @Module({
+      imports: [TypeOrmModule.forFeature([User])],
+      controllers: [UsersController],
+      providers: [UsersService],
+    })
+    export class UsersModule {}
+    
+    ```
+
+- users.service.ts
+
+  - CRUD具体的方法
+
+    ```typescript
+    import { Injectable } from "@nestjs/common";
+    import { CreateUserDto, FindUserDto, FindUserDtoByPage, UpdateUserDto } from "./dto/index";
+    import { ApiResult } from "@/common/utils/result";
+    import { InjectRepository } from "@nestjs/typeorm";
+    import { User } from "./entities/user.entity";
+    import { Repository } from "typeorm";
+    import { BaseService } from "@/common/service/base";
+    
+    @Injectable()
+    export class UsersService extends BaseService {
+      constructor(
+        @InjectRepository(User) // NestJS 会根据这个装饰器将 UserRepository 自动注入到 userRepository 变量中。
+        private userRepository: Repository<User> // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
+      ) {
+        super();
+      }
+    
+      /**
+       * 创建用户
+       * @param {CreateUserDto} createUserDto  创建用户DTO
+       * @returns {Promise<ApiResult<any>>} 统一返回结果
+       */
+      async create(createUserDto: CreateUserDto): Promise<ApiResult<any>> {
+        try {
+          // 查询数据库，确保 userName, phone, email 不存在
+          const { userName = null, phone = null, email = null } = createUserDto;
+    
+          // 构建查询条件
+          const queryBuilder = this.userRepository.createQueryBuilder("user");
+          userName && queryBuilder.andWhere("user.userName = :userName", { userName });
+          phone && queryBuilder.orWhere("user.phone = :phone", { phone });
+          email && queryBuilder.orWhere("user.email = :email", { email });
+          // 执行查询
+          const existingUser = await queryBuilder.getOne();
+          // 如果查询结果存在，返回错误
+          if (existingUser) {
+            return ApiResult.error<string>("用户名、电话号码或邮箱已存在");
+          }
+          // createUserDto.password = CryptoUtil.encrypt(createUserDto.password as string);
+          const user = this.userRepository.create(createUserDto); // 创建 User 实体
+          // if (roleIds.length > 0) {
+          //   user.roles = await this.roleRepository.find({ where: { id: In(roleIds) } });
+          // }
+          let data = await this.userRepository.save(user); // 保存到数据库并返回
+          return ApiResult.success({ data });
+        } catch (error) {
+          return ApiResult.error<any>(error);
+        }
+      }
+    
+      /**
+       * 分页查询
+       * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
+       * @returns {Promise<ApiResult<any>>} 统一返回结果
+       */
+      async findByPage(findUserDtoByPage?: FindUserDtoByPage): Promise<ApiResult<any>> {
+        try {
+          let { take, skip } = this.buildCommonPaging(findUserDtoByPage?.page, findUserDtoByPage?.pageSize);
+          let where = this.buildCommonQuery(findUserDtoByPage);
+          let order = this.buildCommonSort(findUserDtoByPage);
+          // 查询符合条件的用户
+          const [data, total] = await this.userRepository.findAndCount({
+            where: {
+              ...where,
+              userName: findUserDtoByPage?.userName,
+              nickName: findUserDtoByPage?.nickName,
+              email: findUserDtoByPage?.email,
+              phone: findUserDtoByPage?.phone,
+            },
+            order: {
+              ...order,
+            },
+            skip, // 跳过的条数
+            take, // 每页条数
+          });
+    
+          // 计算总页数
+          const totalPages = Math.ceil(total / take);
+          return ApiResult.success({
+            data: {
+              data,
+              total,
+              totalPages,
+              page: findUserDtoByPage?.page || 1,
+              pageSize: findUserDtoByPage?.pageSize || 10,
+            },
+          });
+        } catch (error) {
+          return ApiResult.error(error || "用户查询失败，请稍后再试");
+        }
+      }
+    
+      /**
+       * 查询所有用户
+       * @param {FindUserDto} findUserDto 查询条件
+       * @returns {Promise<ApiResult<any>>} 统一返回结果
+       */
+      async findAll(findUserDto?: FindUserDto): Promise<ApiResult<any>> {
+        try {
+          let where = this.buildCommonQuery(findUserDto);
+          let order = this.buildCommonSort(findUserDto);
+          let data = await this.userRepository.find({
+            where: {
+              ...where,
+              userName: findUserDto?.userName,
+              nickName: findUserDto?.nickName,
+              email: findUserDto?.email,
+              phone: findUserDto?.phone,
+            },
+            order: {
+              ...order,
+            },
+          }); // 查询所有用户并返回;
+          return ApiResult.success({ data });
+        } catch (error) {
+          return ApiResult.error(error || "用户查询失败，请稍后再试");
+        }
+      }
+    
+      /**
+       * 通过ID查询详情
+       * @param {number} id
+       * @returns {Promise<ApiResult<any>>} 统一返回结果
+       */
+      async findOne(id: number): Promise<ApiResult<any>> {
+        try {
+          let data = await this.userRepository.findOne({ where: { id } });
+          return ApiResult.success({ data });
+        } catch (error) {
+          return ApiResult.error(error || "用户查询失败，请稍后再试");
+        }
+      }
+    
+      /**
+       * 修改用户信息
+       * @param {number} id 用户ID
+       * @param updateUserDto 更新用户信息
+       * @returns {Promise<ApiResult<any>>} 统一返回结果
+       */
+      async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResult<any>> {
+        try {
+          let data = await this.userRepository.update(id, updateUserDto);
+          return ApiResult.success({ data });
+        } catch (error) {
+          return ApiResult.error(error || "用户更新失败，请稍后再试");
+        }
+      }
+    
+      /**
+       * 删除用户信息
+       * @param {number} id 用户ID
+       * @returns {Promise<ApiResult<any>>} 统一返回结果
+       */
+      async remove(id: number): Promise<ApiResult<any>> {
+        try {
+          let data = await this.userRepository.softDelete(id);
+          return ApiResult.success({ data });
+        } catch (error) {
+          return ApiResult.error(error || "用户删除失败，请稍后再试");
+        }
+      }
+    }
+    
+    ```
+
+
+
+**此时可以在http://localhost:3000/doc.html中测试接口是否正常使用**
+
+
+

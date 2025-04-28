@@ -31,7 +31,7 @@ export class CreateUserDto extends CreateBaseDto {
   @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" }) // 正则校验
   phone?: string;
 
-  @ApiProperty({ description: "性别 0男 1女 2未知", required: false, example: "0", enum: ["0", "1", "2"] })
+  @ApiProperty({ description: "性别 0未知 1男 2女", required: false, example: "0", enum: ["0", "1", "2"] })
   @IsOptional()
   @IsIn(["0", "1", "2"], { message: "性别只能是0、1、2" }) // 枚举校验
   sex?: string;
@@ -70,7 +70,7 @@ export class UpdateUserDto {
   @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" })
   phone?: string | undefined;
 
-  @ApiProperty({ description: "性别 0男 1女 2未知", required: false, example: "0", enum: ["0", "1", "2"] })
+  @ApiProperty({ description: "性别 0未知 1男 2女", required: false, example: "0", enum: ["0", "1", "2"] })
   @IsOptional()
   @IsIn(["0", "1", "2"], { message: "性别只能是0、1、2" })
   sex?: string | undefined;

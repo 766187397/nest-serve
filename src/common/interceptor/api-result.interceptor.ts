@@ -2,7 +2,6 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpStatus } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { ApiResult } from "@/common/utils/result";
 
 @Injectable()
 export class ApiResultInterceptor implements NestInterceptor {
