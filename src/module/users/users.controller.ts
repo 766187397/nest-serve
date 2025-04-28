@@ -3,6 +3,7 @@ import { UsersService } from "./users.service";
 import { ProcessDataThroughID } from "@/common/dto/base";
 import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage } from "./dto/index";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 
 @ApiTags("用户管理")
 @ApiResponse({ status: 200, description: "操作成功" })
@@ -24,13 +25,13 @@ export class UsersController {
 
   @Get("/page")
   @ApiOperation({ summary: "查询用户列表(分页)" })
-  findByPage(@Query() findUserDtoByPage: FindUserDtoByPage) {
+  findByPage(@Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage) {
     return this.usersService.findByPage(findUserDtoByPage);
   }
 
   @Get()
   @ApiOperation({ summary: "查询用户列表(不分页)" })
-  findAll(@Query() findUserDto: FindUserDto) {
+  findAll(@Query(new FilterEmptyPipe()) findUserDto: FindUserDto) {
     return this.usersService.findAll(findUserDto);
   }
 

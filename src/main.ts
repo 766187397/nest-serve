@@ -32,6 +32,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true, // 如果有非法字段，抛出异常 仅对DTO中的生效
     })
   );
+
   // 使用 ClassSerializerInterceptor
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   await app.listen(port).then((res) => {

@@ -81,6 +81,9 @@ export class UpdateUserDto {
   avatar?: string | undefined;
 }
 
+/**
+ * 查询所有用户信息
+ */
 export class FindUserDto extends FindByParameter {
   @ApiProperty({ type: "string", description: "用户名", required: false, example: "admin" })
   @IsOptional()
@@ -103,6 +106,9 @@ export class FindUserDto extends FindByParameter {
   phone?: string | undefined;
 }
 
+/**
+ * 分页查询用户信息
+ */
 export class FindUserDtoByPage extends FindUserDto {
   @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()

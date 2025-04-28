@@ -48,6 +48,11 @@ export class UsersService extends BaseService {
     }
   }
 
+  /**
+   * 分页查询
+   * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
   async findByPage(findUserDtoByPage?: FindUserDtoByPage): Promise<ApiResult<any>> {
     try {
       let { take, skip } = this.buildCommonPaging(findUserDtoByPage?.page, findUserDtoByPage?.pageSize);
@@ -57,6 +62,10 @@ export class UsersService extends BaseService {
       const [data, total] = await this.userRepository.findAndCount({
         where: {
           ...where,
+          userName: findUserDtoByPage?.userName,
+          nickName: findUserDtoByPage?.nickName,
+          email: findUserDtoByPage?.email,
+          phone: findUserDtoByPage?.phone,
         },
         order: {
           ...order,
@@ -81,6 +90,11 @@ export class UsersService extends BaseService {
     }
   }
 
+  /**
+   * 查询所有用户
+   * @param {FindUserDto} findUserDto 查询条件
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
   async findAll(findUserDto?: FindUserDto): Promise<ApiResult<any>> {
     try {
       let where = this.buildCommonQuery(findUserDto);
@@ -88,6 +102,10 @@ export class UsersService extends BaseService {
       let data = await this.userRepository.find({
         where: {
           ...where,
+          userName: findUserDto?.userName,
+          nickName: findUserDto?.nickName,
+          email: findUserDto?.email,
+          phone: findUserDto?.phone,
         },
         order: {
           ...order,
@@ -99,27 +117,43 @@ export class UsersService extends BaseService {
     }
   }
 
-  findOne(id: number) {
+  /**
+   * 通过ID查询详情
+   * @param {number} id
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async findOne(id: number): Promise<ApiResult<any>> {
     try {
-      let data = this.userRepository.findOne({ where: { id } });
+      let data = await this.userRepository.findOne({ where: { id } });
       return ApiResult.success({ data });
     } catch (error) {
       return ApiResult.error(error || "用户查询失败，请稍后再试");
     }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  /**
+   * 修改用户信息
+   * @param {number} id 用户ID
+   * @param updateUserDto 更新用户信息
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResult<any>> {
     try {
-      let data = this.userRepository.update(id, updateUserDto);
+      let data = await this.userRepository.update(id, updateUserDto);
       return ApiResult.success({ data });
     } catch (error) {
       return ApiResult.error(error || "用户更新失败，请稍后再试");
     }
   }
 
-  remove(id: number) {
+  /**
+   * 删除用户信息
+   * @param {number} id 用户ID
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async remove(id: number): Promise<ApiResult<any>> {
     try {
-      let data = this.userRepository.softDelete(id);
+      let data = await this.userRepository.softDelete(id);
       return ApiResult.success({ data });
     } catch (error) {
       return ApiResult.error(error || "用户删除失败，请稍后再试");
