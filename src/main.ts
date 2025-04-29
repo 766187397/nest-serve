@@ -21,7 +21,7 @@ import { UsersService } from "./module/users/users.service";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.enableCors(); // 允许所有不同源的客户端请求
+  app.enableCors(); // 允许所有不同源的客户端请求
   // app.enableCors({
   //   origin: "http://example.com", // 只允许来自 http://example.com 的请求
   //   methods: ["GET", "POST"], // 只允许 GET 和 POST 请求

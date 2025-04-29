@@ -199,4 +199,35 @@ export class UsersService extends BaseService {
       return ApiResult.error(error || "用户登录失败，请稍后再试");
     }
   }
+
+  /**
+   * 使用 refresh_token 刷新token
+   * @param refreshToken refresh_token
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async refreshToken(refreshToken: string): Promise<ApiResult<any>> {
+    try {
+      let { id } = this.jwtService.verify(refreshToken);
+      let user = await this.userRepository.findOne({
+        where: { id },
+      });
+      if (!user) {
+        return ApiResult.error({
+          data: null,
+          message: "用户不存在",
+          code: 401,
+        });
+      }
+      let { password, ...data } = user;
+      let token = this.jwtService.sign(data);
+      return ApiResult.success<any>({
+        data: {
+          token_type: "Bearer",
+          access_token: token,
+        },
+      });
+    } catch (error) {
+      return ApiResult.error(error || "刷新token失败，请重新登录！");
+    }
+  }
 }

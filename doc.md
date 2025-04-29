@@ -1735,3 +1735,271 @@ nest g module module/defaultData --no-spec
 
 > 两种方式：前端在请求头写的token，登录成功接口设置cookie（不能跨越）
 
+### 两种登录方式
+
+**Response：必须是通过expressd导入的类型否则会各种报错**
+
+```typescript
+  @Post("/logIn")
+  @ApiOperation({ summary: "用户登录" })
+  logIn(@Body() loginDto: LogInDto) {
+    return this.usersService.logIn(loginDto);
+  }
+
+  @Post("/logIn/setCookie")
+  @ApiOperation({ summary: "用户登录(设置Cookie)" })
+  async logInSetCookie(@Body() loginDto: LogInDto, @Res() res: Response) {
+    let { __isApiResult, ...data } = await this.usersService.logIn(loginDto);
+    if (data.code == 200) {
+      res.cookie("token", data.data.access_token, { maxAge: 1000 * 60 * 60 * Number(process.env.JWT_EXPIRES_IN) });
+      res.cookie("refresh_token", data.data.refresh_token, {
+        maxAge: 1000 * 60 * 60 * 24 * Number(process.env.JWT_EXPIRES_IN),
+      });
+      res.json(data);
+    } else {
+      res.status(data.code).json(data);
+    }
+  }
+```
+
+
+
+```typescript
+  /**
+   * 登录
+   * @param {LogInDto} logInDto 登录参数
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async logIn(logInDto: LogInDto): Promise<ApiResult<any>> {
+    try {
+      let data = await this.userRepository.findOne({
+        where: { userName: logInDto.userName },
+      });
+      if (!data || data.password !== logInDto.password) {
+        return ApiResult.error("用户名或密码错误");
+      }
+      // 这个状态需要自定义
+      if (data.status === 2) {
+        return ApiResult.error("当前账号已被禁用，请联系管理员！");
+      }
+      let { password, ...info } = data;
+      let userInfo = {
+        userInfo: info,
+        token_type: "Bearer",
+        access_token: this.jwtService.sign(info),
+        refresh_token: this.jwtService.sign(
+          { id: info.id },
+          {
+            expiresIn: this.configService.get("JWT_REFRESH_EXPIRES_IN") + "d",
+          }
+        ),
+      };
+      return ApiResult.success({ data: userInfo });
+    } catch (error) {
+      return ApiResult.error(error || "用户登录失败，请稍后再试");
+    }
+  }
+```
+
+
+
+### 刷新token
+
+> 为了安全性以及某些修改用户信息但又不重新登录的操作需要自动更新token
+
+
+
+```typescript
+  @Get("refresh/token")
+  @ApiOperation({ summary: "刷新token" })
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    let refresh_token: string | undefined;
+    // 首先尝试从 Cookie 中获取 Token
+    if (req.cookies && req.cookies.refresh_token) {
+      refresh_token = req.cookies.refresh_token;
+    }
+    // 如果没有从 Cookie 中获取到 refreshToken，则尝试从请求头中获取
+    if (!refresh_token) {
+      refresh_token = (req.headers["refresh_token"] as string)?.split(" ")[1]; // 从请求头获取 Bearer Token
+    }
+    if (!refresh_token) {
+      return res.status(401).json({ code: 401, message: "refreshToken不存在，请先登录！", data: null });
+    }
+    let { __isApiResult, ...data } = await this.usersService.refreshToken(refresh_token);
+    if (data.code == 200) {
+      res.cookie("token", data.data.access_token, { maxAge: 1000 * 60 * 60 * Number(process.env.JWT_EXPIRES_IN) });
+    }
+    res.status(data.code).json(data);
+  }
+```
+
+
+
+
+
+```typescript
+  /**
+   * 使用 refresh_token 刷新token
+   * @param refreshToken refresh_token
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async refreshToken(refreshToken: string): Promise<ApiResult<any>> {
+    try {
+      let { id } = this.jwtService.verify(refreshToken);
+      let user = await this.userRepository.findOne({
+        where: { id },
+      });
+      if (!user) {
+        return ApiResult.error({
+          data: null,
+          message: "用户不存在",
+          code: 401,
+        });
+      }
+      let { password, ...data } = user;
+      let token = this.jwtService.sign(data);
+      return ApiResult.success<any>({
+        data: {
+          token_type: "Bearer",
+          access_token: token,
+        },
+      });
+    } catch (error) {
+      return ApiResult.error(error || "刷新token失败，请重新登录！");
+    }
+  }
+```
+
+
+
+### 前端封装代码如下
+
+> 示例代码，仅供参考
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Axios 401 Refresh Token Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <h1>Axios 401 Refresh Token Example</h1>
+    <button onclick="makeRequest()">Make Request</button>
+    <div id="result"></div>
+
+    <script>
+      // 这个refresh_token可以通过接口文档获取
+      localStorage.setItem(
+        "refresh_token",
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ1ODk4MjE2LCJleHAiOjE3NDU5ODQ2MTZ9.15sU2pGvFOmG9yMrrWzI4LrCbxEA7SvrNLtf5EFyO-8"
+      );
+
+      // 创建 axios 实例
+      const service = axios.create({
+        baseURL: "http://localhost:3000", // 替换为你的 API 基础路径
+        timeout: 5000, // 请求超时时间
+      });
+
+      // 请求拦截器
+      service.interceptors.request.use(
+        (config) => {
+          // 在请求发送前添加 token 到请求头
+          const token = localStorage.getItem("token");
+          if (token) {
+            config.headers["Authorization"] = `Bearer ${token}`;
+          }
+          return config;
+        },
+        (error) => {
+          return Promise.reject(error);
+        }
+      );
+
+      // 响应拦截器
+      service.interceptors.response.use(
+        (response) => {
+          return response;
+        },
+        (error) => {
+          const { response } = error;
+          if (response.status === 401) {
+            // 判断本地是否有 refresh_token
+            const refresh_token = localStorage.getItem("refresh_token");
+            if (refresh_token) {
+              // 存储当前请求的配置，用于后续重新请求
+              const config = error.config;
+              // 标记这个请求为正在重新请求的状态，避免重复刷新 token
+              if (!config._retry) {
+                config._retry = true;
+                return new Promise((resolve, reject) => {
+                  // 发起刷新 token 的请求
+                  axios
+                    .get("http://localhost:3000/api/v1/backend/users/refresh/token", {
+                      headers: {
+                        refresh_token: refresh_token,
+                      },
+                    })
+                    .then((res) => {
+                      if (res.data) {
+                        // 存储新的 token
+                        localStorage.setItem("token", res.data.data.access_token);
+                        // 重新设置 axios 默认的请求头中的 token
+                        axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
+                        // 重新发送之前失败的请求
+                        config.headers["Authorization"] = `Bearer ${res.data.token}`;
+                        resolve(service(config));
+                      } else {
+                        reject(error);
+                      }
+                    })
+                    .catch((err) => {
+                      // 刷新 token 失败，跳转到登录页等操作
+                      localStorage.removeItem("token");
+                      localStorage.removeItem("refresh_token");
+                      // window.location.href = '/login'; // 如果是单页应用且有登录页，取消注释跳转到登录页
+                      document.getElementById("result").innerHTML = "Token refresh failed, please login again.";
+                      reject(err);
+                    });
+                });
+              }
+            } else {
+              // 没有 refresh_token，提示重新登录
+              localStorage.removeItem("token");
+              // window.location.href = '/login'; // 如果是单页应用且有登录页，取消注释跳转到登录页
+              document.getElementById("result").innerHTML = "No refresh token, please login again.";
+            }
+          }
+          return Promise.reject(error);
+        }
+      );
+
+      // 测试函数，模拟发送请求
+      function makeRequest() {
+        document.getElementById("result").innerHTML = "Sending request...";
+        service
+          .get("http://localhost:3000/api/v1/backend/users") // 替换为实际的 API 端点
+          .then((response) => {
+            document.getElementById("result").innerHTML = `Request succeeded: ${JSON.stringify(response.data)}`;
+          })
+          .catch((error) => {
+            document.getElementById("result").innerHTML = `Request failed: ${error.message}`;
+          });
+      }
+
+      // 模拟初始 token 和 refresh_token，实际项目中应该通过登录获取
+      // 请在实际项目中删除此部分，并通过真实的登录流程获取 token 和 refresh_token
+      if (!localStorage.getItem("token")) {
+        localStorage.setItem("token", "initial_token");
+        localStorage.setItem("refresh_token", "initial_refresh_token");
+      }
+    </script>
+  </body>
+</html>
+
+```
+
+
+

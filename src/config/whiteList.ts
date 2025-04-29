@@ -12,5 +12,6 @@ export class WhiteList {
     "/v3/api-docs/swagger-config", // knife4j 请求配置
     "/api/v1/backend/users/logIn", // 登录接口
     "/api/v1/backend/users/logIn/setCookie", // 登录接口
+    "/api/v1/backend/users/refresh/token", // 登录接口
   ];
 }

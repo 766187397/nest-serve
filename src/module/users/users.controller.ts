@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res, Req } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { ProcessDataThroughID } from "@/common/dto/base";
 import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage, LogInDto } from "./dto/index";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
-import { Response } from "express";
+import { Request, Response } from "express";
 
 @ApiTags("用户管理")
 @ApiResponse({ status: 200, description: "操作成功" })
@@ -73,5 +73,27 @@ export class UsersController {
     } else {
       res.status(data.code).json(data);
     }
+  }
+
+  @Get("refresh/token")
+  @ApiOperation({ summary: "刷新token" })
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    let refresh_token: string | undefined;
+    // 首先尝试从 Cookie 中获取 Token
+    if (req.cookies && req.cookies.refresh_token) {
+      refresh_token = req.cookies.refresh_token;
+    }
+    // 如果没有从 Cookie 中获取到 refreshToken，则尝试从请求头中获取
+    if (!refresh_token) {
+      refresh_token = (req.headers["refresh_token"] as string)?.split(" ")[1]; // 从请求头获取 Bearer Token
+    }
+    if (!refresh_token) {
+      return res.status(401).json({ code: 401, message: "refreshToken不存在，请先登录！", data: null });
+    }
+    let { __isApiResult, ...data } = await this.usersService.refreshToken(refresh_token);
+    if (data.code == 200) {
+      res.cookie("token", data.data.access_token, { maxAge: 1000 * 60 * 60 * Number(process.env.JWT_EXPIRES_IN) });
+    }
+    res.status(data.code).json(data);
   }
 }
