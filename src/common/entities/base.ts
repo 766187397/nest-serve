@@ -9,7 +9,7 @@ export abstract class BaseEntity {
   @Column({ default: 1, comment: "排序" })
   sort: number;
 
-  @Column({ default: 1, comment: "1 - 启用，0 - 禁用，根据业务定义" })
+  @Column({ default: 1, comment: "状态；1 - 启用，2 - 禁用；根据业务定义" })
   status: number;
 
   @Exclude({ toPlainOnly: true })

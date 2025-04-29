@@ -1,6 +1,5 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
-import { JwtStrategy } from "./auth.strategy";
 import { UsersModule } from "@/module/users/users.module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 @Module({
@@ -16,7 +15,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
     forwardRef(() => UsersModule), // 使用 forwardRef 解决循环依赖
   ],
   controllers: [],
-  providers: [JwtStrategy],
+  providers: [],
   exports: [JwtModule],
 })
 export class AuthModule {}

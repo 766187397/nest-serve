@@ -35,8 +35,8 @@ export async function createAuthMiddleware(jwtService: JwtService, usersService:
 
       // // 验证用户状态、如果不需要可以直接注释
       // user = await usersService.findOne(payload.id);
-      // // 当前定义 0 为禁用
-      // if (user.data.status === 0) {
+      // // 当前定义 2 为禁用
+      // if (user.data.status === 2) {
       //   return res.status(403).json(ApiResult.error({ code: 403, message: "当前账号已被禁用，请联系管理员！", data: null }));
       // }
 

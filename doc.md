@@ -1447,8 +1447,8 @@ docs(nest-serve): 更新文档并添加用户管理模块
 ### 安装依赖
 
 ```bash
-npm i @nestjs/jwt @nestjs/passport cookie-parser passport passport-jwt
-npm i @types/passport-jwt @types/cookie-parser --save-dev
+npm i @nestjs/jwt cookie-parser
+npm i @types/cookie-parser --save-dev
 ```
 
 
@@ -1466,7 +1466,6 @@ nest g module module/auth --no-spec
 ```typescript
 import { forwardRef, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
-import { JwtStrategy } from "./auth.strategy";
 import { UsersModule } from "@/module/users/users.module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 @Module({
@@ -1475,54 +1474,17 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => ({
         secret: config.get("JWT_SECRET"),
-        signOptions: { expiresIn: config.get("JWT_EXPIRES_IN") + "h" },
+        signOptions: { expiresIn: config.get("JWT_EXPIRES_IN") + "h" }, // 全局的时长配置
       }),
       inject: [ConfigService],
     }),
     forwardRef(() => UsersModule), // 使用 forwardRef 解决循环依赖
   ],
   controllers: [],
-  providers: [JwtStrategy],
+  providers: [],
   exports: [JwtModule],
 })
 export class AuthModule {}
-
-```
-
-
-
-> auth.strategy.ts
-
-```typescript
-import { Injectable } from "@nestjs/common";
-import { PassportStrategy } from "@nestjs/passport";
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { Request } from "express";
-
-@Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
-    super({
-      jwtFromRequest: (req: Request) => {
-        // 从 cookie 获取 token
-        const cookieToken = req.cookies["token"]; // 根据你的 cookie 名称
-        if (cookieToken) {
-          return cookieToken;
-        }
-
-        // 如果 cookie 中没有 token，再从 Authorization header 获取
-        const headerToken = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-        return headerToken;
-      },
-      ignoreExpiration: false, // 设置为 true 时，过期的 JWT 也会被接受
-      secretOrKey: process.env.JWT_SECRET as string, // 使用环境变量管理更安全
-    });
-  }
-
-  async validate(payload: any) {
-    return payload;
-  }
-}
 
 ```
 
@@ -1538,7 +1500,6 @@ import { Request, Response, NextFunction } from "express";
 import { WhiteList } from "@/config/whiteList";
 import { ApiResult } from "@/common/utils/result";
 import { UsersService } from "@/module/users/users.service";
-import { json } from "stream/consumers";
 
 export async function createAuthMiddleware(jwtService: JwtService, usersService: UsersService) {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -1571,8 +1532,8 @@ export async function createAuthMiddleware(jwtService: JwtService, usersService:
 
       // // 验证用户状态、如果不需要可以直接注释
       // user = await usersService.findOne(payload.id);
-      // // 当前定义 0 为禁用
-      // if (user.data.status === 0) {
+      // // 当前定义 2 为禁用
+      // if (user.data.status === 2) {
       //   return res.status(403).json(ApiResult.error({ code: 403, message: "当前账号已被禁用，请联系管理员！", data: null }));
       // }
 
