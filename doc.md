@@ -1490,7 +1490,7 @@ export class AuthModule {}
 
 
 
-### 中间件拦截
+### 函数拦截
 
 > auth.middleware.ts
 
