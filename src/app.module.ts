@@ -14,7 +14,7 @@ import { DefaultDataModule } from './module/default-data/default-data.module';
     // 配置 ConfigModule 作为全局模块，并根据 NODE_ENV 加载相应的 .env 文件
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV || "development"}`,
+      envFilePath: `.env.${process.env.NODE_ENV || "dev"}`,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
