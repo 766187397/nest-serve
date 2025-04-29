@@ -120,3 +120,19 @@ export class FindUserDtoByPage extends FindUserDto {
   @IsString({ message: "pageSize必须是字符串" })
   pageSize?: string;
 }
+
+/**
+ * 登录
+ */
+
+export class LogInDto {
+  @ApiProperty({ description: "用户名", example: "admin" })
+  @IsString({ message: "用户名字符串" })
+  @IsNotEmpty({ message: "用户名是必填项" }) // 必填校验
+  userName: string;
+
+  @ApiProperty({ description: "密码", example: "123456" })
+  @IsString({ message: "密码字符串" })
+  @IsNotEmpty({ message: "密码是必填项" })
+  password: string;
+}

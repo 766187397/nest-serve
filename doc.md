@@ -1405,3 +1405,333 @@ docs(nest-serve): 更新文档并添加用户管理模块
 - 更新文档：调整代码示例，优化描述内容
 - 添加用户管理模块：包括用户实体、DTO、服务、控制器和模块定义
 - 封装空值管道校验和通用排序方法
+
+
+
+## 跨域请求解决方案
+
+> 浏览器请求会存在跨越问题，主要是浏览器为了安全做了限制，跨越可以直接通过配置解决，也可以按照cors的扩展包封装中间件等方法
+
+- 允许所有不同源的客户端请求，在main.ts中加上
+
+  ```typescript
+  app.enableCors(); // 允许所有不同源的客户端请求
+  ```
+
+- 允许指定的地址、请求等
+
+  ```typescript
+  app.enableCors({
+    origin: "http://example.com", // 只允许来自 http://example.com 的请求
+    methods: ["GET", "POST"], // 只允许 GET 和 POST 请求
+    credentials: true, // 允许携带凭证信息
+  });
+  ```
+
+- 装饰器，直接在接口上加上装饰器指定地址
+
+  ```typescript
+  @UseCors({
+    origin: 'http://xxx.com',
+  })
+  ```
+
+  
+
+## 设置jwt
+
+> jwt授权校验身份的，当前设置的白名单只针对接口没有针对请求方式，也可以优化判断和白名单，但是一般不会涉及太多接口甚至是重复的接口
+
+
+
+### 安装依赖
+
+```bash
+npm i @nestjs/jwt @nestjs/passport cookie-parser passport passport-jwt
+npm i @types/passport-jwt @types/cookie-parser --save-dev
+```
+
+
+
+### 创建auth
+
+```bash
+nest g module module/auth --no-spec
+```
+
+
+
+> auth.module.ts
+
+```typescript
+import { forwardRef, Module } from "@nestjs/common";
+import { JwtModule } from "@nestjs/jwt";
+import { JwtStrategy } from "./auth.strategy";
+import { UsersModule } from "@/module/users/users.module";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+@Module({
+  imports: [
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => ({
+        secret: config.get("JWT_SECRET"),
+        signOptions: { expiresIn: config.get("JWT_EXPIRES_IN") + "h" },
+      }),
+      inject: [ConfigService],
+    }),
+    forwardRef(() => UsersModule), // 使用 forwardRef 解决循环依赖
+  ],
+  controllers: [],
+  providers: [JwtStrategy],
+  exports: [JwtModule],
+})
+export class AuthModule {}
+
+```
+
+
+
+> auth.strategy.ts
+
+```typescript
+import { Injectable } from "@nestjs/common";
+import { PassportStrategy } from "@nestjs/passport";
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { Request } from "express";
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor() {
+    super({
+      jwtFromRequest: (req: Request) => {
+        // 从 cookie 获取 token
+        const cookieToken = req.cookies["token"]; // 根据你的 cookie 名称
+        if (cookieToken) {
+          return cookieToken;
+        }
+
+        // 如果 cookie 中没有 token，再从 Authorization header 获取
+        const headerToken = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+        return headerToken;
+      },
+      ignoreExpiration: false, // 设置为 true 时，过期的 JWT 也会被接受
+      secretOrKey: process.env.JWT_SECRET as string, // 使用环境变量管理更安全
+    });
+  }
+
+  async validate(payload: any) {
+    return payload;
+  }
+}
+
+```
+
+
+
+### 中间件拦截
+
+> auth.middleware.ts
+
+```typescript
+import { JwtService } from "@nestjs/jwt";
+import { Request, Response, NextFunction } from "express";
+import { WhiteList } from "@/config/whiteList";
+import { ApiResult } from "@/common/utils/result";
+import { UsersService } from "@/module/users/users.service";
+import { json } from "stream/consumers";
+
+export async function createAuthMiddleware(jwtService: JwtService, usersService: UsersService) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const whiteListStartsWith = WhiteList.whiteListStartsWith;
+    const whiteListExact = WhiteList.whiteListExact;
+    let state = false; // 是否匹配白名单
+    const url = req.url;
+    // 检查白名单
+    if (whiteListStartsWith.some((prefix) => url.startsWith(prefix)) || whiteListExact.includes(url)) {
+      state = true; // 如果匹配白名单，跳过 JWT 验证
+    }
+
+    let token: string | undefined;
+    // 首先尝试从 Cookie 中获取 Token
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    }
+    // 如果没有从 Cookie 中获取到 Token，则尝试从请求头中获取
+    if (!token) {
+      token = req.headers["authorization"]?.split(" ")[1]; // 从请求头获取 Bearer Token
+    }
+    if (!token && !state) {
+      let { __isApiResult, ...data } = ApiResult.error({ code: 401, message: "请登录后访问！", data: null });
+      return res.status(401).json(data);
+    }
+
+    try {
+      let payload: any, user: any;
+      user = payload = jwtService.verify(token as string);
+
+      // // 验证用户状态、如果不需要可以直接注释
+      // user = await usersService.findOne(payload.id);
+      // // 当前定义 0 为禁用
+      // if (user.data.status === 0) {
+      //   return res.status(403).json(ApiResult.error({ code: 403, message: "当前账号已被禁用，请联系管理员！", data: null }));
+      // }
+
+      req.userInfo = user; // 将用户信息附加到请求对象上
+      next();
+    } catch (e) {
+      if (state) {
+        return next(); // 如果是白名单的路径，跳过验证
+      } else {
+        return res.status(401).json(ApiResult.error({ code: 401, message: "授权失败，Token无效！", data: null }));
+      }
+    }
+  };
+}
+
+```
+
+
+
+### 配置文件
+
+> config/whiteList.ts
+
+```typescript
+export class WhiteList {
+  // 前缀匹配
+  static whiteListStartsWith: string[] = [
+    "/doc.html", // knife4j 前台地址
+    "/api-docs", // knife4j 分组接口文档
+    "/webjars", // knife4j 静态资源
+    "/swagger", // swagger 接口文档地址
+  ];
+  // 全匹配
+  static whiteListExact: string[] = [
+    "/favicon.ico", // 网站图标
+    "/v3/api-docs/swagger-config", // knife4j 请求配置
+  ];
+}
+
+```
+
+
+
+根文件中使用
+
+> main.ts
+
+```typescript
+import { createAuthMiddleware } from "./module/auth/auth.middleware";
+import * as cookieParser from "cookie-parser";
+import { JwtService } from "@nestjs/jwt";
+import { UsersService } from "./module/users/users.service";
+
+....
+
+// 配置 cookie-parser 中间件，支持签名的 cookie
+app.use(cookieParser(process.env.COOKIE_SECRET));
+// 注册全局守卫
+const jwtService = app.get(JwtService); // 从 DI 容器中获取 JwtService
+const usersService = app.get(UsersService); // 获取用户的服务方便查询最新信息
+app.use(await createAuthMiddleware(jwtService, usersService));
+```
+
+
+
+**此时调用其他接口会出现报错401，提示必须要登录携带token才能调用**
+
+**记得强制刷新，防止静态文件有缓存，没有设置上白名单**
+
+
+
+## 生成默认数据
+
+> 生成默认数据方便调试
+
+
+
+### 创建defaultData模块
+
+```bash
+nest g module module/defaultData --no-spec
+```
+
+
+
+- default-data.module.ts
+
+  ```typescript
+  import { Module } from "@nestjs/common";
+  import { User } from "@/module/users/entities/user.entity";
+  import { TypeOrmModule } from "@nestjs/typeorm";
+  import { defaultData } from "./defaultData.service";
+  
+  @Module({
+    imports: [TypeOrmModule.forFeature([User])],
+    controllers: [],
+    providers: [defaultData],
+  })
+  export class DefaultDataModule {}
+  
+  ```
+
+- defaultData.service.ts
+
+  ```typescript
+  import { Injectable, OnApplicationBootstrap } from "@nestjs/common";
+  import { InjectRepository } from "@nestjs/typeorm";
+  import { Repository } from "typeorm";
+  import { User } from "@/module/users/entities/user.entity";
+  
+  @Injectable()
+  export class defaultData implements OnApplicationBootstrap {
+    constructor(
+      @InjectRepository(User)
+      private readonly userRepository: Repository<User>
+    ) {}
+  
+    async onApplicationBootstrap() {
+      await this.seedUsers();
+    }
+  
+    // 插入默认用户数据
+    private async seedUsers() {
+      const count = await this.userRepository.count();
+      if (count === 0) {
+        // 如果没有用户，插入默认数据
+        let password = "123456";
+        const users = [
+          {
+            userName: "admin",
+            nickName: "管理员",
+            password,
+            phoneNumber: "18888888888",
+            email: "admin@example.com",
+            sex: "0",
+          },
+          {
+            userName: "john_doe",
+            nickName: "John Doe",
+            phoneNumber: "18888888889",
+            email: "john@example.com",
+            password,
+            sex: "0",
+          },
+        ];
+        await this.userRepository.save(users); // 插入数据
+      }
+    }
+  }
+  
+  ```
+
+
+
+**手动清空数据库重新运行代码，查看是否生成默认数据**
+
+
+
+## 实现登录
+
+> 两种方式：前端在请求头写的token，登录成功接口设置cookie（不能跨越）
+

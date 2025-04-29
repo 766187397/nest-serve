@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { ProcessDataThroughID } from "@/common/dto/base";
-import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage } from "./dto/index";
+import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage, LogInDto } from "./dto/index";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
+import { Response } from "express";
 
 @ApiTags("用户管理")
 @ApiResponse({ status: 200, description: "操作成功" })
@@ -51,5 +52,26 @@ export class UsersController {
   @ApiOperation({ summary: "删除用户" })
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Post("/logIn")
+  @ApiOperation({ summary: "用户登录" })
+  logIn(@Body() loginDto: LogInDto) {
+    return this.usersService.logIn(loginDto);
+  }
+
+  @Post("/logIn/setCookie")
+  @ApiOperation({ summary: "用户登录(设置Cookie)" })
+  async logInSetCookie(@Body() loginDto: LogInDto, @Res() res: Response) {
+    let { __isApiResult, ...data } = await this.usersService.logIn(loginDto);
+    if (data.code == 200) {
+      res.cookie("token", data.data.access_token, { maxAge: 1000 * 60 * 60 * Number(process.env.JWT_EXPIRES_IN) });
+      res.cookie("refresh_token", data.data.refresh_token, {
+        maxAge: 1000 * 60 * 60 * 24 * Number(process.env.JWT_EXPIRES_IN),
+      });
+      res.json(data);
+    } else {
+      res.status(data.code).json(data);
+    }
   }
 }

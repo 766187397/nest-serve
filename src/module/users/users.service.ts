@@ -1,16 +1,21 @@
 import { Injectable } from "@nestjs/common";
-import { CreateUserDto, FindUserDto, FindUserDtoByPage, UpdateUserDto } from "./dto/index";
+import { CreateUserDto, FindUserDto, FindUserDtoByPage, LogInDto, UpdateUserDto } from "./dto/index";
 import { ApiResult } from "@/common/utils/result";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { Repository } from "typeorm";
 import { BaseService } from "@/common/service/base";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class UsersService extends BaseService {
   constructor(
     @InjectRepository(User) // NestJS 会根据这个装饰器将 UserRepository 自动注入到 userRepository 变量中。
-    private userRepository: Repository<User> // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
+    private userRepository: Repository<User>, // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
+
+    private readonly jwtService: JwtService, // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
+    private readonly configService: ConfigService
   ) {
     super();
   }
@@ -157,6 +162,41 @@ export class UsersService extends BaseService {
       return ApiResult.success({ data });
     } catch (error) {
       return ApiResult.error(error || "用户删除失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 登录
+   * @param {LogInDto} logInDto 登录参数
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async logIn(logInDto: LogInDto): Promise<ApiResult<any>> {
+    try {
+      let data = await this.userRepository.findOne({
+        where: { userName: logInDto.userName },
+      });
+      if (!data || data.password !== logInDto.password) {
+        return ApiResult.error("用户名或密码错误");
+      }
+      // 这个状态需要自定义
+      if (data.status === 2) {
+        return ApiResult.error("当前账号已被禁用，请联系管理员！");
+      }
+      let { password, ...info } = data;
+      let userInfo = {
+        userInfo: info,
+        token_type: "Bearer",
+        access_token: this.jwtService.sign(info),
+        refresh_token: this.jwtService.sign(
+          { id: info.id },
+          {
+            expiresIn: this.configService.get("JWT_REFRESH_EXPIRES_IN") + "d",
+          }
+        ),
+      };
+      return ApiResult.success({ data: userInfo });
+    } catch (error) {
+      return ApiResult.error(error || "用户登录失败，请稍后再试");
     }
   }
 }

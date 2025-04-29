@@ -6,6 +6,8 @@ import { join } from "path";
 import { Knife4jModule } from "./module/knife4j/knife4j.module";
 import { ApiResultInterceptor } from "@/common/interceptor/api-result.interceptor";
 import { APP_INTERCEPTOR } from "@nestjs/core";
+import { AuthModule } from './module/auth/auth.module';
+import { DefaultDataModule } from './module/default-data/default-data.module';
 
 @Module({
   imports: [
@@ -46,6 +48,8 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
     }),
     UsersModule,
     Knife4jModule,
+    AuthModule,
+    DefaultDataModule,
   ],
   controllers: [],
   providers: [

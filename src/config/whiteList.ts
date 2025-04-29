@@ -1,22 +1,16 @@
 export class WhiteList {
   // 前缀匹配
-  static whiteListStartsWith = [
-    "/api/api-docs", // knife4j 分组接口文档
-    "/api/webjars", // knife4j 静态资源
-    "/api/doc", // knife4j 接口文档地址
+  static whiteListStartsWith: string[] = [
+    "/doc.html", // knife4j 前台地址
+    "/api-docs", // knife4j 分组接口文档
+    "/webjars", // knife4j 静态资源
     "/swagger", // swagger 接口文档地址
-    "/uploads", // 文件访问地址
-    "/api/large", // 大文件上传地址
   ];
   // 全匹配
-  static whiteListExact = [
-    "/api/upload/file", // 文件上传
-    "/favicon.ico", // 前端静态文件
-    "/api/v3/api-docs/swagger-config", // knife4j 接口文档配置
-    "/api/json", // 获取 Swagger JSON
-    "/api/download", // 下载接口文档
-    "/api/users/login", // 登录接口
-    "/api/users/login/setCookie", // 登录设置 cookie
-    "/api/users/register", // 注册接口
+  static whiteListExact: string[] = [
+    "/favicon.ico", // 网站图标
+    "/v3/api-docs/swagger-config", // knife4j 请求配置
+    "/api/v1/backend/users/logIn", // 登录接口
+    "/api/v1/backend/users/logIn/setCookie", // 登录接口
   ];
 }

@@ -12,7 +12,7 @@ export class ApiResultInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       map((data) => {
-        if (data.__isApiResult) {
+        if (data?.__isApiResult) {
           delete data.__isApiResult;
           response.status(data.code);
           return {

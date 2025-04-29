@@ -14,9 +14,27 @@ import { AppModule } from "./app.module";
 import { SwaggerModule } from "@nestjs/swagger";
 import { SwaggerConfig } from "./config/swagger";
 import { ClassSerializerInterceptor, ValidationPipe } from "@nestjs/common";
+import * as cookieParser from "cookie-parser";
+import { createAuthMiddleware } from "./module/auth/auth.middleware";
+import { JwtService } from "@nestjs/jwt";
+import { UsersService } from "./module/users/users.service";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // app.enableCors(); // 允许所有不同源的客户端请求
+  // app.enableCors({
+  //   origin: "http://example.com", // 只允许来自 http://example.com 的请求
+  //   methods: ["GET", "POST"], // 只允许 GET 和 POST 请求
+  //   credentials: true, // 允许携带凭证信息
+  // });
+
+  // 配置 cookie-parser 中间件，支持签名的 cookie
+  app.use(cookieParser(process.env.COOKIE_SECRET));
+  // 注册全局守卫
+  const jwtService = app.get(JwtService); // 从 DI 容器中获取 JwtService
+  const usersService = app.get(UsersService); // 获取用户的服务方便查询最新信息
+  app.use(await createAuthMiddleware(jwtService, usersService));
+
   // 创建 Swagger 文档
   const document = SwaggerModule.createDocument(app, SwaggerConfig.swaggerOptions);
   // 将 Swagger 文档存储在全局对象中
