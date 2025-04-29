@@ -60,9 +60,9 @@ git config core.ignorecase false
 
 ## 创建环境变量
 
-> 开发环境：.env.development
+> 开发环境：.env.dev
 >
-> 生成环境：.env.production
+> 生成环境：.env.prod
 >
 > sqlitedb环境（没有安装MySQL等数据库，sqlite不需要安装其他的）：.env.sqlitedb
 
@@ -1629,7 +1629,7 @@ import { UsersService } from "./module/users/users.service";
 ....
 
 // 配置 cookie-parser 中间件，支持签名的 cookie
-app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(cookieParser());
 // 注册全局守卫
 const jwtService = app.get(JwtService); // 从 DI 容器中获取 JwtService
 const usersService = app.get(UsersService); // 获取用户的服务方便查询最新信息
@@ -2003,3 +2003,65 @@ nest g module module/defaultData --no-spec
 
 
 
+
+
+## 密码hash
+
+> 通常不会明文存储密码以及一些重要信息，防止数据泄露被明文查看
+>
+> 哈希加密：常见的就是校验和存储，单向不可逆。当前项目使用场景：密码验证。
+>
+> 对称加密：传输、数据存储、快速等，后续还需要解密查看。当前项目使用场景：前端密码传输。（实际上前端加密更多的是对付领导和甲方，前端加密了密钥也通常在代码中可以找到）
+
+
+
+### 安装依赖
+
+```bash
+ npm i bcrypt
+ npm i -D @types/bcrypt
+```
+
+
+
+### 封装函数
+
+bcrypt-hash.ts
+
+```typescript
+import * as bcrypt from "bcrypt";
+
+export class BcryptService {
+  // 不要设置这个值太多，测试环4左右即可，生产环境设置为10-12（这个值越大越耗时间）
+  private readonly saltRounds = global.envFilePath == "prod" ? 10 : 4;
+
+  /**
+   * 哈希加密
+   * @param {string} str 需要加密的内容
+   * @returns {Promise<string>} 加密后的内容
+   */
+  async encryptStr(str: string): Promise<string> {
+    return bcrypt.hash(str, this.saltRounds);
+  }
+  /**
+   * 校验对比
+   * @param plainStr 明文字符串
+   * @param hashedStr 密文字符串
+   * @returns {Promise<boolean>} true/false
+   */
+  async validateStr(plainStr: string, hashedStr: string): Promise<boolean> {
+    return bcrypt.compare(plainStr, hashedStr);
+  }
+}
+
+export const bcryptService = new BcryptService();
+
+```
+
+
+
+**在创建用户、登录验证、生成默认数据的地方使用即可**
+
+
+
+清空用户后重新运行查看数据库，密码：123456  加密为：$2b$04$y5EawwB10CsH621kMBKpPOm.AirfMCXQ5DhepK69kjCtsJmMwJP.y

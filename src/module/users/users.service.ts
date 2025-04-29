@@ -7,6 +7,7 @@ import { Repository } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import { bcryptService } from "@/common/utils/bcrypt-hash";
 
 @Injectable()
 export class UsersService extends BaseService {
@@ -41,7 +42,7 @@ export class UsersService extends BaseService {
       if (existingUser) {
         return ApiResult.error<string>("用户名、电话号码或邮箱已存在");
       }
-      // createUserDto.password = CryptoUtil.encrypt(createUserDto.password as string);
+      createUserDto.password = await bcryptService.encryptStr(createUserDto.password as string);
       const user = this.userRepository.create(createUserDto); // 创建 User 实体
       // if (roleIds.length > 0) {
       //   user.roles = await this.roleRepository.find({ where: { id: In(roleIds) } });
@@ -175,9 +176,15 @@ export class UsersService extends BaseService {
       let data = await this.userRepository.findOne({
         where: { userName: logInDto.userName },
       });
-      if (!data || data.password !== logInDto.password) {
+
+      if (!data) {
+        return ApiResult.error("用户不存在");
+      }
+      const status = await bcryptService.validateStr(logInDto.password, data.password);
+      if (!status) {
         return ApiResult.error("用户名或密码错误");
       }
+
       // 这个状态需要自定义
       if (data.status === 2) {
         return ApiResult.error("当前账号已被禁用，请联系管理员！");

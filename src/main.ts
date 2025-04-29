@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 // 根据环境加载对应的 .env 文件
-const envFilePath = `.env.${process.env.NODE_ENV || "development"}`;
+const envFilePath = `.env.${process.env.NODE_ENV || "dev"}`;
+global.envFilePath = envFilePath;
 dotenv.config({ path: envFilePath });
 
 // 项目地址端口
@@ -29,7 +30,7 @@ async function bootstrap() {
   // });
 
   // 配置 cookie-parser 中间件，支持签名的 cookie
-  app.use(cookieParser(process.env.COOKIE_SECRET));
+  app.use(cookieParser());
   // 注册全局守卫
   const jwtService = app.get(JwtService); // 从 DI 容器中获取 JwtService
   const usersService = app.get(UsersService); // 获取用户的服务方便查询最新信息

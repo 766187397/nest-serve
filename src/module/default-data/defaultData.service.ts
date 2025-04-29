@@ -2,6 +2,7 @@ import { Injectable, OnApplicationBootstrap } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "@/module/users/entities/user.entity";
+import { bcryptService } from "@/common/utils/bcrypt-hash";
 
 @Injectable()
 export class defaultData implements OnApplicationBootstrap {
@@ -19,7 +20,7 @@ export class defaultData implements OnApplicationBootstrap {
     const count = await this.userRepository.count();
     if (count === 0) {
       // 如果没有用户，插入默认数据
-      let password = "123456";
+      const password = await bcryptService.encryptStr("123456");
       const users = [
         {
           userName: "admin",
