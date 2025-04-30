@@ -19,6 +19,7 @@ import * as cookieParser from "cookie-parser";
 import { createAuthMiddleware } from "./module/auth/auth.middleware";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "./module/users/users.service";
+import { ClassValidatorExceptionFilter } from "./common/filter/class-validator-filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -54,6 +55,9 @@ async function bootstrap() {
 
   // 使用 ClassSerializerInterceptor
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  // 表单校验过滤器
+  app.useGlobalFilters(new ClassValidatorExceptionFilter());
+
   await app.listen(port).then((res) => {
     console.log(`当前环境为：${envFilePath}`);
     console.log(`server to ${url}`);
