@@ -6,7 +6,6 @@ import { User } from "./entities/user.entity";
 import { Brackets, ILike, Repository } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { JwtService } from "@nestjs/jwt";
-import { ConfigService } from "@nestjs/config";
 import { bcryptService } from "@/common/utils/bcrypt-hash";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
 
@@ -17,7 +16,6 @@ export class UsersService extends BaseService {
     private userRepository: Repository<User>, // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
 
     private readonly jwtService: JwtService, // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
-    private readonly configService: ConfigService
   ) {
     super();
   }
@@ -36,6 +34,7 @@ export class UsersService extends BaseService {
       const queryBuilder = this.userRepository.createQueryBuilder("user");
       queryBuilder.andWhere("user.platform = :platform", { platform });
       if (userName || phone || email) {
+        // 使用Brackets，防止orWhere的优先级高于andWhere的platform 条件
         queryBuilder.andWhere(
           new Brackets((qb) => {
             if (userName) qb.where("user.userName = :userName", { userName });
@@ -145,6 +144,9 @@ export class UsersService extends BaseService {
   async findOne(id: number, platform: string = "admin"): Promise<ApiResult<any>> {
     try {
       let data = await this.userRepository.findOne({ where: { id, platform } });
+      if (!data) {
+        return ApiResult.error("用户不存在");
+      }
       return ApiResult.success({ data });
     } catch (error) {
       return ApiResult.error(error || "用户查询失败，请稍后再试");

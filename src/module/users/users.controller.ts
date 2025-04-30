@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res, Req } from "@nestjs/common";
 import { UsersService } from "./users.service";
-import { ProcessDataThroughID } from "@/common/dto/base";
 import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage, LogInDto } from "./dto/index";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
@@ -20,43 +19,43 @@ import { ApiResult } from "@/common/utils/result";
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post("create")
   @ApiOperation({ summary: "创建用户" })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto, "admin");
   }
 
-  @Get("/page")
+  @Get("page")
   @ApiOperation({ summary: "查询用户列表(分页)" })
   findByPage(@Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage) {
     return this.usersService.findByPage(findUserDtoByPage, "admin");
   }
 
-  @Get()
+  @Get("all")
   @ApiOperation({ summary: "查询用户列表(不分页)" })
   findAll(@Query(new FilterEmptyPipe()) findUserDto: FindUserDto) {
     return this.usersService.findAll(findUserDto, "admin");
   }
 
-  @Get(":id")
+  @Get("info/:id")
   @ApiOperation({ summary: "查询用户详情" })
-  findOne(@Param("id") id: ProcessDataThroughID) {
+  findOne(@Param("id") id: string) {
     return this.usersService.findOne(+id, "admin");
   }
 
-  @Patch(":id")
+  @Patch("update/:id")
   @ApiOperation({ summary: "更新用户信息" })
-  update(@Param("id") id: ProcessDataThroughID, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @Delete(":id")
+  @Delete("delete/:id")
   @ApiOperation({ summary: "删除用户" })
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
   }
 
-  @Post("/logIn")
+  @Post("logIn")
   @ApiOperation({ summary: "用户登录" })
   logIn(@Body() loginDto: LogInDto) {
     return this.usersService.logIn(loginDto, "admin");
@@ -68,6 +67,7 @@ export class UsersController {
     let { __isApiResult, ...data } = await this.usersService.logIn(loginDto, "admin");
     if (data.code == 200) {
       const options = getPlatformJwtConfig("admin") as JwtConfig;
+      console.log(" Number(options.jwt_expires_in) * 1000  :>> ", Number(options.jwt_expires_in) * 1000);
       res.cookie("token", data.data.access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
       res.cookie("refresh_token", data.data.refresh_token, {
         maxAge: Number(options.jwt_refresh_expires_in) * 1000,
@@ -78,7 +78,7 @@ export class UsersController {
     }
   }
 
-  @Get("/refresh/token")
+  @Get("refresh/token")
   @ApiOperation({ summary: "刷新token" })
   async refreshToken(@Req() req: Request, @Res() res: Response) {
     let refresh_token: string | undefined;
@@ -101,11 +101,12 @@ export class UsersController {
     res.status(data.code).json(data);
   }
 
-  @Get("/logout")
+  @Get("logout")
   @ApiOperation({ summary: "退出登录清除Cookie" })
   logout(@Res() res: Response) {
-    console.log("退出登录清除Cookie :>> ");
     res.cookie("token", "", { expires: new Date(0) });
-    res.json(null);
+    res.cookie("refresh_token", "", { expires: new Date(0) });
+    const { __isApiResult, ...data } = ApiResult.success({ data: null });
+    res.json(data);
   }
 }

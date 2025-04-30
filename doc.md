@@ -169,7 +169,6 @@ export abstract class BaseEntity {
 ```typescript
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsOptional, IsString } from "class-validator";
-import { IsStringOrNumber } from "@/common/utils/class-validator";
 import { FindOptionsOrderValue } from "typeorm";
 
 /**
@@ -178,22 +177,13 @@ import { FindOptionsOrderValue } from "typeorm";
 export class CreateBaseDto {
   @ApiProperty({ description: "排序", required: false, example: 1 })
   @IsOptional()
-  @IsNumber({}, { message: "排序值必须为数字" })
+  @IsNumber({}, { message: "sort必须为数字" })
   sort?: number;
 
   @ApiProperty({ description: "状态；1 - 启用，2 - 禁用；根据模块业务定义", required: false, example: 1 })
   @IsOptional()
-  @IsNumber({}, { message: "状态值必须为数字" })
+  @IsNumber({}, { message: "status必须为数字" })
   status?: number;
-}
-
-/**
- * 通过ID处理数据
- */
-export class ProcessDataThroughID {
-  @ApiProperty({ description: "id", required: true, example: 1 })
-  @IsStringOrNumber()
-  id: number | string;
 }
 
 /**
@@ -207,7 +197,7 @@ export class FindByParameter {
     default: "DESC",
   })
   @IsOptional()
-  @IsString({ message: "排序值必须为字符串" })
+  @IsString({ message: "sort必须为字符串" })
   sort?: FindOptionsOrderValue;
 
   @ApiProperty({
@@ -217,8 +207,8 @@ export class FindByParameter {
     example: 1,
   })
   @IsOptional()
-  @IsStringOrNumber()
-  status?: number | string;
+  @IsString({ message: "status值必须为字符串" })
+  status?: string;
 
   @ApiProperty({
     type: "string",
@@ -452,7 +442,7 @@ export class ApiResult<T> {
 
   static error<T>(param: Error | string | Result<T>): ApiResult<T> {
     let message = "操作失败",
-      code = 500,
+      code = 400,
       data: T | null = null;
     if (param instanceof HttpException) {
       // 获取 HttpException 的响应内容和状态码
@@ -1142,7 +1132,6 @@ export class BaseService {
     ```typescript
     import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
     import { UsersService } from "./users.service";
-    import { ProcessDataThroughID } from "@/common/dto/base";
     import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage } from "./dto/index";
     import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
     import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
@@ -1179,13 +1168,13 @@ export class BaseService {
     
       @Get(":id")
       @ApiOperation({ summary: "查询用户详情" })
-      findOne(@Param("id") id: ProcessDataThroughID) {
+      findOne(@Param("id") id: string) {
         return this.usersService.findOne(+id);
       }
     
       @Patch(":id")
       @ApiOperation({ summary: "更新用户信息" })
-      update(@Param("id") id: ProcessDataThroughID, @Body() updateUserDto: UpdateUserDto) {
+      update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
         return this.usersService.update(+id, updateUserDto);
       }
     
@@ -1197,7 +1186,7 @@ export class BaseService {
     }
     
     ```
-
+  
 - users.module.ts
 
   - users的模块管理文件，只有在这里导入了的模块才能正常使用否则报错
@@ -1391,20 +1380,6 @@ export class BaseService {
 
 
 **此时可以在http://localhost:3000/doc.html中测试接口是否正常使用**
-
-
-
-## Git提交记录
-
-> 方便有需要从这个记录抽离分支查看代码
-
-**2025-04-28**
-
-docs(nest-serve): 更新文档并添加用户管理模块
-
-- 更新文档：调整代码示例，优化描述内容
-- 添加用户管理模块：包括用户实体、DTO、服务、控制器和模块定义
-- 封装空值管道校验和通用排序方法
 
 
 
@@ -2069,8 +2044,473 @@ export class AuthModule {}
 ### 接口调整
 
 >  用户接口前缀改为：api/v1/admin/users，service中的所有函数加上platform，Controller中的都传入admin，后续开发其他平台则传入其他平台的字段
+>
+> 增加前缀，防止出现接口冲突，增加退出登录接口清除Cookie
+
+```typescript
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res, Req } from "@nestjs/common";
+import { UsersService } from "./users.service";
+import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage, LogInDto } from "./dto/index";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
+import { Request, Response } from "express";
+import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
+import { ApiResult } from "@/common/utils/result";
+
+@ApiTags("admin - 用户管理")
+@ApiResponse({ status: 200, description: "操作成功" })
+@ApiResponse({ status: 201, description: "操作成功，无返回内容" })
+@ApiResponse({ status: 400, description: "参数错误" })
+@ApiResponse({ status: 401, description: "token失效，请重新登录" })
+@ApiResponse({ status: 403, description: "权限不足" })
+@ApiResponse({ status: 404, description: "请求资源不存在" })
+@ApiResponse({ status: 500, description: "服务器异常，请联系管理员" })
+@Controller("api/v1/admin/users")
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post("create")
+  @ApiOperation({ summary: "创建用户" })
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto, "admin");
+  }
+
+  @Get("page")
+  @ApiOperation({ summary: "查询用户列表(分页)" })
+  findByPage(@Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage) {
+    return this.usersService.findByPage(findUserDtoByPage, "admin");
+  }
+
+  @Get("all")
+  @ApiOperation({ summary: "查询用户列表(不分页)" })
+  findAll(@Query(new FilterEmptyPipe()) findUserDto: FindUserDto) {
+    return this.usersService.findAll(findUserDto, "admin");
+  }
+
+  @Get("info/:id")
+  @ApiOperation({ summary: "查询用户详情" })
+  findOne(@Param("id") id: string) {
+    return this.usersService.findOne(+id, "admin");
+  }
+
+  @Patch("update/:id")
+  @ApiOperation({ summary: "更新用户信息" })
+  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
+  }
+
+  @Delete("delete/:id")
+  @ApiOperation({ summary: "删除用户" })
+  remove(@Param("id") id: string) {
+    return this.usersService.remove(+id);
+  }
+
+  @Post("logIn")
+  @ApiOperation({ summary: "用户登录" })
+  logIn(@Body() loginDto: LogInDto) {
+    return this.usersService.logIn(loginDto, "admin");
+  }
+
+  @Post("/logIn/setCookie")
+  @ApiOperation({ summary: "用户登录(设置Cookie)" })
+  async logInSetCookie(@Body() loginDto: LogInDto, @Res() res: Response) {
+    let { __isApiResult, ...data } = await this.usersService.logIn(loginDto, "admin");
+    if (data.code == 200) {
+      const options = getPlatformJwtConfig("admin") as JwtConfig;
+      console.log(" Number(options.jwt_expires_in) * 1000  :>> ", Number(options.jwt_expires_in) * 1000);
+      res.cookie("token", data.data.access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
+      res.cookie("refresh_token", data.data.refresh_token, {
+        maxAge: Number(options.jwt_refresh_expires_in) * 1000,
+      });
+      res.json(data);
+    } else {
+      res.status(data.code).json(data);
+    }
+  }
+
+  @Get("refresh/token")
+  @ApiOperation({ summary: "刷新token" })
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    let refresh_token: string | undefined;
+    // 首先尝试从 Cookie 中获取 Token
+    if (req.cookies && req.cookies.refresh_token) {
+      refresh_token = req.cookies.refresh_token;
+    }
+    // 如果没有从 Cookie 中获取到 refreshToken，则尝试从请求头中获取
+    if (!refresh_token) {
+      refresh_token = (req.headers["refresh_token"] as string)?.split(" ")[1]; // 从请求头获取 Bearer Token
+    }
+    if (!refresh_token) {
+      return res.status(401).json({ code: 401, message: "refreshToken不存在，请先登录！", data: null });
+    }
+    let { __isApiResult, ...data } = await this.usersService.refreshToken(refresh_token, "admin");
+    if (data.code == 200) {
+      const options = getPlatformJwtConfig("admin") as JwtConfig;
+      res.cookie("token", data.data.access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
+    }
+    res.status(data.code).json(data);
+  }
+
+  @Get("logout")
+  @ApiOperation({ summary: "退出登录清除Cookie" })
+  logout(@Res() res: Response) {
+    res.cookie("token", "", { expires: new Date(0) });
+    res.cookie("refresh_token", "", { expires: new Date(0) });
+    const { __isApiResult, ...data } = ApiResult.success({ data: null });
+    res.json(data);
+  }
+}
 
 ```
 
+
+
+users.service.ts
+
+```typescript
+import { Injectable } from "@nestjs/common";
+import { CreateUserDto, FindUserDto, FindUserDtoByPage, LogInDto, UpdateUserDto } from "./dto/index";
+import { ApiResult } from "@/common/utils/result";
+import { InjectRepository } from "@nestjs/typeorm";
+import { User } from "./entities/user.entity";
+import { Brackets, ILike, Repository } from "typeorm";
+import { BaseService } from "@/common/service/base";
+import { JwtService } from "@nestjs/jwt";
+import { bcryptService } from "@/common/utils/bcrypt-hash";
+import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
+
+@Injectable()
+export class UsersService extends BaseService {
+  constructor(
+    @InjectRepository(User) // NestJS 会根据这个装饰器将 UserRepository 自动注入到 userRepository 变量中。
+    private userRepository: Repository<User>, // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
+
+    private readonly jwtService: JwtService, // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
+  ) {
+    super();
+  }
+
+  /**
+   * 创建用户
+   * @param {CreateUserDto} createUserDto  创建用户DTO
+   * @param {string} platform  平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async create(createUserDto: CreateUserDto, platform: string = "admin"): Promise<ApiResult<any>> {
+    try {
+      // 查询数据库，确保 userName, phone, email 不存在
+      const { userName = null, phone = null, email = null } = createUserDto;
+      // 构建查询条件
+      const queryBuilder = this.userRepository.createQueryBuilder("user");
+      queryBuilder.andWhere("user.platform = :platform", { platform });
+      if (userName || phone || email) {
+        // 使用Brackets，防止orWhere的优先级高于andWhere的platform 条件
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            if (userName) qb.where("user.userName = :userName", { userName });
+            if (phone) qb.orWhere("user.phone = :phone", { phone });
+            if (email) qb.orWhere("user.email = :email", { email });
+          })
+        );
+      }
+      // 执行查询
+      const existingUser = await queryBuilder.getOne();
+      // 如果查询结果存在，返回错误
+      if (existingUser) {
+        return ApiResult.error<string>("用户名、电话号码或邮箱已存在");
+      }
+      createUserDto.password = await bcryptService.encryptStr(createUserDto.password as string);
+      const user = this.userRepository.create(createUserDto); // 创建 User 实体
+      user.platform = platform; // 指定平台
+      // if (roleIds.length > 0) {
+      //   user.roles = await this.roleRepository.find({ where: { id: In(roleIds) } });
+      // }
+      let data = await this.userRepository.save(user); // 保存到数据库并返回
+      return ApiResult.success({ data });
+    } catch (error) {
+      return ApiResult.error<any>(error);
+    }
+  }
+
+  /**
+   * 分页查询
+   * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
+   * @param {string} platform  平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async findByPage(findUserDtoByPage?: FindUserDtoByPage, platform: string = "admin"): Promise<ApiResult<any>> {
+    try {
+      let { take, skip } = this.buildCommonPaging(findUserDtoByPage?.page, findUserDtoByPage?.pageSize);
+      let where = this.buildCommonQuery(findUserDtoByPage);
+      let order = this.buildCommonSort(findUserDtoByPage);
+      // 查询符合条件的用户
+      const [data, total] = await this.userRepository.findAndCount({
+        where: {
+          ...where,
+          platform: platform,
+          userName: findUserDtoByPage?.userName ? ILike(`%${findUserDtoByPage.userName}%`) : undefined,
+          nickName: findUserDtoByPage?.nickName ? ILike(`%${findUserDtoByPage.nickName}%`) : undefined,
+          email: findUserDtoByPage?.email ? ILike(`%${findUserDtoByPage.email}%`) : undefined,
+          phone: findUserDtoByPage?.phone ? ILike(`%${findUserDtoByPage.phone}%`) : undefined,
+        },
+        order: {
+          ...order,
+        },
+        skip, // 跳过的条数
+        take, // 每页条数
+      });
+
+      // 计算总页数
+      const totalPages = Math.ceil(total / take);
+      return ApiResult.success({
+        data: {
+          data,
+          total,
+          totalPages,
+          page: findUserDtoByPage?.page || 1,
+          pageSize: findUserDtoByPage?.pageSize || 10,
+        },
+      });
+    } catch (error) {
+      return ApiResult.error(error || "用户查询失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 查询所有用户
+   * @param {FindUserDto} findUserDto 查询条件
+   * @param {string} platform  平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async findAll(findUserDto?: FindUserDto, platform: string = "admin"): Promise<ApiResult<any>> {
+    try {
+      let where = this.buildCommonQuery(findUserDto);
+      let order = this.buildCommonSort(findUserDto);
+      let data = await this.userRepository.find({
+        where: {
+          ...where,
+          platform,
+          userName: findUserDto?.userName ? ILike(`%${findUserDto.userName}%`) : undefined,
+          nickName: findUserDto?.nickName ? ILike(`%${findUserDto.nickName}%`) : undefined,
+          email: findUserDto?.email ? ILike(`%${findUserDto.email}%`) : undefined,
+          phone: findUserDto?.phone ? ILike(`%${findUserDto.phone}%`) : undefined,
+        },
+        order: {
+          ...order,
+        },
+      }); // 查询所有用户并返回;
+      return ApiResult.success({ data });
+    } catch (error) {
+      return ApiResult.error(error || "用户查询失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 通过ID查询详情
+   * @param {number} id
+   * @param {string} platform  平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async findOne(id: number, platform: string = "admin"): Promise<ApiResult<any>> {
+    try {
+      let data = await this.userRepository.findOne({ where: { id, platform } });
+      if (!data) {
+        return ApiResult.error("用户不存在");
+      }
+      return ApiResult.success({ data });
+    } catch (error) {
+      return ApiResult.error(error || "用户查询失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 修改用户信息
+   * @param {number} id 用户ID
+   * @param updateUserDto 更新用户信息
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResult<any>> {
+    try {
+      let data = await this.userRepository.update(id, updateUserDto);
+      return ApiResult.success({ data });
+    } catch (error) {
+      return ApiResult.error(error || "用户更新失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 删除用户信息
+   * @param {number} id 用户ID
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async remove(id: number): Promise<ApiResult<any>> {
+    try {
+      let data = await this.userRepository.softDelete(id);
+      return ApiResult.success({ data });
+    } catch (error) {
+      return ApiResult.error(error || "用户删除失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 登录
+   * @param {LogInDto} logInDto 登录参数
+   * @param {string} platform  平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<any>> {
+    try {
+      let data = await this.userRepository.findOne({
+        where: { userName: logInDto.userName, platform },
+      });
+
+      if (!data) {
+        return ApiResult.error("用户不存在");
+      }
+      const status = await bcryptService.validateStr(logInDto.password, data.password);
+      if (!status) {
+        return ApiResult.error("用户名或密码错误");
+      }
+
+      // 这个状态需要自定义
+      if (data.status === 2) {
+        return ApiResult.error("当前账号已被禁用，请联系管理员！");
+      }
+      let { password, ...info } = data;
+
+      let options = getPlatformJwtConfig(platform) as JwtConfig;
+      let userInfo = {
+        userInfo: info,
+        token_type: "Bearer",
+        access_token: this.jwtService.sign(info, {
+          secret: options.secret,
+          expiresIn: options.jwt_expires_in,
+        }),
+        refresh_token: this.jwtService.sign(
+          { id: info.id },
+          {
+            secret: options.secret,
+            expiresIn: options.jwt_refresh_expires_in,
+          }
+        ),
+      };
+      return ApiResult.success({ data: userInfo });
+    } catch (error) {
+      return ApiResult.error(error || "用户登录失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 使用 refresh_token 刷新token
+   * @param refreshToken refresh_token
+   * @param {string} platform  平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   */
+  async refreshToken(refreshToken: string, platform: string = "admin"): Promise<ApiResult<any>> {
+    try {
+      let options = getPlatformJwtConfig(platform) as JwtConfig;
+      let { id } = this.jwtService.verify(refreshToken, {
+        secret: options.secret,
+      });
+      let user = await this.userRepository.findOne({
+        where: { id, platform },
+      });
+      if (!user) {
+        return ApiResult.error({
+          data: null,
+          message: "用户不存在",
+          code: 401,
+        });
+      }
+
+      let { password, ...data } = user;
+      let token = this.jwtService.sign(data, {
+        secret: options.secret,
+        expiresIn: options.jwt_expires_in,
+      });
+      return ApiResult.success<any>({
+        data: {
+          token_type: "Bearer",
+          access_token: token,
+        },
+      });
+    } catch (error) {
+      return ApiResult.error(error || "刷新token失败，请重新登录！");
+    }
+  }
+}
+
 ```
+
+
+
+### 中间件解密修改
+
+> 需要更加平台获取密钥解密token
+
+```typescript
+import { JwtService } from "@nestjs/jwt";
+import { Request, Response, NextFunction } from "express";
+import { WhiteList } from "@/config/whiteList";
+import { ApiResult } from "@/common/utils/result";
+import { UsersService } from "@/module/users/users.service";
+import { ConfigService } from "@nestjs/config";
+import { getPlatformJwtConfig } from "@/config/jwt";
+
+export async function createAuthMiddleware(jwtService: JwtService, usersService: UsersService) {
+  const configService = new ConfigService();
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const whiteListStartsWith = WhiteList.whiteListStartsWith;
+    const whiteListExact = WhiteList.whiteListExact;
+    let state = false; // 是否匹配白名单
+    const url = req.url;
+    // 检查白名单
+    if (whiteListStartsWith.some((prefix) => url.startsWith(prefix)) || whiteListExact.includes(url)) {
+      state = true; // 如果匹配白名单，跳过 JWT 验证
+    }
+
+    let token: string | undefined;
+    // 首先尝试从 Cookie 中获取 Token
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    }
+    // 如果没有从 Cookie 中获取到 Token，则尝试从请求头中获取
+    if (!token) {
+      token = req.headers["authorization"]?.split(" ")[1]; // 从请求头获取 Bearer Token
+    }
+    if (!token && !state) {
+      let { __isApiResult, ...data } = ApiResult.error({ code: 401, message: "请登录后访问！", data: null });
+      return res.status(401).json(data);
+    }
+
+    try {
+      const options = getPlatformJwtConfig(url.split("/")[2]);
+      if (options) {
+        let payload: any, user: any;
+        user = payload = jwtService.verify(token as string, {
+          secret: options.secret,
+        });
+        // // 验证用户状态、如果不需要可以直接注释
+        // user = await usersService.findOne(payload.id);
+        // // 当前定义 2 为禁用
+        // if (user.data.status === 2) {
+        //   return res.status(403).json(ApiResult.error({ code: 403, message: "当前账号已被禁用，请联系管理员！", data: null }));
+        // }
+
+        req.userInfo = user; // 将用户信息附加到请求对象上
+      }
+      next();
+    } catch (e) {
+      if (state) {
+        return next(); // 如果是白名单的路径，跳过验证
+      } else {
+        return res.status(401).json(ApiResult.error({ code: 401, message: "授权失败，Token无效！", data: null }));
+      }
+    }
+  };
+}
+
+```
+
+
 

@@ -25,7 +25,7 @@ export class ApiResult<T> {
 
   static error<T>(param: Error | string | Result<T>): ApiResult<T> {
     let message = "操作失败",
-      code = 500,
+      code = 400,
       data: T | null = null;
     if (param instanceof HttpException) {
       // 获取 HttpException 的响应内容和状态码

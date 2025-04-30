@@ -8,22 +8,13 @@ import { FindOptionsOrderValue } from "typeorm";
 export class CreateBaseDto {
   @ApiProperty({ description: "排序", required: false, example: 1 })
   @IsOptional()
-  @IsNumber({}, { message: "排序值必须为数字" })
+  @IsNumber({}, { message: "sort必须为数字" })
   sort?: number;
 
   @ApiProperty({ description: "状态；1 - 启用，2 - 禁用；根据模块业务定义", required: false, example: 1 })
   @IsOptional()
-  @IsNumber({}, { message: "状态值必须为数字" })
+  @IsNumber({}, { message: "status必须为数字" })
   status?: number;
-}
-
-/**
- * 通过ID处理数据
- */
-export class ProcessDataThroughID {
-  @ApiProperty({ description: "id", required: true, example: 1 })
-  @IsString({ message: "id值必须为字符串" })
-  id: string;
 }
 
 /**
@@ -37,7 +28,7 @@ export class FindByParameter {
     default: "DESC",
   })
   @IsOptional()
-  @IsString({ message: "排序值必须为字符串" })
+  @IsString({ message: "sort必须为字符串" })
   sort?: FindOptionsOrderValue;
 
   @ApiProperty({
