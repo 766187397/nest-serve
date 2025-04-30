@@ -8,6 +8,7 @@ import { ApiResultInterceptor } from "@/common/interceptor/api-result.intercepto
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { AuthModule } from './module/auth/auth.module';
 import { DefaultDataModule } from './module/default-data/default-data.module';
+import { UploadModule } from './module/upload/upload.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { DefaultDataModule } from './module/default-data/default-data.module';
     Knife4jModule,
     AuthModule,
     DefaultDataModule,
+    UploadModule,
   ],
   controllers: [],
   providers: [

@@ -5,6 +5,7 @@ export class WhiteList {
     "/api-docs", // knife4j 分组接口文档
     "/webjars", // knife4j 静态资源
     "/swagger", // swagger 接口文档地址
+    "/api/v1/large/files",
   ];
   // 全匹配
   static whiteListExact: string[] = [

@@ -20,6 +20,7 @@ import { createAuthMiddleware } from "./module/auth/auth.middleware";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "./module/users/users.service";
 import { ClassValidatorExceptionFilter } from "./common/filter/class-validator-filter";
+import { ErrorFilter } from "./common/filter/multer";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -57,6 +58,8 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   // 表单校验过滤器
   app.useGlobalFilters(new ClassValidatorExceptionFilter());
+  // 文件上传过滤器
+  app.useGlobalFilters(new ErrorFilter());
 
   await app.listen(port).then((res) => {
     console.log(`当前环境为：${envFilePath}`);
