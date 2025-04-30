@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsOptional, IsString } from "class-validator";
-import { IsStringOrNumber } from "@/common/utils/class-validator";
 import { FindOptionsOrderValue } from "typeorm";
 
 /**
@@ -23,8 +22,8 @@ export class CreateBaseDto {
  */
 export class ProcessDataThroughID {
   @ApiProperty({ description: "id", required: true, example: 1 })
-  @IsStringOrNumber()
-  id: number | string;
+  @IsString({ message: "id值必须为字符串" })
+  id: string;
 }
 
 /**
@@ -48,8 +47,8 @@ export class FindByParameter {
     example: 1,
   })
   @IsOptional()
-  @IsStringOrNumber()
-  status?: number | string;
+  @IsString({ message: "status值必须为字符串" })
+  status?: string;
 
   @ApiProperty({
     type: "string",

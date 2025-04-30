@@ -141,7 +141,7 @@ export abstract class BaseEntity {
   status: number;
 
   @Exclude({ toPlainOnly: true })
-  @Column({ default: "web", comment: "平台标识（如admin/web/app/mini）" })
+  @Column({ default: "admin", comment: "平台标识（如admin/web/app/mini）" })
   platform: string;
 
   @CreateDateColumn({ comment: "创建时间" })
@@ -1666,14 +1666,14 @@ nest g module module/defaultData --no-spec
             userName: "admin",
             nickName: "管理员",
             password,
-            phoneNumber: "18888888888",
+            phone: "18888888888",
             email: "admin@example.com",
             sex: "0",
           },
           {
             userName: "john_doe",
             nickName: "John Doe",
-            phoneNumber: "18888888889",
+            phone: "18888888889",
             email: "john@example.com",
             password,
             sex: "0",
@@ -2026,3 +2026,51 @@ export const bcryptService = new BcryptService();
 
 
 清空用户后重新运行查看数据库，密码：123456  加密为：$2b$04$y5EawwB10CsH621kMBKpPOm.AirfMCXQ5DhepK69kjCtsJmMwJP.y
+
+
+
+## 多平台
+
+> 小项目、小团队等基本上不会给每一个平台抽离成不同的后端，都是在一个后端代码中实现的，如果用户的日活上来了就升级服务器或部署多套后端通过nginx代理到不同的实例中
+
+### 修改JWT模块
+
+> 不同平台的JWT使用不同的密钥和时间，之前写的默认的密钥和时间可以删除
+
+```typescript
+import { forwardRef, Module } from "@nestjs/common";
+import { JwtModule } from "@nestjs/jwt";
+import { UsersModule } from "@/module/users/users.module";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+@Module({
+  imports: [
+    // 仅引入 JwtModule，不绑定默认密钥
+    JwtModule.register({}),
+    // JwtModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (config: ConfigService) => ({
+    //     secret: config.get("JWT_SECRET"),
+    //     // signOptions: { expiresIn: config.get("JWT_EXPIRES_IN") + "h" }, // 全局的时长配置
+    //   }),
+    //   inject: [ConfigService],
+    // }),
+    forwardRef(() => UsersModule), // 使用 forwardRef 解决循环依赖
+  ],
+  controllers: [],
+  providers: [],
+  exports: [JwtModule],
+})
+export class AuthModule {}
+
+```
+
+
+
+### 接口调整
+
+>  用户接口前缀改为：api/v1/admin/users，service中的所有函数加上platform，Controller中的都传入admin，后续开发其他平台则传入其他平台的字段
+
+```
+
+```
+

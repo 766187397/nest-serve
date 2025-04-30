@@ -13,7 +13,7 @@ export abstract class BaseEntity {
   status: number;
 
   @Exclude({ toPlainOnly: true })
-  @Column({ default: "web", comment: "平台标识（如admin/web/app/mini），具体更加数据来定义，如果app和mini的数据就是前台的就和前台使用一样的字段不要修改即可" })
+  @Column({ default: "admin", comment: "平台标识（如admin/web/app/mini），具体更加数据来定义，如果app和mini的数据就是前台的就和前台使用一样的字段不要修改即可" })
   platform: string;
 
   @CreateDateColumn({ comment: "创建时间" })

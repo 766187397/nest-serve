@@ -3,11 +3,12 @@ import { CreateUserDto, FindUserDto, FindUserDtoByPage, LogInDto, UpdateUserDto 
 import { ApiResult } from "@/common/utils/result";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
-import { Repository } from "typeorm";
+import { Brackets, ILike, Repository } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { bcryptService } from "@/common/utils/bcrypt-hash";
+import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
 
 @Injectable()
 export class UsersService extends BaseService {
@@ -24,18 +25,25 @@ export class UsersService extends BaseService {
   /**
    * 创建用户
    * @param {CreateUserDto} createUserDto  创建用户DTO
+   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<any>>} 统一返回结果
    */
-  async create(createUserDto: CreateUserDto): Promise<ApiResult<any>> {
+  async create(createUserDto: CreateUserDto, platform: string = "admin"): Promise<ApiResult<any>> {
     try {
       // 查询数据库，确保 userName, phone, email 不存在
       const { userName = null, phone = null, email = null } = createUserDto;
-
       // 构建查询条件
       const queryBuilder = this.userRepository.createQueryBuilder("user");
-      userName && queryBuilder.andWhere("user.userName = :userName", { userName });
-      phone && queryBuilder.orWhere("user.phone = :phone", { phone });
-      email && queryBuilder.orWhere("user.email = :email", { email });
+      queryBuilder.andWhere("user.platform = :platform", { platform });
+      if (userName || phone || email) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            if (userName) qb.where("user.userName = :userName", { userName });
+            if (phone) qb.orWhere("user.phone = :phone", { phone });
+            if (email) qb.orWhere("user.email = :email", { email });
+          })
+        );
+      }
       // 执行查询
       const existingUser = await queryBuilder.getOne();
       // 如果查询结果存在，返回错误
@@ -44,6 +52,7 @@ export class UsersService extends BaseService {
       }
       createUserDto.password = await bcryptService.encryptStr(createUserDto.password as string);
       const user = this.userRepository.create(createUserDto); // 创建 User 实体
+      user.platform = platform; // 指定平台
       // if (roleIds.length > 0) {
       //   user.roles = await this.roleRepository.find({ where: { id: In(roleIds) } });
       // }
@@ -57,9 +66,10 @@ export class UsersService extends BaseService {
   /**
    * 分页查询
    * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
+   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<any>>} 统一返回结果
    */
-  async findByPage(findUserDtoByPage?: FindUserDtoByPage): Promise<ApiResult<any>> {
+  async findByPage(findUserDtoByPage?: FindUserDtoByPage, platform: string = "admin"): Promise<ApiResult<any>> {
     try {
       let { take, skip } = this.buildCommonPaging(findUserDtoByPage?.page, findUserDtoByPage?.pageSize);
       let where = this.buildCommonQuery(findUserDtoByPage);
@@ -68,10 +78,11 @@ export class UsersService extends BaseService {
       const [data, total] = await this.userRepository.findAndCount({
         where: {
           ...where,
-          userName: findUserDtoByPage?.userName,
-          nickName: findUserDtoByPage?.nickName,
-          email: findUserDtoByPage?.email,
-          phone: findUserDtoByPage?.phone,
+          platform: platform,
+          userName: findUserDtoByPage?.userName ? ILike(`%${findUserDtoByPage.userName}%`) : undefined,
+          nickName: findUserDtoByPage?.nickName ? ILike(`%${findUserDtoByPage.nickName}%`) : undefined,
+          email: findUserDtoByPage?.email ? ILike(`%${findUserDtoByPage.email}%`) : undefined,
+          phone: findUserDtoByPage?.phone ? ILike(`%${findUserDtoByPage.phone}%`) : undefined,
         },
         order: {
           ...order,
@@ -99,19 +110,21 @@ export class UsersService extends BaseService {
   /**
    * 查询所有用户
    * @param {FindUserDto} findUserDto 查询条件
+   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<any>>} 统一返回结果
    */
-  async findAll(findUserDto?: FindUserDto): Promise<ApiResult<any>> {
+  async findAll(findUserDto?: FindUserDto, platform: string = "admin"): Promise<ApiResult<any>> {
     try {
       let where = this.buildCommonQuery(findUserDto);
       let order = this.buildCommonSort(findUserDto);
       let data = await this.userRepository.find({
         where: {
           ...where,
-          userName: findUserDto?.userName,
-          nickName: findUserDto?.nickName,
-          email: findUserDto?.email,
-          phone: findUserDto?.phone,
+          platform,
+          userName: findUserDto?.userName ? ILike(`%${findUserDto.userName}%`) : undefined,
+          nickName: findUserDto?.nickName ? ILike(`%${findUserDto.nickName}%`) : undefined,
+          email: findUserDto?.email ? ILike(`%${findUserDto.email}%`) : undefined,
+          phone: findUserDto?.phone ? ILike(`%${findUserDto.phone}%`) : undefined,
         },
         order: {
           ...order,
@@ -126,11 +139,12 @@ export class UsersService extends BaseService {
   /**
    * 通过ID查询详情
    * @param {number} id
+   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<any>>} 统一返回结果
    */
-  async findOne(id: number): Promise<ApiResult<any>> {
+  async findOne(id: number, platform: string = "admin"): Promise<ApiResult<any>> {
     try {
-      let data = await this.userRepository.findOne({ where: { id } });
+      let data = await this.userRepository.findOne({ where: { id, platform } });
       return ApiResult.success({ data });
     } catch (error) {
       return ApiResult.error(error || "用户查询失败，请稍后再试");
@@ -169,12 +183,13 @@ export class UsersService extends BaseService {
   /**
    * 登录
    * @param {LogInDto} logInDto 登录参数
+   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<any>>} 统一返回结果
    */
-  async logIn(logInDto: LogInDto): Promise<ApiResult<any>> {
+  async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<any>> {
     try {
       let data = await this.userRepository.findOne({
-        where: { userName: logInDto.userName },
+        where: { userName: logInDto.userName, platform },
       });
 
       if (!data) {
@@ -190,14 +205,20 @@ export class UsersService extends BaseService {
         return ApiResult.error("当前账号已被禁用，请联系管理员！");
       }
       let { password, ...info } = data;
+
+      let options = getPlatformJwtConfig(platform) as JwtConfig;
       let userInfo = {
         userInfo: info,
         token_type: "Bearer",
-        access_token: this.jwtService.sign(info),
+        access_token: this.jwtService.sign(info, {
+          secret: options.secret,
+          expiresIn: options.jwt_expires_in,
+        }),
         refresh_token: this.jwtService.sign(
           { id: info.id },
           {
-            expiresIn: this.configService.get("JWT_REFRESH_EXPIRES_IN") + "d",
+            secret: options.secret,
+            expiresIn: options.jwt_refresh_expires_in,
           }
         ),
       };
@@ -210,13 +231,17 @@ export class UsersService extends BaseService {
   /**
    * 使用 refresh_token 刷新token
    * @param refreshToken refresh_token
+   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<any>>} 统一返回结果
    */
-  async refreshToken(refreshToken: string): Promise<ApiResult<any>> {
+  async refreshToken(refreshToken: string, platform: string = "admin"): Promise<ApiResult<any>> {
     try {
-      let { id } = this.jwtService.verify(refreshToken);
+      let options = getPlatformJwtConfig(platform) as JwtConfig;
+      let { id } = this.jwtService.verify(refreshToken, {
+        secret: options.secret,
+      });
       let user = await this.userRepository.findOne({
-        where: { id },
+        where: { id, platform },
       });
       if (!user) {
         return ApiResult.error({
@@ -225,8 +250,12 @@ export class UsersService extends BaseService {
           code: 401,
         });
       }
+
       let { password, ...data } = user;
-      let token = this.jwtService.sign(data);
+      let token = this.jwtService.sign(data, {
+        secret: options.secret,
+        expiresIn: options.jwt_expires_in,
+      });
       return ApiResult.success<any>({
         data: {
           token_type: "Bearer",

@@ -26,17 +26,26 @@ export class defaultData implements OnApplicationBootstrap {
           userName: "admin",
           nickName: "管理员",
           password,
-          phoneNumber: "18888888888",
+          phone: "18888888888",
           email: "admin@example.com",
           sex: "0",
         },
         {
           userName: "john_doe",
           nickName: "John Doe",
-          phoneNumber: "18888888889",
+          phone: "18888888889",
           email: "john@example.com",
           password,
           sex: "0",
+        },
+        {
+          userName: "test",
+          nickName: "测试用户",
+          phone: "18333333333",
+          email: "test@example.com",
+          password,
+          sex: "0",
+          platform: "web",
         },
       ];
       await this.userRepository.save(users); // 插入数据

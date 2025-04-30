@@ -10,8 +10,8 @@ export class WhiteList {
   static whiteListExact: string[] = [
     "/favicon.ico", // 网站图标
     "/v3/api-docs/swagger-config", // knife4j 请求配置
-    "/api/v1/backend/users/logIn", // 登录接口
-    "/api/v1/backend/users/logIn/setCookie", // 登录接口
-    "/api/v1/backend/users/refresh/token", // 登录接口
+    "/api/v1/admin/users/logIn", // 登录接口
+    "/api/v1/admin/users/logIn/setCookie", // 登录接口
+    "/api/v1/admin/users/refresh/token", // 登录接口
   ];
 }

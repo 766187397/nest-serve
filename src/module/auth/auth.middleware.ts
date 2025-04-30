@@ -3,8 +3,11 @@ import { Request, Response, NextFunction } from "express";
 import { WhiteList } from "@/config/whiteList";
 import { ApiResult } from "@/common/utils/result";
 import { UsersService } from "@/module/users/users.service";
+import { ConfigService } from "@nestjs/config";
+import { getPlatformJwtConfig } from "@/config/jwt";
 
 export async function createAuthMiddleware(jwtService: JwtService, usersService: UsersService) {
+  const configService = new ConfigService();
   return async (req: Request, res: Response, next: NextFunction) => {
     const whiteListStartsWith = WhiteList.whiteListStartsWith;
     const whiteListExact = WhiteList.whiteListExact;
@@ -30,17 +33,21 @@ export async function createAuthMiddleware(jwtService: JwtService, usersService:
     }
 
     try {
-      let payload: any, user: any;
-      user = payload = jwtService.verify(token as string);
+      const options = getPlatformJwtConfig(url.split("/")[2]);
+      if (options) {
+        let payload: any, user: any;
+        user = payload = jwtService.verify(token as string, {
+          secret: options.secret,
+        });
+        // // 验证用户状态、如果不需要可以直接注释
+        // user = await usersService.findOne(payload.id);
+        // // 当前定义 2 为禁用
+        // if (user.data.status === 2) {
+        //   return res.status(403).json(ApiResult.error({ code: 403, message: "当前账号已被禁用，请联系管理员！", data: null }));
+        // }
 
-      // // 验证用户状态、如果不需要可以直接注释
-      // user = await usersService.findOne(payload.id);
-      // // 当前定义 2 为禁用
-      // if (user.data.status === 2) {
-      //   return res.status(403).json(ApiResult.error({ code: 403, message: "当前账号已被禁用，请联系管理员！", data: null }));
-      // }
-
-      req.userInfo = user; // 将用户信息附加到请求对象上
+        req.userInfo = user; // 将用户信息附加到请求对象上
+      }
       next();
     } catch (e) {
       if (state) {

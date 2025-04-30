@@ -5,8 +5,10 @@ import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage, LogInDto 
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request, Response } from "express";
+import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
+import { ApiResult } from "@/common/utils/result";
 
-@ApiTags("用户管理")
+@ApiTags("admin - 用户管理")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
 @ApiResponse({ status: 400, description: "参数错误" })
@@ -14,32 +16,32 @@ import { Request, Response } from "express";
 @ApiResponse({ status: 403, description: "权限不足" })
 @ApiResponse({ status: 404, description: "请求资源不存在" })
 @ApiResponse({ status: 500, description: "服务器异常，请联系管理员" })
-@Controller("api/v1/backend/users")
+@Controller("api/v1/admin/users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @ApiOperation({ summary: "创建用户" })
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return this.usersService.create(createUserDto, "admin");
   }
 
   @Get("/page")
   @ApiOperation({ summary: "查询用户列表(分页)" })
   findByPage(@Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage) {
-    return this.usersService.findByPage(findUserDtoByPage);
+    return this.usersService.findByPage(findUserDtoByPage, "admin");
   }
 
   @Get()
   @ApiOperation({ summary: "查询用户列表(不分页)" })
   findAll(@Query(new FilterEmptyPipe()) findUserDto: FindUserDto) {
-    return this.usersService.findAll(findUserDto);
+    return this.usersService.findAll(findUserDto, "admin");
   }
 
   @Get(":id")
   @ApiOperation({ summary: "查询用户详情" })
   findOne(@Param("id") id: ProcessDataThroughID) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(+id, "admin");
   }
 
   @Patch(":id")
@@ -57,17 +59,18 @@ export class UsersController {
   @Post("/logIn")
   @ApiOperation({ summary: "用户登录" })
   logIn(@Body() loginDto: LogInDto) {
-    return this.usersService.logIn(loginDto);
+    return this.usersService.logIn(loginDto, "admin");
   }
 
   @Post("/logIn/setCookie")
   @ApiOperation({ summary: "用户登录(设置Cookie)" })
   async logInSetCookie(@Body() loginDto: LogInDto, @Res() res: Response) {
-    let { __isApiResult, ...data } = await this.usersService.logIn(loginDto);
+    let { __isApiResult, ...data } = await this.usersService.logIn(loginDto, "admin");
     if (data.code == 200) {
-      res.cookie("token", data.data.access_token, { maxAge: 1000 * 60 * 60 * Number(process.env.JWT_EXPIRES_IN) });
+      const options = getPlatformJwtConfig("admin") as JwtConfig;
+      res.cookie("token", data.data.access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
       res.cookie("refresh_token", data.data.refresh_token, {
-        maxAge: 1000 * 60 * 60 * 24 * Number(process.env.JWT_EXPIRES_IN),
+        maxAge: Number(options.jwt_refresh_expires_in) * 1000,
       });
       res.json(data);
     } else {
@@ -75,7 +78,7 @@ export class UsersController {
     }
   }
 
-  @Get("refresh/token")
+  @Get("/refresh/token")
   @ApiOperation({ summary: "刷新token" })
   async refreshToken(@Req() req: Request, @Res() res: Response) {
     let refresh_token: string | undefined;
@@ -90,10 +93,19 @@ export class UsersController {
     if (!refresh_token) {
       return res.status(401).json({ code: 401, message: "refreshToken不存在，请先登录！", data: null });
     }
-    let { __isApiResult, ...data } = await this.usersService.refreshToken(refresh_token);
+    let { __isApiResult, ...data } = await this.usersService.refreshToken(refresh_token, "admin");
     if (data.code == 200) {
-      res.cookie("token", data.data.access_token, { maxAge: 1000 * 60 * 60 * Number(process.env.JWT_EXPIRES_IN) });
+      const options = getPlatformJwtConfig("admin") as JwtConfig;
+      res.cookie("token", data.data.access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
     }
     res.status(data.code).json(data);
+  }
+
+  @Get("/logout")
+  @ApiOperation({ summary: "退出登录清除Cookie" })
+  logout(@Res() res: Response) {
+    console.log("退出登录清除Cookie :>> ");
+    res.cookie("token", "", { expires: new Date(0) });
+    res.json(null);
   }
 }
