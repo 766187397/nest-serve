@@ -7,8 +7,9 @@ import * as path from "path";
 import * as fs from "fs";
 import { ApiResult } from "@/common/utils/result";
 import { UploadService } from "./upload.service";
+import { FileUploadService } from "@/config/multer";
 
-const uploadDir = "uploads";
+const uploadDir = FileUploadService.rootPath;
 
 @ApiTags("大文件切片上传")
 @Controller("api/v1/large/files")

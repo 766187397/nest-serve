@@ -2642,3 +2642,205 @@ bootstrap();
 
 ```
 
+
+
+## 文件上传
+
+> 文件上传分为两种：普通文件上传和大文件上传。不过通常还是会使用第三方的存储服务，大致也分为两种：①前端直接上传到第三方服务，返回指定的参数给后端直接存储；②后端包裹一层临时存储然后上传到第三方，前端调用后端的接口上传文件
+>
+> 当前采用方案如下：
+>
+> 普通文件上传使用multer
+>
+> 大文件上传使用tus
+
+详细查看代码
+
+**注意：大文件上传前端也得使用tus，使用knife4j查看接口文档，普通文件上传不能使用DTO的模式，不然生成的接口文档有误，没法上传文件**
+
+
+
+### 前端tus示例
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>tus 文件上传 Demo - 暂停/继续/取消</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .progress-container {
+        width: 100%;
+        background: #eee;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+      }
+      .progress-bar {
+        width: 0%;
+        height: 25px;
+        background: green;
+        color: white;
+        text-align: center;
+        line-height: 25px;
+      }
+      button {
+        margin-right: 5px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>tus 文件上传 Demo</h1>
+    <input type="file" id="fileInput" />
+    <br />
+    <button id="uploadBtn">开始上传</button>
+    <button id="pauseBtn" disabled>暂停上传</button>
+    <button id="resumeBtn" disabled>继续上传</button>
+    <button id="cancelBtn" disabled>取消上传</button>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar">0%</div>
+    </div>
+    <p id="status"></p>
+
+    <!-- 引入 tus-js-client 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/tus-js-client/dist/tus.min.js"></script>
+    <script>
+      let currentUpload = null;
+
+      const fileInput = document.getElementById("fileInput");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const pauseBtn = document.getElementById("pauseBtn");
+      const resumeBtn = document.getElementById("resumeBtn");
+      const cancelBtn = document.getElementById("cancelBtn");
+      const progressBar = document.getElementById("progressBar");
+      const statusEl = document.getElementById("status");
+
+      // 开始上传
+      uploadBtn.addEventListener("click", function () {
+        const file = fileInput.files[0];
+        if (!file) {
+          alert("请选择一个文件");
+          return;
+        }
+
+        // 禁用上传按钮，防止重复操作
+        uploadBtn.disabled = true;
+        pauseBtn.disabled = false;
+        cancelBtn.disabled = false;
+        resumeBtn.disabled = true;
+
+        // 创建 tus 上传实例
+        currentUpload = new tus.Upload(file, {
+          endpoint: "http://localhost:3000/api/v1/large/files/",
+          metadata: {
+            filename: file.name,
+            filetype: file.type,
+          },
+          retryDelays: [0, 1000, 3000, 5000],
+          onError: function (error) {
+            statusEl.innerText = "上传失败：" + error;
+            console.error("上传失败：", error);
+            uploadBtn.disabled = false;
+            pauseBtn.disabled = true;
+            cancelBtn.disabled = true;
+            resumeBtn.disabled = true;
+          },
+          onProgress: function (bytesUploaded, bytesTotal) {
+            const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+            progressBar.style.width = percentage + "%";
+            progressBar.innerText = percentage + "%";
+            statusEl.innerText = `上传中：${bytesUploaded} / ${bytesTotal} 字节`;
+          },
+          onSuccess: function (e) {
+            const segments = currentUpload.url.split("/");
+            const fileId = segments[segments.length - 1];
+            const file = currentUpload.file;
+            const extension = file.name.split(".").pop();
+            console.log("文件名称.扩展名 :>> ", fileId + "." + extension);
+            statusEl.innerText = "上传成功！上传地址：" + currentUpload.url;
+            console.log("上传成功：", currentUpload.url);
+            // 上传完成后禁用暂停/继续/取消按钮
+            uploadBtn.disabled = false;
+            pauseBtn.disabled = true;
+            resumeBtn.disabled = true;
+            cancelBtn.disabled = true;
+          },
+        });
+        // 启动上传
+        currentUpload.start();
+      });
+
+      // 暂停上传
+      pauseBtn.addEventListener("click", function () {
+        if (currentUpload) {
+          currentUpload.abort();
+          statusEl.innerText = "上传已暂停。";
+          pauseBtn.disabled = true;
+          resumeBtn.disabled = false;
+        }
+      });
+
+      // 继续上传
+      resumeBtn.addEventListener("click", function () {
+        if (currentUpload) {
+          currentUpload.start();
+          statusEl.innerText = "继续上传...";
+          pauseBtn.disabled = false;
+          resumeBtn.disabled = true;
+        }
+      });
+
+      // 取消上传，并配合后端 DELETE 方法删除已上传数据
+      cancelBtn.addEventListener("click", function () {
+        if (currentUpload) {
+          // 暂停当前上传
+          currentUpload.abort();
+          statusEl.innerText = "正在取消上传...";
+
+          // 如果已经有上传 URL，则从中提取上传文件的 ID
+          if (currentUpload.url) {
+            // 假定 URL 格式为：<endpoint>/<upload-id>
+            const segments = currentUpload.url.split("/");
+            const fileId = segments[segments.length - 1];
+
+            // 调用后端 DELETE 接口取消上传（删除服务器上的文件）
+            fetch(`http://localhost:3000/api/v1/large/tempFile/${fileId}`, {
+              method: "DELETE",
+            })
+              .then((response) => {
+                if (response.ok) {
+                  statusEl.innerText = "上传已取消并删除成功。";
+                } else {
+                  statusEl.innerText = "取消上传成功，但删除服务器文件失败。";
+                }
+              })
+              .catch((error) => {
+                console.error("取消上传时出错：", error);
+                statusEl.innerText = "取消上传时出错：请查看控制台日志。";
+              });
+          } else {
+            statusEl.innerText = "上传已取消。";
+          }
+
+          // 重置按钮状态和进度条
+          uploadBtn.disabled = false;
+          pauseBtn.disabled = true;
+          resumeBtn.disabled = true;
+          cancelBtn.disabled = true;
+          progressBar.style.width = "0%";
+          progressBar.innerText = "0%";
+        }
+      });
+    </script>
+  </body>
+</html>
+
+```
+
+
+

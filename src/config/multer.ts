@@ -1,9 +1,12 @@
 import { diskStorage } from "multer";
 
 export class FileUploadService {
-  static size = 1024 * 1024 * 50; // 文件大小限制
-  static rootPath = "uploads"; // 文件夹名称
-  static serveRoot = "/" + this.rootPath; // 主文件访问路径
+  /** 文件大小限制 */
+  static size = 1024 * 1024 * 50;
+  /** 文件夹名称 */
+  static rootPath = "uploads";
+  /** 主文件访问路径 */
+  static serveRoot = "/" + this.rootPath;
   static multerOptions = {
     storage: diskStorage({
       destination: this.rootPath, // 设置保存上传文件的目录
