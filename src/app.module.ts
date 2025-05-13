@@ -9,6 +9,7 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
 import { AuthModule } from './module/auth/auth.module';
 import { DefaultDataModule } from './module/default-data/default-data.module';
 import { UploadModule } from './module/upload/upload.module';
+import { RolesModule } from './module/roles/roles.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { UploadModule } from './module/upload/upload.module';
     AuthModule,
     DefaultDataModule,
     UploadModule,
+    RolesModule,
   ],
   controllers: [],
   providers: [

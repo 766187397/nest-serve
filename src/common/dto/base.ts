@@ -8,12 +8,12 @@ import { FindOptionsOrderValue } from "typeorm";
 export class CreateBaseDto {
   @ApiProperty({ description: "排序", required: false, example: 1 })
   @IsOptional()
-  @IsNumber({}, { message: "sort必须为数字" })
+  @IsNumber({}, { message: "排序必须为数字" })
   sort?: number;
 
   @ApiProperty({ description: "状态；1 - 启用，2 - 禁用；根据模块业务定义", required: false, example: 1 })
   @IsOptional()
-  @IsNumber({}, { message: "status必须为数字" })
+  @IsNumber({}, { message: "状态必须为数字" })
   status?: number;
 }
 
@@ -28,7 +28,7 @@ export class FindByParameter {
     default: "DESC",
   })
   @IsOptional()
-  @IsString({ message: "sort必须为字符串" })
+  @IsString({ message: "排序必须为字符串" })
   sort?: FindOptionsOrderValue;
 
   @ApiProperty({
@@ -38,7 +38,7 @@ export class FindByParameter {
     example: 1,
   })
   @IsOptional()
-  @IsString({ message: "status值必须为字符串" })
+  @IsString({ message: "状态值必须为字符串" })
   status?: string;
 
   @ApiProperty({
@@ -48,6 +48,6 @@ export class FindByParameter {
     example: "2025-1-1 10:10:10,2025-1-2 23:59:59",
   })
   @IsOptional()
-  @IsString({ message: "time必须为字符串" })
+  @IsString({ message: "时间范围必须为字符串，并且需要使用逗号隔开" })
   time?: string;
 }

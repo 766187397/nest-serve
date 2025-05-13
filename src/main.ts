@@ -87,7 +87,7 @@ async function run(app: INestApplication<any>, port?: number | string) {
       console.log(`当前环境为：${envFilePath}`);
       console.log(`server to ${url}`);
       console.log(`swagger to ${url}/swagger`);
-      console.log(`knife4j to ${url}/api/doc?v=1`);
+      console.log(`knife4j to ${url}/doc.html`);
     })
     .catch((err) => {
       if (err.errno === -4091 && process.env.PORT_AUTO !== "true") {
