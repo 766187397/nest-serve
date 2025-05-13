@@ -5,16 +5,16 @@ global.envFilePath = envFilePath;
 dotenv.config({ path: envFilePath });
 
 // 项目地址端口
-const port = process.env.PORT || 3000;
-const host = process.env.HOST || "localhost";
-const url = `http://${host}:${port}`;
+let port = process.env.PORT || 3000;
+let host = process.env.HOST || "localhost";
+let url = `http://${host}:${port}`;
 global.url = url;
 
 import { NestFactory, Reflector } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { SwaggerModule } from "@nestjs/swagger";
 import { SwaggerConfig } from "./config/swagger";
-import { ClassSerializerInterceptor, ValidationPipe } from "@nestjs/common";
+import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import { createAuthMiddleware } from "./module/auth/auth.middleware";
 import { JwtService } from "@nestjs/jwt";
@@ -61,11 +61,40 @@ async function bootstrap() {
   // 文件上传过滤器
   app.useGlobalFilters(new ErrorFilter());
 
-  await app.listen(port).then((res) => {
-    console.log(`当前环境为：${envFilePath}`);
-    console.log(`server to ${url}`);
-    console.log(`swagger to ${url}/swagger`);
-    console.log(`knife4j to ${url}/doc.html`);
-  });
+  run(app);
+  // await app.listen(port).then((res) => {
+  //   console.log(`当前环境为：${envFilePath}`);
+  //   console.log(`server to ${url}`);
+  //   console.log(`swagger to ${url}/swagger`);
+  //   console.log(`knife4j to ${url}/doc.html`);
+  // });
 }
 bootstrap();
+
+/**
+ * 运行 app 判断是否被占用，根据环境变量判断是否自动加1
+ * @param app NestFactory.create nestjs创建的实例
+ * @param port 端口号
+ */
+async function run(app: INestApplication<any>, port?: number | string) {
+  port = port || process.env.PORT || 3000;
+  host = process.env.HOST || "localhost";
+  url = `http://${host}:${port}`;
+  global.url = url;
+  await app
+    .listen(port)
+    .then((res) => {
+      console.log(`当前环境为：${envFilePath}`);
+      console.log(`server to ${url}`);
+      console.log(`swagger to ${url}/swagger`);
+      console.log(`knife4j to ${url}/api/doc?v=1`);
+    })
+    .catch((err) => {
+      if (err.errno === -4091 && process.env.PORT_AUTO !== "true") {
+        console.log("请检查端口号是否被占用");
+      } else if (err.errno === -4091 && process.env.PORT_AUTO === "true") {
+        port = Number(port) + 1;
+        run(app, port);
+      }
+    });
+}
