@@ -1,6 +1,7 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
+import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { IsArray, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 
 /**
  * 用户创建Dto
@@ -38,14 +39,20 @@ export class CreateUserDto extends CreateBaseDto {
 
   @ApiProperty({ description: "头像", required: false, example: "" })
   @IsOptional()
-  @IsString()
+  @IsString({ message: "头像地址必须是字符串" })
   avatar?: string;
+
+  @ApiProperty({ description: "角色id", required: false, example: [1] })
+  @IsOptional()
+  @IsArray({ message: "角色id必须是数组" })
+  roleIds?: number[];
 }
 
+// PartialType会创建一个新类型，其中所有属性都变为可选 
 /**
  * 用户更新Dto
  */
-export class UpdateUserDto {
+export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ description: "用户名", example: "admin" })
   @IsOptional()
   @IsString()
@@ -59,26 +66,6 @@ export class UpdateUserDto {
   @ApiProperty({ description: "密码", example: "123456" })
   @IsString()
   password?: string | undefined;
-
-  @ApiProperty({ description: "邮箱", required: false, example: "admin@qq.com" })
-  @IsOptional()
-  @IsEmail({}, { message: "邮箱格式错误" })
-  email?: string | undefined;
-
-  @ApiProperty({ description: "手机号", required: false, example: "13800138000" })
-  @IsOptional()
-  @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" })
-  phone?: string | undefined;
-
-  @ApiProperty({ description: "性别 0未知 1男 2女", required: false, example: "0", enum: ["0", "1", "2"] })
-  @IsOptional()
-  @IsIn(["0", "1", "2"], { message: "性别只能是0、1、2" })
-  sex?: string | undefined;
-
-  @ApiProperty({ description: "头像", required: false, example: "" })
-  @IsOptional()
-  @IsString()
-  avatar?: string | undefined;
 }
 
 /**

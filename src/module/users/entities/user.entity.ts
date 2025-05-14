@@ -1,6 +1,7 @@
 import { BaseEntity } from "@/common/entities/base";
-import { Column, Entity, Index } from "typeorm";
+import { Column, Entity, Index, JoinTable, ManyToMany } from "typeorm";
 import { Exclude } from "class-transformer";
+import { Role } from "@/module/roles/entities/role.entity";
 
 @Entity("users", { comment: "用户信息表" })
 // 复合索引 优化同时查询id和deletedAt的情况
@@ -28,4 +29,8 @@ export class User extends BaseEntity {
 
   @Column({ type: "varchar", name: "avatar", default: "", comment: "头像地址" })
   avatar: string;
+
+  @ManyToMany(() => Role)
+  @JoinTable()
+  roles: Role[];
 }

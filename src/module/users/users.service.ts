@@ -3,20 +3,22 @@ import { CreateUserDto, FindUserDto, FindUserDtoByPage, LogInDto, UpdateUserDto 
 import { ApiResult } from "@/common/utils/result";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
-import { Brackets, ILike, Repository, UpdateResult } from "typeorm";
+import { Brackets, ILike, In, Repository, UpdateResult } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { JwtService } from "@nestjs/jwt";
 import { bcryptService } from "@/common/utils/bcrypt-hash";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
 import { PageApiResult } from "@/types/public";
 import { RefreshToken, UserLogin } from "@/types/user";
+import { Role } from "@/module/roles/entities/role.entity";
 
 @Injectable()
 export class UsersService extends BaseService {
   constructor(
     @InjectRepository(User) // NestJS 会根据这个装饰器将 UserRepository 自动注入到 userRepository 变量中。
     private userRepository: Repository<User>, // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
-
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
     private readonly jwtService: JwtService // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
   ) {
     super();
@@ -31,7 +33,7 @@ export class UsersService extends BaseService {
   async create(createUserDto: CreateUserDto, platform: string = "admin"): Promise<ApiResult<User> | ApiResult<null>> {
     try {
       // 查询数据库，确保 userName, phone, email 不存在
-      const { userName = null, phone = null, email = null } = createUserDto;
+      const { userName = null, phone = null, email = null, roleIds = [] } = createUserDto;
       // 构建查询条件
       const queryBuilder = this.userRepository.createQueryBuilder("user");
       queryBuilder.andWhere("user.platform = :platform", { platform });
@@ -54,9 +56,9 @@ export class UsersService extends BaseService {
       createUserDto.password = await bcryptService.encryptStr(createUserDto.password as string);
       const user = this.userRepository.create(createUserDto); // 创建 User 实体
       user.platform = platform; // 指定平台
-      // if (roleIds.length > 0) {
-      //   user.roles = await this.roleRepository.find({ where: { id: In(roleIds) } });
-      // }
+      if (roleIds.length > 0) {
+        user.roles = await this.roleRepository.find({ where: { id: In(roleIds) } });
+      }
       let data = await this.userRepository.save(user); // 保存到数据库并返回
       return ApiResult.success<User>({ data });
     } catch (error) {
@@ -166,12 +168,37 @@ export class UsersService extends BaseService {
    * 修改用户信息
    * @param {number} id 用户ID
    * @param updateUserDto 更新用户信息
-   * @returns {Promise<ApiResult<UpdateResult> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<User> | ApiResult<null>>} 统一返回结果
    */
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResult<UpdateResult> | ApiResult<null>> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResult<User> | ApiResult<null>> {
     try {
-      let data = await this.userRepository.update(id, updateUserDto);
-      return ApiResult.success<UpdateResult>({ data });
+      // 查询用户
+      let userInfo = await this.userRepository.findOne({
+        where: { id },
+        relations: ["roles"],
+      });
+      if (!userInfo) {
+        return ApiResult.error("用户不存在");
+      }
+      userInfo = { ...userInfo, ...updateUserDto };
+      // 查询角色
+      if (updateUserDto.roleIds && updateUserDto.roleIds.length > 0) {
+        const roles = await this.roleRepository.find({
+          where: { id: In(updateUserDto.roleIds) },
+        });
+        userInfo.roles = roles;
+      } else if (updateUserDto.roleIds && updateUserDto.roleIds.length === 0) {
+        userInfo.roles = [];
+      }
+
+      // 修改密码加密
+      if (updateUserDto.password) {
+        updateUserDto.password = await bcryptService.encryptStr(updateUserDto.password as string);
+      }
+
+      // 重新设置信息
+      let data = await this.userRepository.save(userInfo);
+      return ApiResult.success<User>({ data });
     } catch (error) {
       const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
       return ApiResult.error<null>(errorMessage || "用户更新失败，请稍后再试");
