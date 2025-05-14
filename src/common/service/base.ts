@@ -15,13 +15,16 @@ export class BaseService {
     if (query.status) {
       where.status = query.status;
     }
-    if (query.time) {
-      let time = query.time.split(",");
-      if (time.length == 2) {
-        let start = dayjs(time[0]).startOf("day").toDate();
-        let end = dayjs(time[1]).endOf("day").toDate();
-        where.createdAt = Between(start, end);
-      }
+    let time: string[] = [];
+    if (typeof query.time === "string") {
+      time = query.time.split(",");
+    } else if (Array.isArray(query.time)) {
+      time = query.time;
+    }
+    if (time.length == 2) {
+      let start = dayjs(time[0]).startOf("day").toDate();
+      let end = dayjs(time[1]).endOf("day").toDate();
+      where.createdAt = Between(start, end);
     }
     return where;
   }
