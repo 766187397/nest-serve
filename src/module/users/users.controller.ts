@@ -6,6 +6,7 @@ import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request, Response } from "express";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
 import { ApiResult } from "@/common/utils/result";
+import { UserLogin } from "@/types/user";
 
 @ApiTags("admin - 用户管理")
 @ApiResponse({ status: 200, description: "操作成功" })
@@ -68,8 +69,8 @@ export class UsersController {
     if (data.code == 200) {
       const options = getPlatformJwtConfig("admin") as JwtConfig;
       console.log(" Number(options.jwt_expires_in) * 1000  :>> ", Number(options.jwt_expires_in) * 1000);
-      res.cookie("token", data.data.access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
-      res.cookie("refresh_token", data.data.refresh_token, {
+      res.cookie("token", (data?.data as UserLogin).access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
+      res.cookie("refresh_token", (data?.data as UserLogin).refresh_token, {
         maxAge: Number(options.jwt_refresh_expires_in) * 1000,
       });
       res.json(data);

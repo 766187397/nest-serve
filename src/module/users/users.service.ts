@@ -3,11 +3,13 @@ import { CreateUserDto, FindUserDto, FindUserDtoByPage, LogInDto, UpdateUserDto 
 import { ApiResult } from "@/common/utils/result";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
-import { Brackets, ILike, Repository } from "typeorm";
+import { Brackets, ILike, Repository, UpdateResult } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { JwtService } from "@nestjs/jwt";
 import { bcryptService } from "@/common/utils/bcrypt-hash";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
+import { PageApiResult } from "@/types/public";
+import { RefreshToken, UserLogin } from "@/types/user";
 
 @Injectable()
 export class UsersService extends BaseService {
@@ -15,7 +17,7 @@ export class UsersService extends BaseService {
     @InjectRepository(User) // NestJS 会根据这个装饰器将 UserRepository 自动注入到 userRepository 变量中。
     private userRepository: Repository<User>, // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
 
-    private readonly jwtService: JwtService, // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
+    private readonly jwtService: JwtService // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
   ) {
     super();
   }
@@ -24,9 +26,9 @@ export class UsersService extends BaseService {
    * 创建用户
    * @param {CreateUserDto} createUserDto  创建用户DTO
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   * @returns {Promise<ApiResult<User> | ApiResult<null>>} 统一返回结果
    */
-  async create(createUserDto: CreateUserDto, platform: string = "admin"): Promise<ApiResult<any>> {
+  async create(createUserDto: CreateUserDto, platform: string = "admin"): Promise<ApiResult<User> | ApiResult<null>> {
     try {
       // 查询数据库，确保 userName, phone, email 不存在
       const { userName = null, phone = null, email = null } = createUserDto;
@@ -47,7 +49,7 @@ export class UsersService extends BaseService {
       const existingUser = await queryBuilder.getOne();
       // 如果查询结果存在，返回错误
       if (existingUser) {
-        return ApiResult.error<string>("用户名、电话号码或邮箱已存在");
+        return ApiResult.error<null>("用户名、电话号码或邮箱已存在");
       }
       createUserDto.password = await bcryptService.encryptStr(createUserDto.password as string);
       const user = this.userRepository.create(createUserDto); // 创建 User 实体
@@ -56,9 +58,10 @@ export class UsersService extends BaseService {
       //   user.roles = await this.roleRepository.find({ where: { id: In(roleIds) } });
       // }
       let data = await this.userRepository.save(user); // 保存到数据库并返回
-      return ApiResult.success({ data });
+      return ApiResult.success<User>({ data });
     } catch (error) {
-      return ApiResult.error<any>(error);
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "用户创建失败，请稍后再试");
     }
   }
 
@@ -66,9 +69,12 @@ export class UsersService extends BaseService {
    * 分页查询
    * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   * @returns {Promise<ApiResult<null> | ApiResult<PageApiResult<User[]>>>} 统一返回结果
    */
-  async findByPage(findUserDtoByPage?: FindUserDtoByPage, platform: string = "admin"): Promise<ApiResult<any>> {
+  async findByPage(
+    findUserDtoByPage?: FindUserDtoByPage,
+    platform: string = "admin"
+  ): Promise<ApiResult<null> | ApiResult<PageApiResult<User[]>>> {
     try {
       let { take, skip } = this.buildCommonPaging(findUserDtoByPage?.page, findUserDtoByPage?.pageSize);
       let where = this.buildCommonQuery(findUserDtoByPage);
@@ -92,7 +98,7 @@ export class UsersService extends BaseService {
 
       // 计算总页数
       const totalPages = Math.ceil(total / take);
-      return ApiResult.success({
+      return ApiResult.success<PageApiResult<User[]>>({
         data: {
           data,
           total,
@@ -102,7 +108,8 @@ export class UsersService extends BaseService {
         },
       });
     } catch (error) {
-      return ApiResult.error(error || "用户查询失败，请稍后再试");
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "用户查询失败，请稍后再试");
     }
   }
 
@@ -110,9 +117,9 @@ export class UsersService extends BaseService {
    * 查询所有用户
    * @param {FindUserDto} findUserDto 查询条件
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   * @returns {Promise<ApiResult<User[]> | ApiResult<null>>} 统一返回结果
    */
-  async findAll(findUserDto?: FindUserDto, platform: string = "admin"): Promise<ApiResult<any>> {
+  async findAll(findUserDto?: FindUserDto, platform: string = "admin"): Promise<ApiResult<User[]> | ApiResult<null>> {
     try {
       let where = this.buildCommonQuery(findUserDto);
       let order = this.buildCommonSort(findUserDto);
@@ -129,9 +136,10 @@ export class UsersService extends BaseService {
           ...order,
         },
       }); // 查询所有用户并返回;
-      return ApiResult.success({ data });
+      return ApiResult.success<User[]>({ data });
     } catch (error) {
-      return ApiResult.error(error || "用户查询失败，请稍后再试");
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "用户查询失败，请稍后再试");
     }
   }
 
@@ -139,17 +147,18 @@ export class UsersService extends BaseService {
    * 通过ID查询详情
    * @param {number} id
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   * @returns {Promise<ApiResult<User> | ApiResult<null>>} 统一返回结果
    */
-  async findOne(id: number, platform: string = "admin"): Promise<ApiResult<any>> {
+  async findOne(id: number, platform: string = "admin"): Promise<ApiResult<User> | ApiResult<null>> {
     try {
       let data = await this.userRepository.findOne({ where: { id, platform } });
       if (!data) {
-        return ApiResult.error("用户不存在");
+        return ApiResult.error<null>("用户不存在");
       }
-      return ApiResult.success({ data });
+      return ApiResult.success<User>({ data });
     } catch (error) {
-      return ApiResult.error(error || "用户查询失败，请稍后再试");
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "用户查询失败，请稍后再试");
     }
   }
 
@@ -157,28 +166,30 @@ export class UsersService extends BaseService {
    * 修改用户信息
    * @param {number} id 用户ID
    * @param updateUserDto 更新用户信息
-   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   * @returns {Promise<ApiResult<UpdateResult> | ApiResult<null>>} 统一返回结果
    */
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResult<any>> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResult<UpdateResult> | ApiResult<null>> {
     try {
       let data = await this.userRepository.update(id, updateUserDto);
-      return ApiResult.success({ data });
+      return ApiResult.success<UpdateResult>({ data });
     } catch (error) {
-      return ApiResult.error(error || "用户更新失败，请稍后再试");
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "用户更新失败，请稍后再试");
     }
   }
 
   /**
    * 删除用户信息
    * @param {number} id 用户ID
-   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   * @returns {Promise<ApiResult<UpdateResult> | ApiResult<null>>} 统一返回结果
    */
-  async remove(id: number): Promise<ApiResult<any>> {
+  async remove(id: number): Promise<ApiResult<UpdateResult> | ApiResult<null>> {
     try {
       let data = await this.userRepository.softDelete(id);
-      return ApiResult.success({ data });
+      return ApiResult.success<UpdateResult>({ data });
     } catch (error) {
-      return ApiResult.error(error || "用户删除失败，请稍后再试");
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "用户删除失败，请稍后再试");
     }
   }
 
@@ -186,25 +197,25 @@ export class UsersService extends BaseService {
    * 登录
    * @param {LogInDto} logInDto 登录参数
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   * @returns {Promise<ApiResult<UserLogin> | ApiResult<null>>} 统一返回结果
    */
-  async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<any>> {
+  async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<UserLogin> | ApiResult<null>> {
     try {
       let data = await this.userRepository.findOne({
         where: { userName: logInDto.userName, platform },
       });
 
       if (!data) {
-        return ApiResult.error("用户不存在");
+        return ApiResult.error<null>("用户不存在");
       }
       const status = await bcryptService.validateStr(logInDto.password, data.password);
       if (!status) {
-        return ApiResult.error("用户名或密码错误");
+        return ApiResult.error<null>("用户名或密码错误");
       }
 
       // 这个状态需要自定义
       if (data.status === 2) {
-        return ApiResult.error("当前账号已被禁用，请联系管理员！");
+        return ApiResult.error<null>("当前账号已被禁用，请联系管理员！");
       }
       let { password, ...info } = data;
 
@@ -224,9 +235,10 @@ export class UsersService extends BaseService {
           }
         ),
       };
-      return ApiResult.success({ data: userInfo });
+      return ApiResult.success<UserLogin>({ data: userInfo });
     } catch (error) {
-      return ApiResult.error(error || "用户登录失败，请稍后再试");
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "用户登录失败，请稍后再试");
     }
   }
 
@@ -234,9 +246,12 @@ export class UsersService extends BaseService {
    * 使用 refresh_token 刷新token
    * @param refreshToken refresh_token
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<any>>} 统一返回结果
+   * @returns {Promise<ApiResult<RefreshToken> | ApiResult<null>>} 统一返回结果
    */
-  async refreshToken(refreshToken: string, platform: string = "admin"): Promise<ApiResult<any>> {
+  async refreshToken(
+    refreshToken: string,
+    platform: string = "admin"
+  ): Promise<ApiResult<RefreshToken> | ApiResult<null>> {
     try {
       let options = getPlatformJwtConfig(platform) as JwtConfig;
       let { id } = this.jwtService.verify(refreshToken, {
@@ -246,7 +261,7 @@ export class UsersService extends BaseService {
         where: { id, platform },
       });
       if (!user) {
-        return ApiResult.error({
+        return ApiResult.error<null>({
           data: null,
           message: "用户不存在",
           code: 401,
@@ -258,14 +273,15 @@ export class UsersService extends BaseService {
         secret: options.secret,
         expiresIn: options.jwt_expires_in,
       });
-      return ApiResult.success<any>({
+      return ApiResult.success<RefreshToken>({
         data: {
           token_type: "Bearer",
           access_token: token,
         },
       });
     } catch (error) {
-      return ApiResult.error(error || "刷新token失败，请重新登录！");
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "刷新token失败，请重新登录！");
     }
   }
 }

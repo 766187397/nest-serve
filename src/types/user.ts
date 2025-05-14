@@ -1,0 +1,25 @@
+export interface UserLogin {
+  userInfo: {
+    userName: string;
+    nickName: string;
+    email: string;
+    phone: string;
+    sex: string;
+    avatar: string;
+    id: number;
+    sort: number;
+    status: number;
+    platform: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
+  };
+  token_type: string;
+  access_token: string;
+  refresh_token: string;
+}
+/** 刷新token */
+export interface RefreshToken {
+  access_token: string;
+  token_type: string;
+}
