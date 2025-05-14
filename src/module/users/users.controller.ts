@@ -97,7 +97,7 @@ export class UsersController {
     let { __isApiResult, ...data } = await this.usersService.refreshToken(refresh_token, "admin");
     if (data.code == 200) {
       const options = getPlatformJwtConfig("admin") as JwtConfig;
-      res.cookie("token", data.data.access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
+      res.cookie("token", (data?.data as UserLogin).access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
     }
     res.status(data.code).json(data);
   }

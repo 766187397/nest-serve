@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
 import { RolesService } from "./roles.service";
-import { CreateRoleDto, FindRoleDto, UpdateRoleDto } from "./dto";
+import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from "./dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 
 @ApiTags("admin - 角色管理")
 @ApiResponse({ status: 200, description: "操作成功" })
@@ -21,22 +22,32 @@ export class RolesController {
     return this.rolesService.create(createRoleDto, "admin");
   }
 
-  @Get()
+  @Get("page")
+  @ApiOperation({ summary: "查询角色列表(分页)" })
+  findByPage(@Query(new FilterEmptyPipe()) findRoleDtoByPage: FindRoleDtoByPage) {
+    return this.rolesService.findByPage(findRoleDtoByPage, "admin");
+  }
+
+  @Get("all")
+  @ApiOperation({ summary: "查询角色列表(不分页)" })
   findAll(@Body() findRoleDto: FindRoleDto) {
     return this.rolesService.findAll(findRoleDto, "admin");
   }
 
   @Get(":id")
+  @ApiOperation({ summary: "查询角色详情" })
   findOne(@Param("id") id: string) {
     return this.rolesService.findOne(+id);
   }
 
   @Patch(":id")
+  @ApiOperation({ summary: "更新角色" })
   update(@Param("id") id: string, @Body() updateRoleDto: UpdateRoleDto) {
     return this.rolesService.update(+id, updateRoleDto);
   }
 
   @Delete(":id")
+  @ApiOperation({ summary: "删除角色" })
   remove(@Param("id") id: string) {
     return this.rolesService.remove(+id);
   }
