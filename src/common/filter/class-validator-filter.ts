@@ -20,7 +20,8 @@ export class ClassValidatorExceptionFilter implements ExceptionFilter {
     }
 
     // 其他类型的异常交给下一个过滤器或默认处理
-    return response.status(status).json(exceptionResponse);
+    // return response.status(status).json(exceptionResponse);
+    return exception;
   }
 
   // 按照class-validator返回的格式判断的

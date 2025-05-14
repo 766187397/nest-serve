@@ -40,7 +40,7 @@ export class FindRoleDto extends FindByParameter {
   @IsOptional()
   name?: string;
 
-  @ApiProperty({ description: "角色key", example: "0" })
+  @ApiProperty({ description: "角色key", example: "admin" })
   @IsString({ message: "角色key必须为字符串" })
   @IsOptional()
   roleKey?: string;

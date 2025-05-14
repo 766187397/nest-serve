@@ -17,13 +17,14 @@ export class ErrorFilter implements ExceptionFilter {
       });
       response.status(status).json(data);
     } else {
-      let msg = responseMessage instanceof Object ? responseMessage.message : responseMessage;
-      response.status(status).json(
-        ApiResult.error({
-          message: msg,
-          code: status,
-        })
-      );
+      // let msg = responseMessage instanceof Object ? responseMessage.message : responseMessage;
+      // response.status(status).json(
+      //   ApiResult.error({
+      //     message: msg,
+      //     code: status,
+      //   })
+      // );
+      return exception;
     }
   }
 }
