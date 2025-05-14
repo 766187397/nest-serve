@@ -43,11 +43,11 @@ export class FindByParameter {
 
   @ApiProperty({
     type: "string",
-    description: "时间范围(根据创建时间查询)以逗号分隔",
+    description: "时间范围(根据创建时间查询)以逗号分隔，也兼容了数组，长度必须为2，时间需要精确到时分秒防止查询同一天为空",
     required: false,
     example: "2025-1-1 10:10:10,2025-1-2 23:59:59",
   })
   @IsOptional()
-  @IsString({ message: "时间范围必须为字符串，并且需要使用逗号隔开" })
-  time?: string;
+  // @IsString({ message: "时间范围必须为字符串，并且需要使用逗号隔开" })
+  time?: string | string[];
 }
