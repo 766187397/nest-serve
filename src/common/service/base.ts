@@ -15,10 +15,13 @@ export class BaseService {
     if (query.status) {
       where.status = query.status;
     }
-    if (query.time && query.time.length === 2) {
-      let start = dayjs(query.time[0]).startOf("day").toDate();
-      let end = dayjs(query.time[1]).endOf("day").toDate();
-      where.createdAt = Between(start, end);
+    if (query.time) {
+      let time = query.time.split(",");
+      if (time.length == 2) {
+        let start = dayjs(time[0]).startOf("day").toDate();
+        let end = dayjs(time[1]).endOf("day").toDate();
+        where.createdAt = Between(start, end);
+      }
     }
     return where;
   }
