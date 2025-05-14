@@ -193,7 +193,7 @@ export class UsersService extends BaseService {
 
       // 修改密码加密
       if (updateUserDto.password) {
-        updateUserDto.password = await bcryptService.encryptStr(updateUserDto.password as string);
+        userInfo.password = await bcryptService.encryptStr(updateUserDto.password as string);
       }
 
       // 重新设置信息

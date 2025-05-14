@@ -68,10 +68,9 @@ export class UsersController {
     let { __isApiResult, ...data } = await this.usersService.logIn(loginDto, "admin");
     if (data.code == 200) {
       const options = getPlatformJwtConfig("admin") as JwtConfig;
-      console.log(" Number(options.jwt_expires_in) * 1000  :>> ", Number(options.jwt_expires_in) * 1000);
-      res.cookie("token", (data?.data as UserLogin).access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
+      res.cookie("token", (data?.data as UserLogin).access_token, { maxAge: Number(options.jwt_expires_in) });
       res.cookie("refresh_token", (data?.data as UserLogin).refresh_token, {
-        maxAge: Number(options.jwt_refresh_expires_in) * 1000,
+        maxAge: Number(options.jwt_refresh_expires_in),
       });
       res.json(data);
     } else {
@@ -97,7 +96,7 @@ export class UsersController {
     let { __isApiResult, ...data } = await this.usersService.refreshToken(refresh_token, "admin");
     if (data.code == 200) {
       const options = getPlatformJwtConfig("admin") as JwtConfig;
-      res.cookie("token", (data?.data as UserLogin).access_token, { maxAge: Number(options.jwt_expires_in) * 1000 });
+      res.cookie("token", (data?.data as UserLogin).access_token, { maxAge: Number(options.jwt_expires_in) });
     }
     res.status(data.code).json(data);
   }

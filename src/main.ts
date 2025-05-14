@@ -33,10 +33,10 @@ async function bootstrap() {
 
   // 配置 cookie-parser 中间件，支持签名的 cookie
   app.use(cookieParser());
-  // 注册全局守卫
-  const jwtService = app.get(JwtService); // 从 DI 容器中获取 JwtService
-  const usersService = app.get(UsersService); // 获取用户的服务方便查询最新信息
-  app.use(await createAuthMiddleware(jwtService, usersService));
+  // // 注册全局守卫
+  // const jwtService = app.get(JwtService); // 从 DI 容器中获取 JwtService
+  // const usersService = app.get(UsersService); // 获取用户的服务方便查询最新信息
+  // app.use(await createAuthMiddleware(jwtService, usersService));
 
   // 创建 Swagger 文档
   const document = SwaggerModule.createDocument(app, SwaggerConfig.swaggerOptions);

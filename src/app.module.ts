@@ -11,6 +11,7 @@ import { DefaultDataModule } from "./module/default-data/default-data.module";
 import { UploadModule } from "./module/upload/upload.module";
 import { RolesModule } from "./module/roles/roles.module";
 import { RolesGuard } from "./module/roles/roles.guard";
+import { AuthGuard } from "./module/auth/auth.guard";
 
 @Module({
   imports: [
@@ -61,6 +62,10 @@ import { RolesGuard } from "./module/roles/roles.guard";
     {
       provide: APP_INTERCEPTOR,
       useClass: ApiResultInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
     {
       provide: APP_GUARD,

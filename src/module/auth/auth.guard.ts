@@ -1,14 +1,24 @@
-import { JwtService } from "@nestjs/jwt";
-import { Request, Response, NextFunction } from "express";
-import { WhiteList } from "@/config/whiteList";
+// auth.guard.ts
 import { ApiResult } from "@/common/utils/result";
-import { UsersService } from "@/module/users/users.service";
-import { ConfigService } from "@nestjs/config";
 import { getPlatformJwtConfig } from "@/config/jwt";
+import { WhiteList } from "@/config/whiteList";
+import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { JwtService } from "@nestjs/jwt";
+import { Response } from "express";
 
-export async function createAuthMiddleware(jwtService: JwtService, usersService: UsersService) {
-  const configService = new ConfigService();
-  return async (req: Request, res: Response, next: NextFunction) => {
+@Injectable()
+export class AuthGuard implements CanActivate {
+  constructor(
+    private reflector: Reflector,
+
+    private readonly jwtService: JwtService // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
+  ) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const ctx = context.switchToHttp();
+    const req = ctx.getRequest();
+    const res = ctx.getResponse<Response>();
     const whiteListStartsWith = WhiteList.whiteListStartsWith;
     const whiteListExact = WhiteList.whiteListExact;
     let state = false; // 是否匹配白名单
@@ -29,14 +39,15 @@ export async function createAuthMiddleware(jwtService: JwtService, usersService:
     }
     if (!token && !state) {
       let { __isApiResult, ...data } = ApiResult.error({ code: 401, message: "请登录后访问！", data: null });
-      return res.status(401).json(data);
+      res.status(401).json(data);
+      return false;
     }
 
     try {
-      const options = getPlatformJwtConfig(url.split("/")[2]);
+      const options = getPlatformJwtConfig(url.split("/")[3]);
       if (options) {
         let payload: any, user: any;
-        user = payload = jwtService.verify(token as string, {
+        user = payload = this.jwtService.verify(token as string, {
           secret: options.secret,
         });
         // // 验证用户状态、如果不需要可以直接注释
@@ -45,16 +56,18 @@ export async function createAuthMiddleware(jwtService: JwtService, usersService:
         // if (user.data.status === 2) {
         //   return res.status(403).json(ApiResult.error({ code: 403, message: "当前账号已被禁用，请联系管理员！", data: null }));
         // }
-        console.log("token :>> ", user);
         req.userInfo = user; // 将用户信息附加到请求对象上
+        console.log("req.userInfo :>> ", req.userInfo);
       }
-      next();
-    } catch (e) {
+      return true;
+    } catch (error) {
+      console.log('error :>> ', error);
       if (state) {
-        return next(); // 如果是白名单的路径，跳过验证
+        return true;
       } else {
-        return res.status(401).json(ApiResult.error({ code: 401, message: "授权失败，Token无效！", data: null }));
+        res.status(401).json(ApiResult.error({ code: 401, message: "授权失败，Token无效！", data: null }));
+        return false;
       }
     }
-  };
+  }
 }

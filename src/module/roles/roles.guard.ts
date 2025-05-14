@@ -18,8 +18,7 @@ export class RolesGuard implements CanActivate {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse<Response>();
-    const user = request.res.userinfo;
-
+    const user = request.userInfo;
     if (!user || !user.roles) {
       let { __isApiResult, ...data } = ApiResult.error<null>({
         code: 401,
