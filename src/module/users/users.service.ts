@@ -247,7 +247,7 @@ export class UsersService extends BaseService {
         token_type: "Bearer",
         access_token: this.jwtService.sign(info, {
           secret: options.secret,
-          expiresIn: options.jwt_expires_in,
+          expiresIn: options.jwt_expires_in + "s",
         }),
         refresh_token: this.jwtService.sign(
           { id: info.id },
@@ -292,7 +292,7 @@ export class UsersService extends BaseService {
       let { password, ...data } = user;
       let token = this.jwtService.sign(data, {
         secret: options.secret,
-        expiresIn: options.jwt_expires_in,
+        expiresIn: options.jwt_expires_in + "s",
       });
       return ApiResult.success<RefreshToken>({
         data: {
