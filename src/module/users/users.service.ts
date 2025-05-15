@@ -32,16 +32,16 @@ export class UsersService extends BaseService {
    */
   async create(createUserDto: CreateUserDto, platform: string = "admin"): Promise<ApiResult<User> | ApiResult<null>> {
     try {
-      // 查询数据库，确保 userName, phone, email 不存在
-      const { userName = null, phone = null, email = null, roleIds = [] } = createUserDto;
+      // 查询数据库，确保 account, phone, email 不存在
+      const { account = null, phone = null, email = null, roleIds = [] } = createUserDto;
       // 构建查询条件
       const queryBuilder = this.userRepository.createQueryBuilder("user");
       queryBuilder.andWhere("user.platform = :platform", { platform });
-      if (userName || phone || email) {
+      if (account || phone || email) {
         // 使用Brackets，防止orWhere的优先级高于andWhere的platform 条件
         queryBuilder.andWhere(
           new Brackets((qb) => {
-            if (userName) qb.where("user.userName = :userName", { userName });
+            if (account) qb.where("user.account = :account", { account });
             if (phone) qb.orWhere("user.phone = :phone", { phone });
             if (email) qb.orWhere("user.email = :email", { email });
           })
@@ -51,7 +51,7 @@ export class UsersService extends BaseService {
       const existingUser = await queryBuilder.getOne();
       // 如果查询结果存在，返回错误
       if (existingUser) {
-        return ApiResult.error<null>("用户名、电话号码或邮箱已存在");
+        return ApiResult.error<null>("账号、电话号码或邮箱已存在");
       }
       createUserDto.password = await bcryptService.encryptStr(createUserDto.password as string);
       const user = this.userRepository.create(createUserDto); // 创建 User 实体
@@ -86,7 +86,7 @@ export class UsersService extends BaseService {
         where: {
           ...where,
           platform: platform,
-          userName: findUserDtoByPage?.userName ? ILike(`%${findUserDtoByPage.userName}%`) : undefined,
+          account: findUserDtoByPage?.account ? ILike(`%${findUserDtoByPage.account}%`) : undefined,
           nickName: findUserDtoByPage?.nickName ? ILike(`%${findUserDtoByPage.nickName}%`) : undefined,
           email: findUserDtoByPage?.email ? ILike(`%${findUserDtoByPage.email}%`) : undefined,
           phone: findUserDtoByPage?.phone ? ILike(`%${findUserDtoByPage.phone}%`) : undefined,
@@ -129,7 +129,7 @@ export class UsersService extends BaseService {
         where: {
           ...where,
           platform,
-          userName: findUserDto?.userName ? ILike(`%${findUserDto.userName}%`) : undefined,
+          account: findUserDto?.account ? ILike(`%${findUserDto.account}%`) : undefined,
           nickName: findUserDto?.nickName ? ILike(`%${findUserDto.nickName}%`) : undefined,
           email: findUserDto?.email ? ILike(`%${findUserDto.email}%`) : undefined,
           phone: findUserDto?.phone ? ILike(`%${findUserDto.phone}%`) : undefined,
@@ -229,7 +229,7 @@ export class UsersService extends BaseService {
   async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<UserLogin> | ApiResult<null>> {
     try {
       let data = await this.userRepository.findOne({
-        where: { userName: logInDto.userName, platform },
+        where: { account: logInDto.account, platform },
       });
 
       if (!data) {
@@ -237,7 +237,7 @@ export class UsersService extends BaseService {
       }
       const status = await bcryptService.validateStr(logInDto.password, data.password);
       if (!status) {
-        return ApiResult.error<null>("用户名或密码错误");
+        return ApiResult.error<null>("账号或密码错误");
       }
 
       // 这个状态需要自定义

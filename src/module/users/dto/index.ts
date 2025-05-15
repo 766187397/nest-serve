@@ -7,10 +7,10 @@ import { IsArray, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } fro
  * 用户创建Dto
  */
 export class CreateUserDto extends CreateBaseDto {
-  @ApiProperty({ description: "用户名", example: "admin" })
-  @IsString({ message: "用户名字符串" })
-  @IsNotEmpty({ message: "用户名是必填项" }) // 必填校验
-  userName: string;
+  @ApiProperty({ description: "账号", example: "admin" })
+  @IsString({ message: "账号字符串" })
+  @IsNotEmpty({ message: "账号是必填项" }) // 必填校验
+  account: string;
 
   @ApiProperty({ description: "昵称", example: "管理员" })
   @IsString({ message: "昵称字符串" })
@@ -53,10 +53,10 @@ export class CreateUserDto extends CreateBaseDto {
  * 用户更新Dto
  */
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-  @ApiProperty({ description: "用户名", example: "admin" })
+  @ApiProperty({ description: "账号", example: "admin" })
   @IsOptional()
   @IsString()
-  userName?: string | undefined;
+  account?: string | undefined;
 
   @ApiProperty({ description: "昵称", example: "管理员" })
   @IsOptional()
@@ -72,10 +72,10 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
  * 查询所有用户信息
  */
 export class FindUserDto extends FindByParameter {
-  @ApiProperty({ type: "string", description: "用户名", required: false, example: "admin" })
+  @ApiProperty({ type: "string", description: "账号", required: false, example: "admin" })
   @IsOptional()
   @IsString()
-  userName?: string | undefined;
+  account?: string | undefined;
 
   @ApiProperty({ type: "string", description: "昵称", required: false, example: "管理员" })
   @IsOptional()
@@ -113,10 +113,10 @@ export class FindUserDtoByPage extends FindUserDto {
  */
 
 export class LogInDto {
-  @ApiProperty({ description: "用户名", example: "admin" })
-  @IsString({ message: "用户名字符串" })
-  @IsNotEmpty({ message: "用户名是必填项" }) // 必填校验
-  userName: string;
+  @ApiProperty({ description: "账号", example: "admin" })
+  @IsString({ message: "账号字符串" })
+  @IsNotEmpty({ message: "账号是必填项" }) // 必填校验
+  account: string;
 
   @ApiProperty({ description: "密码", example: "123456" })
   @IsString({ message: "密码字符串" })

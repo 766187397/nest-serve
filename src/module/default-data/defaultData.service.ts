@@ -23,7 +23,7 @@ export class defaultData implements OnApplicationBootstrap {
       const password = await bcryptService.encryptStr("123456");
       const users = [
         {
-          userName: "admin",
+          account: "admin",
           nickName: "管理员",
           password,
           phone: "18888888888",
@@ -31,7 +31,7 @@ export class defaultData implements OnApplicationBootstrap {
           sex: "0",
         },
         {
-          userName: "john_doe",
+          account: "john_doe",
           nickName: "John Doe",
           phone: "18888888889",
           email: "john@example.com",
@@ -39,7 +39,7 @@ export class defaultData implements OnApplicationBootstrap {
           sex: "0",
         },
         {
-          userName: "test",
+          account: "test",
           nickName: "测试用户",
           phone: "18333333333",
           email: "test@example.com",

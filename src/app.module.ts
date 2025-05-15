@@ -12,6 +12,7 @@ import { UploadModule } from "./module/upload/upload.module";
 import { RolesModule } from "./module/roles/roles.module";
 import { RolesGuard } from "./module/roles/roles.guard";
 import { AuthGuard } from "./module/auth/auth.guard";
+import { RoutesModule } from './module/routes/routes.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { AuthGuard } from "./module/auth/auth.guard";
     DefaultDataModule,
     UploadModule,
     RolesModule,
+    RoutesModule,
   ],
   controllers: [],
   providers: [

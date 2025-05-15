@@ -7,8 +7,8 @@ import { Role } from "@/module/roles/entities/role.entity";
 // 复合索引 优化同时查询id和deletedAt的情况
 @Index("IDX_users_id_deletedAt", ["id", "deletedAt"])
 export class User extends BaseEntity {
-  @Column({ type: "varchar", name: "user_name", length: 30, nullable: false, comment: "用户账号" })
-  userName: string;
+  @Column({ type: "varchar", name: "account", length: 30, nullable: false, comment: "用户账号" })
+  account: string;
 
   @Column({ type: "varchar", name: "nick_name", length: 30, nullable: false, comment: "用户昵称" })
   nickName: string;
