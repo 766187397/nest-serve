@@ -36,7 +36,7 @@ export class UploadService extends BaseService {
         data: { ...savedFile, completePath: global.url + "/" + file.path.replace(/\\/g, "/") },
         message: "上传成功",
         code: 200,
-        dto: Upload,
+        entities: Upload,
       });
     } catch (error) {
       return ApiResult.error(error || "上传失败");
@@ -67,7 +67,7 @@ export class UploadService extends BaseService {
         data: resultData,
         message: "查询成功",
         code: 200,
-        dto: Upload,
+        entities: Upload,
       });
     } catch (error) {
       return ApiResult.error(error || "查询失败");
@@ -125,7 +125,7 @@ export class UploadService extends BaseService {
           completePath: global.url + file.url,
         },
         message: "查询成功",
-        dto: Upload,
+        entities: Upload,
       });
     } catch (error) {
       return ApiResult.error(error || "查询失败");
@@ -142,7 +142,7 @@ export class UploadService extends BaseService {
       return ApiResult.success({
         data: null,
         message: "删除成功",
-        dto: Upload,
+        entities: Upload,
       });
     } catch (error) {
       return ApiResult.error(error || "删除失败");

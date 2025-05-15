@@ -5,7 +5,7 @@ interface Result<T> {
   code?: number;
   message?: string;
   data?: T | null;
-  dto?: any;
+  entities?: any;
 }
 export class ApiResult<T> {
   readonly __isApiResult = true;
@@ -16,9 +16,9 @@ export class ApiResult<T> {
     public data: T | null = null
   ) {}
 
-  static success<T>({ data = null, message = "操作成功", code = 200, dto }: Result<T> = {}): ApiResult<T> {
-    if (dto) {
-      data = plainToInstance(dto, data);
+  static success<T>({ data = null, message = "操作成功", code = 200, entities }: Result<T> = {}): ApiResult<T> {
+    if (entities) {
+      data = plainToInstance(entities, data);
     }
     return new ApiResult<T>(code, message, data);
   }
