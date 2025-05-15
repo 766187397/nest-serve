@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { CreateUserDto, FindUserDto, FindUserDtoByPage, LogInDto, UpdateUserDto } from "./dto/index";
 import { ApiResult } from "@/common/utils/result";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -11,6 +11,8 @@ import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
 import { PageApiResult } from "@/types/public";
 import { RefreshToken, UserLogin } from "@/types/user";
 import { Role } from "@/module/roles/entities/role.entity";
+import { Logger } from "winston";
+import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 
 @Injectable()
 export class UsersService extends BaseService {
@@ -19,7 +21,8 @@ export class UsersService extends BaseService {
     private userRepository: Repository<User>, // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
-    private readonly jwtService: JwtService // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
+    private readonly jwtService: JwtService, // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) {
     super();
   }
@@ -221,6 +224,7 @@ export class UsersService extends BaseService {
    * @returns {Promise<ApiResult<UserLogin> | ApiResult<null>>} 统一返回结果
    */
   async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<UserLogin> | ApiResult<null>> {
+    this.logger.info("用户登录", { logInDto, platform });
     try {
       let data = await this.userRepository.findOne({
         where: { account: logInDto.account, platform },
@@ -259,6 +263,7 @@ export class UsersService extends BaseService {
       };
       return ApiResult.success<UserLogin>({ data: userInfo });
     } catch (error) {
+      this.logger.error("登录失败", error);
       return ApiResult.error<null>(error || "用户登录失败，请稍后再试");
     }
   }
