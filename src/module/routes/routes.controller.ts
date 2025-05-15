@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res } from "@nestjs/common";
 import { RoutesService } from "./routes.service";
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from "./dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Request, Response } from "express";
+import { User } from "@/module/users/entities/user.entity";
 
 @ApiTags("admin - 路由管理")
 @ApiResponse({ status: 200, description: "操作成功" })
@@ -43,5 +45,14 @@ export class RoutesController {
   @ApiOperation({ summary: "删除路由" })
   remove(@Param("id") id: string) {
     return this.routesService.remove(+id);
+  }
+
+  @Get("/by/role")
+  @ApiOperation({ summary: "根据登录用户的角色ids获取路由" })
+  async getRoutesByRoleId(@Req() req: Request, @Res() res: Response) {
+    const userInfo = req.userInfo as User;
+    const rolesIds = userInfo.roles.map((item) => item.id);
+    let { __isApiResult, ...data } = await this.routesService.getRoutesByRoleId(rolesIds, userInfo.platform);
+    res.json(data);
   }
 }

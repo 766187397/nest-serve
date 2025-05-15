@@ -141,8 +141,49 @@ export class RoutesService extends BaseService {
     }
   }
 
-  async getRoutesByRoleId(rolesIds: number[], platform: string = "admin") {
+  /**
+   * 通过角色存在，则返回角色下的所有路由信息
+   * @param {number[]} rolesIds 角色ID数组
+   * @param {string} platform 平台标识
+   * @returns {Promise<ApiResult<Route[]> | ApiResult<null>>} 统一返回结果
+   */
+  async getRoutesByRoleId(
+    rolesIds: number[],
+    platform: string = "admin"
+  ): Promise<ApiResult<Route[]> | ApiResult<null>> {
     try {
+      let roles = await this.roleRepository.find({
+        where: { id: In(rolesIds) },
+        relations: ["routes"],
+      });
+      let routeIds: any = [];
+      if (roles && roles.length > 0) {
+        routeIds = roles.map((item) => {
+          return item.routes.map((item) => {
+            return item.id;
+          });
+        });
+      }
+      routeIds = [...new Set(routeIds.flat(Infinity))];
+      let data = await this.routeRepository
+        // 创建 QueryBuilder，别名设为 'parent'（主表）
+        .createQueryBuilder("parent")
+        // 关联查询子节点（核心过滤逻辑）
+        .leftJoinAndSelect(
+          "parent.children", // 关联字段路径（父实体的 children 属性）
+          "child", // 子表别名（自定义）
+          "child.id  IN (:...routeIds)", // 子节点过滤条件（SQL条件片段）
+          { routeIds } // 参数注入（防SQL注入）
+        )
+        // WHERE 主表条件组合
+        .where({
+          id: In(routeIds), // 主表ID在 routeIds 中
+          parentId: IsNull(), // 主表的 parentId 为空（查根节点）
+          platform, // 平台条件（变量值自动绑定）
+        })
+        // 执行查询并返回实体对象数组
+        .getMany();
+      return ApiResult.success<Route[]>({ data });
     } catch (error) {
       const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
       return ApiResult.error<null>(errorMessage || "获取路由失败，请稍后再试");

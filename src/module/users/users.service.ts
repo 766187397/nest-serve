@@ -230,6 +230,7 @@ export class UsersService extends BaseService {
     try {
       let data = await this.userRepository.findOne({
         where: { account: logInDto.account, platform },
+        relations: ["roles"],
       });
 
       if (!data) {
