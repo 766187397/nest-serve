@@ -43,8 +43,7 @@ export class RoutesService extends BaseService {
       await this.routeRepository.save(route);
       return ApiResult.success<null>();
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "路由创建失败，请稍后再试");
+            return ApiResult.error<null>(error || "路由创建失败，请稍后再试");
     }
   }
 
@@ -63,8 +62,7 @@ export class RoutesService extends BaseService {
       });
       return ApiResult.success<Route[]>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "路由查询失败，请稍后再试");
+            return ApiResult.error<null>(error || "路由查询失败，请稍后再试");
     }
   }
 
@@ -78,8 +76,7 @@ export class RoutesService extends BaseService {
       let data = await this.routeRepository.findOne({ where: { id } });
       return ApiResult.success<Route>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "路由查询失败，请稍后再试");
+            return ApiResult.error<null>(error || "路由查询失败，请稍后再试");
     }
   }
 
@@ -121,8 +118,7 @@ export class RoutesService extends BaseService {
       await this.routeRepository.save(route);
       return ApiResult.success<null>();
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "路由更新失败，请稍后再试");
+            return ApiResult.error<null>(error || "路由更新失败，请稍后再试");
     }
   }
 
@@ -136,8 +132,7 @@ export class RoutesService extends BaseService {
       await this.routeRepository.softDelete(id);
       return ApiResult.success<null>();
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "路由删除失败，请稍后再试");
+            return ApiResult.error<null>(error || "路由删除失败，请稍后再试");
     }
   }
 
@@ -185,8 +180,7 @@ export class RoutesService extends BaseService {
         .getMany();
       return ApiResult.success<Route[]>({ data, entities: Route });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "获取路由失败，请稍后再试");
+            return ApiResult.error<null>(error || "获取路由失败，请稍后再试");
     }
   }
 }

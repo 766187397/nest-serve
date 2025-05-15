@@ -62,8 +62,7 @@ export class UsersService extends BaseService {
       let data = await this.userRepository.save(user); // 保存到数据库并返回
       return ApiResult.success<User>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "用户创建失败，请稍后再试");
+            return ApiResult.error<null>(error || "用户创建失败，请稍后再试");
     }
   }
 
@@ -110,8 +109,7 @@ export class UsersService extends BaseService {
         },
       });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "用户查询失败，请稍后再试");
+            return ApiResult.error<null>(error || "用户查询失败，请稍后再试");
     }
   }
 
@@ -140,8 +138,7 @@ export class UsersService extends BaseService {
       }); // 查询所有用户并返回;
       return ApiResult.success<User[]>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "用户查询失败，请稍后再试");
+            return ApiResult.error<null>(error || "用户查询失败，请稍后再试");
     }
   }
 
@@ -159,8 +156,7 @@ export class UsersService extends BaseService {
       }
       return ApiResult.success<User>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "用户查询失败，请稍后再试");
+            return ApiResult.error<null>(error || "用户查询失败，请稍后再试");
     }
   }
 
@@ -200,8 +196,7 @@ export class UsersService extends BaseService {
       let data = await this.userRepository.save(userInfo);
       return ApiResult.success<User>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "用户更新失败，请稍后再试");
+            return ApiResult.error<null>(error || "用户更新失败，请稍后再试");
     }
   }
 
@@ -215,8 +210,7 @@ export class UsersService extends BaseService {
       let data = await this.userRepository.softDelete(id);
       return ApiResult.success<UpdateResult>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "用户删除失败，请稍后再试");
+            return ApiResult.error<null>(error || "用户删除失败，请稍后再试");
     }
   }
 
@@ -265,8 +259,7 @@ export class UsersService extends BaseService {
       };
       return ApiResult.success<UserLogin>({ data: userInfo });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "用户登录失败，请稍后再试");
+            return ApiResult.error<null>(error || "用户登录失败，请稍后再试");
     }
   }
 
@@ -308,8 +301,7 @@ export class UsersService extends BaseService {
         },
       });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "刷新token失败，请重新登录！");
+            return ApiResult.error<null>(error || "刷新token失败，请重新登录！");
     }
   }
 }

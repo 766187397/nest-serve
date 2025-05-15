@@ -5,6 +5,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { FindOptionsWhere, ILike, Repository } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { FindFileDto, FindFileDtoByPage } from "./dto/index.dto";
+import { UploadFile } from "@/types/upload";
+import { PageApiResult } from "@/types/public";
 
 @Injectable()
 export class UploadService extends BaseService {
@@ -18,35 +20,35 @@ export class UploadService extends BaseService {
   /**
    * 文件上传
    * @param file 文件
+   * @returns {Promise<ApiResult<UploadFile> | ApiResult<null>>} 统一返回结果
    */
-  async uploadFile(file: any) {
+  async uploadFile(file: any): Promise<ApiResult<UploadFile> | ApiResult<null>> {
     try {
       if (!file) {
         return ApiResult.error("文件不能为空！");
       }
-      // const port = process.env.PORT || 3000;
-      // const host = process.env.HOST || "localhost";
-      // const url = `http://${host}:${port}`;
       const savedFile = await this.upload.save({
         url: "/" + file.path.replace(/\\/g, "/"),
         fileName: file.filename,
         size: file.size,
       });
-      return ApiResult.success({
+      return ApiResult.success<UploadFile>({
         data: { ...savedFile, completePath: global.url + "/" + file.path.replace(/\\/g, "/") },
         message: "上传成功",
         code: 200,
         entities: Upload,
       });
     } catch (error) {
-      return ApiResult.error(error || "上传失败");
+      return ApiResult.error<null>(error || "上传失败");
     }
   }
 
   /**
    * 获取所有文件列表
+   * @param {FindFileDto} findFileDto 查询参数
+   * @returns {Promise<ApiResult<UploadFile[]> | ApiResult<null>>} 统一返回结果
    */
-  async getFileAll(findFileDto: FindFileDto) {
+  async getFileAll(findFileDto: FindFileDto): Promise<ApiResult<UploadFile[]> | ApiResult<null>> {
     try {
       let where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDto);
       let order = this.buildCommonSort(findFileDto);
@@ -63,23 +65,23 @@ export class UploadService extends BaseService {
           completePath: global.url + file.url,
         };
       });
-      return ApiResult.success({
+      return ApiResult.success<UploadFile[]>({
         data: resultData,
-        message: "查询成功",
-        code: 200,
         entities: Upload,
       });
     } catch (error) {
-      return ApiResult.error(error || "查询失败");
+      return ApiResult.error<null>(error || "查询失败");
     }
   }
 
   /**
    * 分页查询文件
-   * @param page 页码
-   * @param pageSize 数量
+   * @param {FindFileDtoByPage} findFileDtoByPage
+   * @returns {Promise<ApiResult<PageApiResult<UploadFile[]>> | ApiResult<null>>}
    */
-  async getFileByPage(findFileDtoByPage: FindFileDtoByPage) {
+  async getFileByPage(
+    findFileDtoByPage: FindFileDtoByPage
+  ): Promise<ApiResult<PageApiResult<UploadFile[]>> | ApiResult<null>> {
     try {
       let where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDtoByPage);
       let order = this.buildCommonSort(findFileDtoByPage);
@@ -99,27 +101,36 @@ export class UploadService extends BaseService {
           completePath: global.url + file.url,
         };
       });
-      return ApiResult.success({
-        data: { resultData, total },
+      // 计算总页数
+      const totalPages = Math.ceil(total / take);
+      return ApiResult.success<PageApiResult<UploadFile[]>>({
+        data: {
+          data: resultData,
+          total,
+          totalPages,
+          page: findFileDtoByPage?.page || 1,
+          pageSize: findFileDtoByPage?.pageSize || 10,
+        },
         message: "查询成功",
         code: 200,
       });
     } catch (error) {
-      return ApiResult.error(error || "查询失败");
+      return ApiResult.error<null>(error || "查询失败");
     }
   }
 
   /**
    * 通过 ID 查询文件
    * @param id 文件ID
+   * @returns {Promise<ApiResult<UploadFile> | ApiResult<null>>} 统一返回结果
    */
-  async getFileById(id: number) {
+  async getFileById(id: number): Promise<ApiResult<UploadFile> | ApiResult<null>> {
     try {
       const file = await this.upload.findOne({ where: { id } });
       if (!file) {
         return ApiResult.error("文件不存在");
       }
-      return ApiResult.success({
+      return ApiResult.success<UploadFile>({
         data: {
           ...file,
           completePath: global.url + file.url,
@@ -128,24 +139,25 @@ export class UploadService extends BaseService {
         entities: Upload,
       });
     } catch (error) {
-      return ApiResult.error(error || "查询失败");
+      return ApiResult.error<null>(error || "查询失败");
     }
   }
 
   /**
    * 删除文件
    * @param id 文件ID
+   * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async deleteFileById(id: number) {
+  async deleteFileById(id: number): Promise<ApiResult<null>> {
     try {
       await this.upload.softDelete(id);
-      return ApiResult.success({
+      return ApiResult.success<null>({
         data: null,
         message: "删除成功",
         entities: Upload,
       });
     } catch (error) {
-      return ApiResult.error(error || "删除失败");
+      return ApiResult.error<null>(error || "删除失败");
     }
   }
 }

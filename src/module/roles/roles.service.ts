@@ -98,8 +98,7 @@ export class RolesService extends BaseService {
         },
       });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "查询角色失败，请稍后重试");
+      return ApiResult.error<null>(error || "查询角色失败，请稍后重试");
     }
   }
 
@@ -127,8 +126,7 @@ export class RolesService extends BaseService {
       }); // 查询所有用户并返回;
       return ApiResult.success<Role[]>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "查询角色失败，请稍后重试");
+      return ApiResult.error<null>(error || "查询角色失败，请稍后重试");
     }
   }
 
@@ -146,8 +144,7 @@ export class RolesService extends BaseService {
       }
       return ApiResult.success<Role>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "查询角色失败，请稍后重试");
+      return ApiResult.error<null>(error || "查询角色失败，请稍后重试");
     }
   }
 
@@ -170,8 +167,7 @@ export class RolesService extends BaseService {
       let data = await this.roleRepository.save(role);
       return ApiResult.success<Role>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "角色更新失败，请稍后再试");
+      return ApiResult.error<null>(error || "角色更新失败，请稍后再试");
     }
   }
 
@@ -185,8 +181,7 @@ export class RolesService extends BaseService {
       let data = await this.roleRepository.softDelete(id);
       return ApiResult.success<UpdateResult>({ data });
     } catch (error) {
-      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<null>(errorMessage || "角色删除失败，请稍后再试");
+      return ApiResult.error<null>(error || "角色删除失败，请稍后再试");
     }
   }
 }
