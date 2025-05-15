@@ -1,5 +1,6 @@
 import { BaseEntity } from "@/common/entities/base";
-import { Column, Entity, Index } from "typeorm";
+import { Column, Entity, Index, JoinTable, ManyToMany } from "typeorm";
+import { Route } from "@/module/routes/entities/route.entity";
 
 @Entity("roles", { comment: "角色表" })
 // 复合索引 优化同时查询id和deletedAt的情况
@@ -16,4 +17,8 @@ export class Role extends BaseEntity {
 
   @Column("varchar", { comment: "角色描述", length: 255, nullable: true })
   description: string;
+
+  @ManyToMany(() => Route)
+  @JoinTable()
+  routes: Route[];
 }

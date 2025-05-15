@@ -1,6 +1,6 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 /** 创建角色 */
 export class CreateRoleDto extends CreateBaseDto {
@@ -31,6 +31,11 @@ export class UpdateRoleDto extends CreateBaseDto {
   @IsString({ message: "角色名称必须为字符串" })
   @IsOptional()
   name?: string;
+
+  @ApiProperty({ description: "路由id", required: false, example: [1] })
+  @IsOptional()
+  @IsArray({ message: "routeIds必须为数字数组" })
+  routeIds?: number[];
 }
 
 /** 查询所有角色信息 */

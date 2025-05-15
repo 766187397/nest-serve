@@ -3,15 +3,19 @@ import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from "./
 import { BaseService } from "@/common/service/base";
 import { Role } from "./entities/role.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Brackets, ILike, Repository, UpdateResult } from "typeorm";
+import { Brackets, ILike, In, Repository, UpdateResult } from "typeorm";
 import { ApiResult } from "@/common/utils/result";
 import { PageApiResult } from "@/types/public";
+import { Route } from "@/module/routes/entities/route.entity";
 
 @Injectable()
 export class RolesService extends BaseService {
   constructor(
     @InjectRepository(Role)
-    private roleRepository: Repository<Role>
+    private roleRepository: Repository<Role>,
+
+    @InjectRepository(Route)
+    private routeRepository: Repository<Route>
   ) {
     super();
   }
@@ -151,12 +155,20 @@ export class RolesService extends BaseService {
    * 更新角色
    * @param {number} id 角色ID
    * @param {UpdateRoleDto} updateRoleDto 更新角色信息
-   * @returns {Promise<ApiResult<UpdateResult> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<Role> | ApiResult<null>>} 统一返回结果
    */
-  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<ApiResult<UpdateResult> | ApiResult<null>> {
+  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<ApiResult<Role> | ApiResult<null>> {
     try {
-      let data = await this.roleRepository.update(id, updateRoleDto);
-      return ApiResult.success<UpdateResult>({ data });
+      let role = await this.roleRepository.findOne({ where: { id } });
+      if (!role) {
+        return ApiResult.error("角色不存在");
+      }
+      role = { ...role, ...updateRoleDto };
+      if (updateRoleDto.routeIds) {
+        role.routes = await this.routeRepository.find({ where: { id: In(updateRoleDto.routeIds) } });
+      }
+      let data = await this.roleRepository.save(role);
+      return ApiResult.success<Role>({ data });
     } catch (error) {
       const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
       return ApiResult.error<null>(errorMessage || "角色更新失败，请稍后再试");

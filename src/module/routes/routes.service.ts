@@ -2,15 +2,18 @@ import { Injectable } from "@nestjs/common";
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from "./dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Route } from "./entities/route.entity";
-import { IsNull, Repository } from "typeorm";
+import { In, IsNull, Repository } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { ApiResult } from "@/common/utils/result";
+import { Role } from "@/module/roles/entities/role.entity";
 
 @Injectable()
 export class RoutesService extends BaseService {
   constructor(
     @InjectRepository(Route)
-    private readonly routeRepository: Repository<Route>
+    private readonly routeRepository: Repository<Route>,
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>
   ) {
     super();
   }
@@ -135,6 +138,14 @@ export class RoutesService extends BaseService {
     } catch (error) {
       const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
       return ApiResult.error<null>(errorMessage || "路由删除失败，请稍后再试");
+    }
+  }
+
+  async getRoutesByRoleId(rolesIds: number[], platform: string = "admin") {
+    try {
+    } catch (error) {
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "获取路由失败，请稍后再试");
     }
   }
 }
