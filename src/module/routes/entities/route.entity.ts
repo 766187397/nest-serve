@@ -26,6 +26,9 @@ export class Route extends BaseEntity {
   @Column({ default: "", comment: "图标标识" })
   icon: string;
 
+  @Column({ default: false, comment: "是否为外链" })
+  externalLinks: boolean;
+
   // 树形结构关系
   @OneToMany(() => Route, (route) => route.parentId)
   children: Route[];
