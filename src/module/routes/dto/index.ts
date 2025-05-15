@@ -3,6 +3,11 @@ import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateRouteDto extends CreateBaseDto {
+  @ApiProperty({ description: "平台标识（如admin/web/app/mini等）", required: false })
+  @IsOptional()
+  @IsString({ message: "平台必须为字符串" })
+  platform?: string;
+
   @ApiProperty({ description: "路由类型：菜单/按钮/API等", required: true })
   @IsString({ message: "路由类型必须为字符串" })
   @IsNotEmpty({ message: "路由类型不能为空" })

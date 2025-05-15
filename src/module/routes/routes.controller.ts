@@ -27,17 +27,20 @@ export class RoutesController {
     return this.routesService.findAll(findRouteDto);
   }
 
-  @Get(":id")
+  @Get("info/:id")
+  @ApiOperation({ summary: "获取路由详情" })
   findOne(@Param("id") id: string) {
     return this.routesService.findOne(+id);
   }
 
-  @Patch(":id")
+  @Patch("update/:id")
+  @ApiOperation({ summary: "修改路由信息" })
   update(@Param("id") id: string, @Body() updateRouteDto: UpdateRouteDto) {
     return this.routesService.update(+id, updateRouteDto);
   }
 
-  @Delete(":id")
+  @Delete("delete/:id")
+  @ApiOperation({ summary: "删除路由" })
   remove(@Param("id") id: string) {
     return this.routesService.remove(+id);
   }

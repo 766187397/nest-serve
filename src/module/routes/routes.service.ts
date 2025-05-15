@@ -60,19 +60,81 @@ export class RoutesService extends BaseService {
       });
       return ApiResult.success<Route[]>({ data });
     } catch (error) {
-      return ApiResult.error<null>(error || "路由查询失败，请稍后再试");
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "路由查询失败，请稍后再试");
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} route`;
+  /**
+   * 通过id查询详情
+   * @param {number} id 路由的id
+   * @returns
+   */
+  async findOne(id: number): Promise<ApiResult<Route> | ApiResult<null>> {
+    try {
+      let data = await this.routeRepository.findOne({ where: { id } });
+      return ApiResult.success<Route>({ data });
+    } catch (error) {
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "路由查询失败，请稍后再试");
+    }
   }
 
-  update(id: number, updateRouteDto: UpdateRouteDto) {
-    return `This action updates a #${id} route`;
+  /**
+   * 路由信息修改
+   * @param {number} id 路由id
+   * @param {UpdateRouteDto} updateRouteDto 路由信息
+   * @returns {Promise<ApiResult<null> | ApiResult<null>>} 统一返回结果
+   */
+  async update(id: number, updateRouteDto: UpdateRouteDto): Promise<ApiResult<null> | ApiResult<null>> {
+    try {
+      // 查询当前路由是否存在
+      let route = await this.routeRepository.findOne({
+        where: { id },
+        relations: ["children", "parentId"],
+      });
+      if (!route) {
+        return ApiResult.error("路由不存在");
+      }
+
+      // 如果有新的 parentId，查询对应的父级路由
+      if (updateRouteDto.parentId) {
+        const parentRoute = await this.routeRepository.findOne({
+          where: { id: updateRouteDto.parentId, platform: updateRouteDto.platform },
+        });
+        if (!parentRoute) {
+          return ApiResult.error("父级路由不存在");
+        }
+        route.parentId = parentRoute || null; // 如果 parentId 为 null，则设置为 null
+      }
+
+      // 更新其他字段
+      Object.assign(route, {
+        ...updateRouteDto,
+        parentId: route.parentId, // 确保 parentId 类型一致
+      });
+
+      // 保存更新后的路由
+      await this.routeRepository.save(route);
+      return ApiResult.success<null>();
+    } catch (error) {
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "路由更新失败，请稍后再试");
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} route`;
+  /**
+   * 删除路由信息
+   * @param {number} id 路由id
+   * @returns {Promise<ApiResult<null>>} 统一返回结果
+   */
+  async remove(id: number): Promise<ApiResult<null>> {
+    try {
+      await this.routeRepository.softDelete(id);
+      return ApiResult.success<null>();
+    } catch (error) {
+      const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || "路由删除失败，请稍后再试");
+    }
   }
 }
