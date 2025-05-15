@@ -16,14 +16,14 @@ export class ApiResult<T> {
     public data: T | null = null
   ) {}
 
-  static success<T>({ data = null, message = "操作成功", code = 200, dto }: Result<T>): ApiResult<T> {
+  static success<T>({ data = null, message = "操作成功", code = 200, dto }: Result<T> = {}): ApiResult<T> {
     if (dto) {
       data = plainToInstance(dto, data);
     }
     return new ApiResult<T>(code, message, data);
   }
 
-  static error<T>(param: Error | string | Result<T>): ApiResult<T> {
+  static error<T>(param: Error | string | Result<T> = {}): ApiResult<T> {
     let message = "操作失败",
       code = 400,
       data: T | null = null;
