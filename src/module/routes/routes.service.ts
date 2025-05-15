@@ -183,7 +183,7 @@ export class RoutesService extends BaseService {
         })
         // 执行查询并返回实体对象数组
         .getMany();
-      return ApiResult.success<Route[]>({ data });
+      return ApiResult.success<Route[]>({ data, entities: Route });
     } catch (error) {
       const errorMessage = typeof error === "string" ? error : JSON.stringify(error);
       return ApiResult.error<null>(errorMessage || "获取路由失败，请稍后再试");
