@@ -62,6 +62,7 @@ export class LoggerService {
       const filePath = join(process.cwd(), this.logRootDir, date, fileName);
       // 异步读取
       let file = await readFile(filePath, "utf-8");
+      file = JSON.parse(`[${file.trim().replace(/\r?\n/g, ",")}]`);
       return ApiResult.success({ data: file });
     } catch (error) {
       return ApiResult.error(error || "获取日志文件失败，请稍后再试");
