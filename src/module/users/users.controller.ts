@@ -72,7 +72,7 @@ export class UsersController {
       res.cookie("refresh_token", (data?.data as UserLogin).refresh_token, {
         maxAge: Number(options.jwt_refresh_expires_in),
       });
-      res.json(data);
+      res.status(data.code).json(data);
     } else {
       res.status(data.code).json(data);
     }
@@ -107,6 +107,6 @@ export class UsersController {
     res.cookie("token", "", { expires: new Date(0) });
     res.cookie("refresh_token", "", { expires: new Date(0) });
     const { __isApiResult, ...data } = ApiResult.success({ data: null });
-    res.json(data);
+    res.status(200).json(data);
   }
 }

@@ -14,6 +14,7 @@ import { RolesGuard } from "./module/roles/roles.guard";
 import { AuthGuard } from "./module/auth/auth.guard";
 import { RoutesModule } from "./module/routes/routes.module";
 import { WinstonModule } from "nest-winston";
+import { LoggerModule } from './module/logger/logger.module';
 import * as winston from "winston";
 import * as DailyRotateFile from "winston-daily-rotate-file";
 
@@ -87,6 +88,7 @@ import * as DailyRotateFile from "winston-daily-rotate-file";
     UploadModule,
     RolesModule,
     RoutesModule,
+    LoggerModule,
   ],
   controllers: [],
   providers: [

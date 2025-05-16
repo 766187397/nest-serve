@@ -18,6 +18,8 @@ import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from "@n
 import * as cookieParser from "cookie-parser";
 import { ClassValidatorExceptionFilter } from "./common/filter/class-validator-filter";
 import { ErrorFilter } from "./common/filter/multer";
+import { LoggerService } from "./module/logger/logger.service";
+import { LoggerInterceptor } from "./module/logger/logger.middleware";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -54,13 +56,11 @@ async function bootstrap() {
   // 文件上传过滤器
   app.useGlobalFilters(new ErrorFilter());
 
+  // 自定义日志中间件
+  const loggerService = app.get(LoggerService); // 从 DI 容器中获取 LoggerService
+  app.useGlobalInterceptors(new LoggerInterceptor(loggerService)); // 传递 LoggerService 实例
+
   run(app);
-  // await app.listen(port).then((res) => {
-  //   console.log(`当前环境为：${envFilePath}`);
-  //   console.log(`server to ${url}`);
-  //   console.log(`swagger to ${url}/swagger`);
-  //   console.log(`knife4j to ${url}/doc.html`);
-  // });
 }
 bootstrap();
 

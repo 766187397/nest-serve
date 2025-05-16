@@ -1,7 +1,7 @@
 // auth.guard.ts
 import { ApiResult } from "@/common/utils/result";
 import { getPlatformJwtConfig } from "@/config/jwt";
-import { WhiteList } from "@/config/whiteList";
+import { JWTWhiteList } from "@/config/whiteList";
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
@@ -19,8 +19,8 @@ export class AuthGuard implements CanActivate {
     const ctx = context.switchToHttp();
     const req = ctx.getRequest();
     const res = ctx.getResponse<Response>();
-    const whiteListStartsWith = WhiteList.whiteListStartsWith;
-    const whiteListExact = WhiteList.whiteListExact;
+    const whiteListStartsWith = JWTWhiteList.whiteListStartsWith;
+    const whiteListExact = JWTWhiteList.whiteListExact;
     let state = false; // 是否匹配白名单
     const url = req.url;
     // 检查白名单

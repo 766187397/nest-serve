@@ -5,9 +5,7 @@ declare global {
   namespace Express {
     interface Request {
       userInfo?: MyUser;
+      startTime?: any;
     }
-  }
-  interface Request {
-    userInfo?: MyUser;
   }
 }
