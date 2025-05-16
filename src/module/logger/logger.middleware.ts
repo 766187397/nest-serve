@@ -46,12 +46,7 @@ export class LoggerInterceptor implements NestInterceptor {
     // 在响应返回前记录日志
     return next.handle().pipe(
       tap(async (data) => {
-        let resData: string = "";
-        try {
-          resData = JSON.stringify(data) || "";
-        } catch (error) {
-          resData = data;
-        }
+        let resData = data;
         // `data` 是控制器返回给前端的响应体
         const statusCode = response.statusCode || "";
         const responseTime = Date.now() - request["startTime"] || 0; // 计算响应时间(毫秒)
