@@ -47,7 +47,6 @@ export class LoggerInterceptor implements NestInterceptor {
         // `data` 是控制器返回给前端的响应体
         let resData = data;
         const statusCode = response.statusCode || "";
-        console.log("statusCode :>> ", statusCode);
         const responseTime = Date.now() - request["startTime"] || 0; // 计算响应时间(毫秒)
         try {
           const data = {
