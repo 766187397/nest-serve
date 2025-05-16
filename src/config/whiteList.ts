@@ -26,7 +26,9 @@ export class LoggerWhiteList {
     "/api-docs", // knife4j 分组接口文档
     "/webjars", // knife4j 静态资源
     "/swagger", // swagger 接口文档地址
-    "/api/v1/large/files",
+    "/api/v1/large/files", // 大文件上传
+    "/api/v1/admin/logger/downloadFile", // 日志文件下载
+    "/api/v1/admin/logger/read", // 日志文件读取
   ];
   // 全匹配
   static whiteListExact: string[] = [

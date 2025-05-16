@@ -20,14 +20,14 @@ export class LoggerController {
     return this.loggerService.findAll();
   }
 
-  @Get(":date")
+  @Get("getFilesByDate/:date")
   @ApiOperation({ summary: "查询日志文件列表" })
   getFilesByDate(@Param("date") date: string) {
     return this.loggerService.getFilesByDate(date);
   }
 
   // 下载指定日期的指定文件
-  @Get(":date/:filename")
+  @Get("downloadFile/:date/:filename")
   @ApiOperation({ summary: "下载日志文件" })
   @Header("Content-Type", "application/octet-stream")
   @Header("Content-Disposition", 'attachment; filename=":filename"')
@@ -42,5 +42,11 @@ export class LoggerController {
       "Content-Disposition": `attachment; filename="${encodeURIComponent(filename)}"`,
     });
     return new StreamableFile(file);
+  }
+
+  @Get("read/:date/:filename")
+  @ApiOperation({ summary: "读取日志文件" })
+  async readLoggerFile(@Param("date") date: string, @Param("filename") filename: string) {
+    return this.loggerService.readLoggerFile(date, filename);
   }
 }

@@ -2,10 +2,11 @@ import { ApiResult } from "@/common/utils/result";
 import { BaseFileUrl } from "@/config/logger";
 import { Inject, Injectable } from "@nestjs/common";
 import { createReadStream } from "fs";
+import { readFile } from "fs/promises";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import { join } from "path";
 import { Logger } from "winston";
-const { promises: fsPromises } = require("fs");
+import { promises as fsPromises } from "fs";
 
 @Injectable()
 export class LoggerService {
@@ -54,5 +55,16 @@ export class LoggerService {
   async downloadFile(date: string, fileName: string) {
     const filePath = join(process.cwd(), this.logRootDir, date, fileName);
     return createReadStream(filePath);
+  }
+
+  async readLoggerFile(date: string, fileName: string) {
+    try {
+      const filePath = join(process.cwd(), this.logRootDir, date, fileName);
+      // 异步读取
+      let file = await readFile(filePath, "utf-8");
+      return ApiResult.success({ data: file });
+    } catch (error) {
+      return ApiResult.error(error || "获取日志文件失败，请稍后再试");
+    }
   }
 }
