@@ -61,7 +61,12 @@ import { DebugConfig, ErrorConfig, InfoConfig, WarnConfig } from "./config/logge
         winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
         winston.format.json()
       ),
-      transports: [InfoConfig, ErrorConfig, DebugConfig, WarnConfig],
+      transports: [
+        InfoConfig,
+        ErrorConfig,
+        // DebugConfig,
+        WarnConfig,
+      ],
     }),
     UsersModule,
     Knife4jModule,
