@@ -14,9 +14,10 @@ import { RolesGuard } from "./module/roles/roles.guard";
 import { AuthGuard } from "./module/auth/auth.guard";
 import { RoutesModule } from "./module/routes/routes.module";
 import { WinstonModule } from "nest-winston";
-import { LoggerModule } from './module/logger/logger.module';
+import { LoggerModule } from "./module/logger/logger.module";
 import * as winston from "winston";
 import * as DailyRotateFile from "winston-daily-rotate-file";
+import { DebugConfig, ErrorConfig, InfoConfig, WarnConfig } from "./config/logger";
 
 @Module({
   imports: [
@@ -60,26 +61,7 @@ import * as DailyRotateFile from "winston-daily-rotate-file";
         winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
         winston.format.json()
       ),
-      transports: [
-        new DailyRotateFile({
-          filename: "logs/app-%DATE%.log",
-          datePattern: "YYYY-MM-DD",
-          maxSize: "20m", // 单个文件最大 20MB
-          maxFiles: "30d", // 保留最近 30 天的日志
-          zippedArchive: true, // 自动压缩旧日志
-          level: "info", // 记录 info 及以上级别
-          json: true, // 以 JSON 格式存储
-        }),
-        new DailyRotateFile({
-          filename: "logs/error-%DATE%.log",
-          datePattern: "YYYY-MM-DD",
-          maxSize: "20m", // 单个文件最大 20MB
-          maxFiles: "30d", // 保留最近 30 天的日志
-          zippedArchive: true, // 自动压缩旧日志
-          level: "error", // 记录 error 及以上级别
-          json: true, // 以 JSON 格式存储
-        }),
-      ],
+      transports: [InfoConfig, ErrorConfig, DebugConfig, WarnConfig],
     }),
     UsersModule,
     Knife4jModule,
