@@ -74,10 +74,10 @@ import { DebugConfig, ErrorConfig, InfoConfig, WarnConfig } from "./config/logge
   ],
   controllers: [],
   providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ApiResultInterceptor,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: ApiResultInterceptor,
+    // },
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

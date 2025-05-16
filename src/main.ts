@@ -19,7 +19,8 @@ import * as cookieParser from "cookie-parser";
 import { ClassValidatorExceptionFilter } from "./common/filter/class-validator-filter";
 import { ErrorFilter } from "./common/filter/multer";
 import { LoggerService } from "./module/logger/logger.service";
-import { LoggerInterceptor } from "./module/logger/logger.middleware";
+import { LoggerInterceptor } from "./module/logger/logger.interceptor";
+import { ApiResultInterceptor } from "./common/interceptor/api-result.interceptor";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -56,9 +57,12 @@ async function bootstrap() {
   // 文件上传过滤器
   app.useGlobalFilters(new ErrorFilter());
 
-  // 自定义日志中间件
+  // 拦截器的执行顺序是后注册先执行 日志拦截器 需要存储格式化之后的数据，所以需要在 返回格式处理拦截器 之前注册确保数据一致
+  // 自定义日志拦截器
   const loggerService = app.get(LoggerService); // 从 DI 容器中获取 LoggerService
   app.useGlobalInterceptors(new LoggerInterceptor(loggerService)); // 传递 LoggerService 实例
+  // 返回格式处理拦截器
+  app.useGlobalInterceptors(new ApiResultInterceptor());
 
   run(app);
 }

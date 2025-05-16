@@ -1,14 +1,12 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { CallHandler, ExecutionContext, NestInterceptor } from "@nestjs/common";
-import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
-import { LoggerService } from "../logger/logger.service";
-import { Request } from "express";
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
+import { LoggerService } from "./logger.service";
+import { Observable, tap } from "rxjs";
 import { LoggerWhiteList } from "@/config/whiteList";
+import { Request } from "express";
 
 @Injectable()
 export class LoggerInterceptor implements NestInterceptor {
-  constructor(@Inject(LoggerService) private readonly loggerService: LoggerService) {}
+  constructor(private readonly loggerService: LoggerService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     // 以什么开头
@@ -49,6 +47,7 @@ export class LoggerInterceptor implements NestInterceptor {
         // `data` 是控制器返回给前端的响应体
         let resData = data;
         const statusCode = response.statusCode || "";
+        console.log("statusCode :>> ", statusCode);
         const responseTime = Date.now() - request["startTime"] || 0; // 计算响应时间(毫秒)
         try {
           const data = {
