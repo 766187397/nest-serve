@@ -1,7 +1,10 @@
 import * as DailyRotateFile from "winston-daily-rotate-file";
+
+export const BaseFileUrl = "logs";
+
 /** info 日志配置 */
 export const InfoConfig = new DailyRotateFile({
-  filename: "logs/%DATE%/info.log",
+  filename: BaseFileUrl + "/%DATE%/info.log",
   datePattern: "YYYY-MM-DD",
   maxSize: "20m", // 单个文件最大 20MB
   maxFiles: "30d", // 保留最近 30 天的日志
@@ -12,7 +15,7 @@ export const InfoConfig = new DailyRotateFile({
 
 /** error 日志配置 */
 export const ErrorConfig = new DailyRotateFile({
-  filename: "logs/%DATE%/error.log",
+  filename: BaseFileUrl + "/%DATE%/error.log",
   datePattern: "YYYY-MM-DD",
   maxSize: "20m", // 单个文件最大 20MB
   maxFiles: "30d", // 保留最近 30 天的日志
@@ -23,7 +26,7 @@ export const ErrorConfig = new DailyRotateFile({
 
 /** debug 日志配置 */
 export const DebugConfig = new DailyRotateFile({
-  filename: "logs/%DATE%/debug.log",
+  filename: BaseFileUrl + "/%DATE%/debug.log",
   datePattern: "YYYY-MM-DD",
   maxSize: "20m", // 单个文件最大 20MB
   maxFiles: "30d", // 保留最近 30 天的日志
@@ -34,7 +37,7 @@ export const DebugConfig = new DailyRotateFile({
 
 /** warn 日志配置 */
 export const WarnConfig = new DailyRotateFile({
-  filename: "logs/%DATE%/warn.log",
+  filename: BaseFileUrl + "/%DATE%/warn.log",
   datePattern: "YYYY-MM-DD",
   maxSize: "20m", // 单个文件最大 20MB
   maxFiles: "30d", // 保留最近 30 天的日志

@@ -34,3 +34,11 @@ export class LoggerWhiteList {
     "/v3/api-docs/swagger-config", // knife4j 请求配置
   ];
 }
+
+/** 返回处理白名单 */
+export class ResultWhiteList {
+  // 前缀匹配
+  static whiteListStartsWith: string[] = ["/api/v1/admin/logger"];
+  // 全匹配
+  static whiteListExact: string[] = [];
+}
