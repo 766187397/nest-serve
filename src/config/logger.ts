@@ -1,7 +1,7 @@
 import * as DailyRotateFile from "winston-daily-rotate-file";
 /** info 日志配置 */
 export const InfoConfig = new DailyRotateFile({
-  filename: "logs/app-%DATE%.log",
+  filename: "logs/info-%DATE%.log",
   datePattern: "YYYY-MM-DD",
   maxSize: "20m", // 单个文件最大 20MB
   maxFiles: "30d", // 保留最近 30 天的日志

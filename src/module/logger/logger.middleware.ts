@@ -27,7 +27,14 @@ export class LoggerInterceptor implements NestInterceptor {
     const apiPlatform: string = url.split("/")[3] || "";
     const { account = "", nickName = "" } = request.userInfo || {};
     const method = request.method || "";
-    const { referer = "", "sec-ch-ua-platform": platform = "", "sec-ch-ua": browser = "" } = request.headers;
+    let { referer = "", "sec-ch-ua-platform": platform = "", "sec-ch-ua": browser = "" } = request.headers;
+    try {
+      browser = (browser as string).replace(/"/g, "");
+      platform = (platform as string).replace(/"/g, "");
+    } catch (error) {
+      platform = "";
+      browser = "";
+    }
     request.startTime = Date.now();
 
     // 获取客户端的 IP 地址
