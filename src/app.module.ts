@@ -18,6 +18,7 @@ import { LoggerModule } from "./module/logger/logger.module";
 import * as winston from "winston";
 import * as DailyRotateFile from "winston-daily-rotate-file";
 import { DebugConfig, ErrorConfig, InfoConfig, WarnConfig } from "./config/logger";
+import { NoticeModule } from './module/notice/notice.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { DebugConfig, ErrorConfig, InfoConfig, WarnConfig } from "./config/logge
     RolesModule,
     RoutesModule,
     LoggerModule,
+    NoticeModule,
   ],
   controllers: [],
   providers: [
