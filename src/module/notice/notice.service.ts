@@ -71,14 +71,14 @@ export class NoticeService extends BaseService {
    * @param {FindNoticeDtoByPageByUserOrRole} findNoticeDtoByPageByUserOrRole 分页
    * @param {string} platform 平台
    * @param {string[]} roleKeys 角色权限数组
-   * @returns { Promise<ApiResult<PageApiResult<Notice[]> | null>>} 统一返回结果
+   * @returns { Promise<ApiResult<PageApiResult<any[]> | null>>} 统一返回结果
    */
   async findByPageByUserAndRole(
     findNoticeDtoByPageByUserOrRole: FindNoticeDtoByPageByUserOrRole,
     platform: string,
     roleKeys: string[] | undefined,
     userId: number
-  ): Promise<ApiResult<PageApiResult<Notice[]> | null>> {
+  ): Promise<ApiResult<PageApiResult<any[]> | null>> {
     try {
       let { take, skip } = this.buildCommonPaging(
         findNoticeDtoByPageByUserOrRole?.page,
@@ -106,12 +106,29 @@ export class NoticeService extends BaseService {
       );
 
       // 添加分页
-      const [data, total] = await queryBuilder.skip(skip).take(take).getManyAndCount();
+      let [data, total] = await queryBuilder.skip(skip).take(take).getManyAndCount();
       // 计算总页数
       const totalPages = Math.ceil(total / take);
-      return ApiResult.success<PageApiResult<Notice[]>>({
+
+      let filterData = data.map((item) => {
+        return {
+          id: item.id,
+          content: item.content,
+          // platform: item.platform,
+          // roleKeys: item.roleKeys,
+          // specifyTime: item.specifyTime,
+          title: item.title,
+          type: item.type,
+          // userIds: item.userIds,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+          // deletedAt: item.deletedAt,
+        };
+      });
+
+      return ApiResult.success<PageApiResult<any[]>>({
         data: {
-          data,
+          data: filterData,
           total,
           totalPages,
           page: findNoticeDtoByPageByUserOrRole?.page || 1,
