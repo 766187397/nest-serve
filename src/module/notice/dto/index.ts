@@ -1,6 +1,6 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { IsArray, IsDate, IsDateString, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsArray, IsDateString, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 /** 创建通知 */
 export class CreateNoticeDto extends CreateBaseDto {
@@ -9,22 +9,23 @@ export class CreateNoticeDto extends CreateBaseDto {
     type: String,
     required: true,
     description: "指定的平台标识（如admin/web/app/mini）",
+    example: "admin",
   })
   @IsNotEmpty({ message: "平台标识不能为空" })
   @IsString({ message: "平台标识必须是字符串" })
   platform: string;
 
-  @ApiProperty({ name: "type", type: String, required: true, description: "类型" })
+  @ApiProperty({ name: "type", type: String, required: true, description: "类型", example: "notice" })
   @IsNotEmpty({ message: "类型不能为空" })
   @IsString({ message: "类型必须是字符串" })
   type: string;
 
-  @ApiProperty({ name: "roleIDs", type: Array, required: false, description: "角色id" })
+  @ApiProperty({ name: "roleKey", type: Array, required: false, description: "角色权限" })
   @IsOptional()
-  @IsArray({ message: "角色id必须是数组" })
-  roleIDs?: string[];
+  @IsArray({ message: "角色key必须是数组" })
+  roleKey?: string[];
 
-  @ApiProperty({ name: "title", type: String, required: true, description: "标题" })
+  @ApiProperty({ name: "title", type: String, required: true, description: "标题", example: "通知" })
   @IsNotEmpty({ message: "标题不能为空" })
   @IsString({ message: "标题必须是字符串" })
   title: string;
@@ -34,7 +35,7 @@ export class CreateNoticeDto extends CreateBaseDto {
   @IsString({ message: "内容必须是字符串" })
   content?: string;
 
-  @ApiProperty({ name: "SpecifyTime", type: String, required: true, description: "指定时间" })
+  @ApiProperty({ name: "specifyTime", type: String, required: true, description: "指定时间" })
   @IsOptional()
   @IsDateString({}, { message: "指定时间必须是日期字符串" })
   specifyTime?: Date;
@@ -62,10 +63,10 @@ export class UpdateNoticeDto extends PartialType(CreateNoticeDto) {
   @IsString({ message: "标题必须是字符串" })
   title?: string;
 
-  @ApiProperty({ name: "roleIDs", type: Array, required: false, description: "角色id" })
+  @ApiProperty({ name: "roleKey", type: Array, required: false, description: "角色权限" })
   @IsOptional()
-  @IsArray({ message: "角色id必须是数组" })
-  roleIDs?: string[];
+  @IsArray({ message: "角色权限必须是数组" })
+  roleKey?: string[];
 }
 
 /** 查询通知 */

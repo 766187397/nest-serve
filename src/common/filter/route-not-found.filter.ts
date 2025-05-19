@@ -11,7 +11,7 @@ export class RouteNotFoundFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     console.log("自定义路由不存在响应 :>> ");
     // 自定义路由不存在响应
-    const { __isApiResult, ...data } = ApiResult.error({
+    const { __isApiResult, ...data } = ApiResult.error<null>({
       code: 404,
       message: "请求的路由不存在,请检查API路径是否正确",
       data: null,

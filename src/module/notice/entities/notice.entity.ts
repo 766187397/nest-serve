@@ -7,8 +7,8 @@ import { Column, Entity, Index } from "typeorm";
 export class Notice extends BaseEntity {
   @Column({ type: "varchar", length: 30, comment: "通知类型" })
   type: string;
-  @Column({ type: "varchar", length: 255, comment: "指定角色id" })
-  roleIDs?: string[];
+  @Column({ type: "varchar", length: 255, comment: "指定角色权限" })
+  roleKey?: string[];
   @Column({ type: "varchar", length: 50, comment: "标题" })
   title: string;
   @Column({ type: "text", comment: "内容" })

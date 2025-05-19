@@ -6,7 +6,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Route } from "@/module/routes/entities/route.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Role]), TypeOrmModule.forFeature([Route])],
+  imports: [TypeOrmModule.forFeature([Role, Route])],
   controllers: [RolesController],
   providers: [RolesService],
 })

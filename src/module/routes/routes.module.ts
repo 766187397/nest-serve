@@ -6,7 +6,7 @@ import { Route } from "./entities/route.entity";
 import { Role } from "@/module/roles/entities/role.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Route]), TypeOrmModule.forFeature([Role])],
+  imports: [TypeOrmModule.forFeature([Route, Role])],
   controllers: [RoutesController],
   providers: [RoutesService],
 })

@@ -7,7 +7,7 @@ import { AuthModule } from "../auth/auth.module";
 import { Role } from "@/module/roles/entities/role.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), forwardRef(() => AuthModule), TypeOrmModule.forFeature([Role])],
+  imports: [TypeOrmModule.forFeature([User, Role]), forwardRef(() => AuthModule)],
   controllers: [UsersController],
   providers: [UsersService],
 })

@@ -16,8 +16,6 @@ import { SwaggerModule } from "@nestjs/swagger";
 import { SwaggerConfig } from "./config/swagger";
 import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
-import { ClassValidatorExceptionFilter } from "./common/filter/class-validator-filter";
-import { ErrorFilter } from "./common/filter/multer";
 import { LoggerService } from "./module/logger/logger.service";
 import { LoggerInterceptor } from "./module/logger/logger.interceptor";
 import { ApiResultInterceptor } from "./common/interceptor/api-result.interceptor";
@@ -55,10 +53,6 @@ async function bootstrap() {
   const loggerService = app.get(LoggerService); // 从 DI 容器中获取 LoggerService
   // 全局过滤器
   app.useGlobalFilters(
-    // 表单校验过滤器
-    new ClassValidatorExceptionFilter(),
-    // 文件上传过滤器
-    new ErrorFilter(),
     // 全局的异常过滤器
     new GlobalExceptionFilter(loggerService),
     // 404过滤器

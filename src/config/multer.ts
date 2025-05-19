@@ -1,8 +1,10 @@
 import { diskStorage } from "multer";
 
 export class FileUploadService {
-  /** 文件大小限制 */
-  static size = 1024 * 1024 * 50;
+  /** 文件大小50MB */
+  static MB = 50;
+  /** 文件大小限制 计算结果 */
+  static size = 1024 * 1024 * this.MB;
   /** 文件夹名称 */
   static rootPath = "uploads";
   /** 主文件访问路径 */

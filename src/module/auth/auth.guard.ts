@@ -3,15 +3,12 @@ import { ApiResult } from "@/common/utils/result";
 import { getPlatformJwtConfig } from "@/config/jwt";
 import { JWTWhiteList } from "@/config/whiteList";
 import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { Response } from "express";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private reflector: Reflector,
-
     private readonly jwtService: JwtService // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
   ) {}
 
@@ -38,9 +35,8 @@ export class AuthGuard implements CanActivate {
       token = req.headers["authorization"]?.split(" ")[1]; // 从请求头获取 Bearer Token
     }
     if (!token && !state) {
-      let { __isApiResult, ...data } = ApiResult.error({ code: 401, message: "请登录后访问！", data: null });
+      // let { __isApiResult, ...data } = ApiResult.error({ code: 401, message: "请登录后访问！", data: null });
       throw new HttpException("请登录后访问！", HttpStatus.UNAUTHORIZED);
-
       return false;
     }
 
