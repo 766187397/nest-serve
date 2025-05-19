@@ -23,9 +23,9 @@ export class RolesService extends BaseService {
    * 创建角色
    * @param {CreateRoleDto} createRoleDto 角色信息
    * @param {string} platform 平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<Role> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<Role | null>>} 统一返回结果
    */
-  async create(createRoleDto: CreateRoleDto, platform: string = "admin"): Promise<ApiResult<Role> | ApiResult<null>> {
+  async create(createRoleDto: CreateRoleDto, platform: string = "admin"): Promise<ApiResult<Role | null>> {
     try {
       let { name, roleKey } = createRoleDto;
       // 构建查询条件
@@ -60,12 +60,12 @@ export class RolesService extends BaseService {
    * 分页查询
    * @param {FindRoleDtoByPage} findRoleDtoByPage 查询条件
    * @param {string} platform 平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<PageApiResult<Role[]>> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<PageApiResult<Role[]> | null>>} 统一返回结果
    */
   async findByPage(
     findRoleDtoByPage: FindRoleDtoByPage,
     platform: string = "admin"
-  ): Promise<ApiResult<PageApiResult<Role[]>> | ApiResult<null>> {
+  ): Promise<ApiResult<PageApiResult<Role[]> | null>> {
     try {
       let { take, skip } = this.buildCommonPaging(findRoleDtoByPage?.page, findRoleDtoByPage?.pageSize);
       let where = this.buildCommonQuery(findRoleDtoByPage);
@@ -105,9 +105,9 @@ export class RolesService extends BaseService {
    * 查询所有角色
    * @param {FindRoleDto} findRoleDto 查询条件
    * @param {string} platform 平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<Role[]> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<Role[] | null>>} 统一返回结果
    */
-  async findAll(findRoleDto: FindRoleDto, platform: string = "admin"): Promise<ApiResult<Role[]> | ApiResult<null>> {
+  async findAll(findRoleDto: FindRoleDto, platform: string = "admin"): Promise<ApiResult<Role[] | null>> {
     try {
       let where = this.buildCommonQuery(findRoleDto);
       let order = this.buildCommonSort(findRoleDto);
@@ -132,9 +132,9 @@ export class RolesService extends BaseService {
    * 通过id查询角色
    * @param {number} id 角色ID
    * @param {string} platform 平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<Role> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<Role | null>>} 统一返回结果
    */
-  async findOne(id: number, platform: string = "admin"): Promise<ApiResult<Role> | ApiResult<null>> {
+  async findOne(id: number, platform: string = "admin"): Promise<ApiResult<Role | null>> {
     try {
       let data = await this.roleRepository.findOne({ where: { id, platform } });
       if (!data) {
@@ -150,9 +150,9 @@ export class RolesService extends BaseService {
    * 更新角色
    * @param {number} id 角色ID
    * @param {UpdateRoleDto} updateRoleDto 更新角色信息
-   * @returns {Promise<ApiResult<Role> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<Role | null>>} 统一返回结果
    */
-  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<ApiResult<Role> | ApiResult<null>> {
+  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<ApiResult<Role | null>> {
     try {
       let role = await this.roleRepository.findOne({ where: { id } });
       if (!role) {
@@ -172,9 +172,9 @@ export class RolesService extends BaseService {
   /**
    * 删除角色
    * @param {number} id 角色ID
-   * @returns {Promise<ApiResult<UpdateResult> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<UpdateResult | null>>} 统一返回结果
    */
-  async remove(id: number): Promise<ApiResult<UpdateResult> | ApiResult<null>> {
+  async remove(id: number): Promise<ApiResult<UpdateResult | null>> {
     try {
       let data = await this.roleRepository.softDelete(id);
       return ApiResult.success<UpdateResult>({ data });

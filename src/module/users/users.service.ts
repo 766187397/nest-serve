@@ -28,9 +28,9 @@ export class UsersService extends BaseService {
    * 创建用户
    * @param {CreateUserDto} createUserDto  创建用户DTO
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<User> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<User | null>>} 统一返回结果
    */
-  async create(createUserDto: CreateUserDto, platform: string = "admin"): Promise<ApiResult<User> | ApiResult<null>> {
+  async create(createUserDto: CreateUserDto, platform: string = "admin"): Promise<ApiResult<User | null>> {
     try {
       // 查询数据库，确保 account, phone, email 不存在
       const { account = null, phone = null, email = null, roleIds = [] } = createUserDto;
@@ -70,12 +70,12 @@ export class UsersService extends BaseService {
    * 分页查询
    * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<null> | ApiResult<PageApiResult<User[]>>>} 统一返回结果
+   * @returns {Promise<ApiResult<PageApiResult<User[]> | null>>} 统一返回结果
    */
   async findByPage(
     findUserDtoByPage?: FindUserDtoByPage,
     platform: string = "admin"
-  ): Promise<ApiResult<null> | ApiResult<PageApiResult<User[]>>> {
+  ): Promise<ApiResult<PageApiResult<User[]> | null>> {
     try {
       let { take, skip } = this.buildCommonPaging(findUserDtoByPage?.page, findUserDtoByPage?.pageSize);
       let where = this.buildCommonQuery(findUserDtoByPage);
@@ -117,9 +117,9 @@ export class UsersService extends BaseService {
    * 查询所有用户
    * @param {FindUserDto} findUserDto 查询条件
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<User[]> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<User[] | null>>} 统一返回结果
    */
-  async findAll(findUserDto?: FindUserDto, platform: string = "admin"): Promise<ApiResult<User[]> | ApiResult<null>> {
+  async findAll(findUserDto?: FindUserDto, platform: string = "admin"): Promise<ApiResult<User[] | null>> {
     try {
       let where = this.buildCommonQuery(findUserDto);
       let order = this.buildCommonSort(findUserDto);
@@ -146,9 +146,9 @@ export class UsersService extends BaseService {
    * 通过ID查询详情
    * @param {number} id
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<User> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<User | null>>} 统一返回结果
    */
-  async findOne(id: number, platform: string = "admin"): Promise<ApiResult<User> | ApiResult<null>> {
+  async findOne(id: number, platform: string = "admin"): Promise<ApiResult<User | null>> {
     try {
       let data = await this.userRepository.findOne({ where: { id, platform } });
       if (!data) {
@@ -164,9 +164,9 @@ export class UsersService extends BaseService {
    * 修改用户信息
    * @param {number} id 用户ID
    * @param updateUserDto 更新用户信息
-   * @returns {Promise<ApiResult<User> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<User | null>>} 统一返回结果
    */
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResult<User> | ApiResult<null>> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResult<User | null>> {
     try {
       // 查询用户
       let userInfo = await this.userRepository.findOne({
@@ -203,9 +203,9 @@ export class UsersService extends BaseService {
   /**
    * 删除用户信息
    * @param {number} id 用户ID
-   * @returns {Promise<ApiResult<UpdateResult> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<UpdateResult | null>>} 统一返回结果
    */
-  async remove(id: number): Promise<ApiResult<UpdateResult> | ApiResult<null>> {
+  async remove(id: number): Promise<ApiResult<UpdateResult | null>> {
     try {
       let data = await this.userRepository.softDelete(id);
       return ApiResult.success<UpdateResult>({ data });
@@ -218,9 +218,9 @@ export class UsersService extends BaseService {
    * 登录
    * @param {LogInDto} logInDto 登录参数
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<UserLogin> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<UserLogin | null>>} 统一返回结果
    */
-  async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<UserLogin> | ApiResult<null>> {
+  async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<UserLogin | null>> {
     try {
       let data = await this.userRepository.findOne({
         where: { account: logInDto.account, platform },
@@ -267,12 +267,9 @@ export class UsersService extends BaseService {
    * 使用 refresh_token 刷新token
    * @param refreshToken refresh_token
    * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<RefreshToken> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<RefreshToken | null>>} 统一返回结果
    */
-  async refreshToken(
-    refreshToken: string,
-    platform: string = "admin"
-  ): Promise<ApiResult<RefreshToken> | ApiResult<null>> {
+  async refreshToken(refreshToken: string, platform: string = "admin"): Promise<ApiResult<RefreshToken | null>> {
     try {
       let options = getPlatformJwtConfig(platform) as JwtConfig;
       let { id } = this.jwtService.verify(refreshToken, {

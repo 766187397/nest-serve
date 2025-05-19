@@ -26,7 +26,11 @@ export class LoggerService {
     this.logger.debug(message, options);
   }
 
-  async findAll() {
+  /**
+   * 查询日志文件夹列表
+   * @returns {Promise<ApiResult<string[] | null>>} 统一返回结果
+   */
+  async findAll(): Promise<ApiResult<string[] | null>> {
     try {
       const allItems = await fsPromises.readdir(this.logRootDir, { withFileTypes: true });
       // 过滤出符合 YYYY-MM-DD 格式的文件夹
@@ -36,19 +40,22 @@ export class LoggerService {
         .filter((name) => /^\d{4}-\d{2}-\d{2}$/.test(name))
         .sort((a, b) => new Date(b).getTime() - new Date(a).getTime()); // 按日期倒序
 
-      return ApiResult.success({ data: dateFolders });
+      return ApiResult.success<string[]>({ data: dateFolders });
     } catch (error) {
-      return ApiResult.error(error || "获取日志列表失败，请稍后再试");
+      return ApiResult.error<null>(error || "获取日志列表失败，请稍后再试");
     }
   }
-
-  async getFilesByDate(date: string) {
+  /**
+   * 查询日志文件夹列表
+   * @returns {Promise<ApiResult<string[] | null>>} 统一返回结果
+   */
+  async getFilesByDate(date: string): Promise<ApiResult<string[] | null>> {
     try {
       const logDir = join(process.cwd(), this.logRootDir, date);
       const data = await fsPromises.readdir(logDir);
-      return ApiResult.success({ data });
+      return ApiResult.success<string[]>({ data });
     } catch (error) {
-      return ApiResult.error(error || "获取日志列表失败，请稍后再试");
+      return ApiResult.error<null>(error || "获取日志列表失败，请稍后再试");
     }
   }
 
@@ -57,15 +64,21 @@ export class LoggerService {
     return createReadStream(filePath);
   }
 
-  async readLoggerFile(date: string, fileName: string) {
+  /**
+   * 查询文件内容
+   * @param {string} date 日期
+   * @param {string} fileName 文件名称
+   * @returns {Promise<ApiResult<string | null>>} 统一返回格式
+   */
+  async readLoggerFile(date: string, fileName: string): Promise<ApiResult<string | null>> {
     try {
       const filePath = join(process.cwd(), this.logRootDir, date, fileName);
       // 异步读取
       let file = await readFile(filePath, "utf-8");
       file = JSON.parse(`[${file.trim().replace(/\r?\n/g, ",")}]`);
-      return ApiResult.success({ data: file });
+      return ApiResult.success<string>({ data: file });
     } catch (error) {
-      return ApiResult.error(error || "获取日志文件失败，请稍后再试");
+      return ApiResult.error<null>(error || "获取日志文件失败，请稍后再试");
     }
   }
 }

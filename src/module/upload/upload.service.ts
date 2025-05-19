@@ -20,9 +20,9 @@ export class UploadService extends BaseService {
   /**
    * 文件上传
    * @param file 文件
-   * @returns {Promise<ApiResult<UploadFile> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<UploadFile | null>>} 统一返回结果
    */
-  async uploadFile(file: any): Promise<ApiResult<UploadFile> | ApiResult<null>> {
+  async uploadFile(file: any): Promise<ApiResult<UploadFile | null>> {
     try {
       if (!file) {
         return ApiResult.error("文件不能为空！");
@@ -46,9 +46,9 @@ export class UploadService extends BaseService {
   /**
    * 获取所有文件列表
    * @param {FindFileDto} findFileDto 查询参数
-   * @returns {Promise<ApiResult<UploadFile[]> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<UploadFile[] | null>>} 统一返回结果
    */
-  async getFileAll(findFileDto: FindFileDto): Promise<ApiResult<UploadFile[]> | ApiResult<null>> {
+  async getFileAll(findFileDto: FindFileDto): Promise<ApiResult<UploadFile[] | null>> {
     try {
       let where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDto);
       let order = this.buildCommonSort(findFileDto);
@@ -77,11 +77,9 @@ export class UploadService extends BaseService {
   /**
    * 分页查询文件
    * @param {FindFileDtoByPage} findFileDtoByPage
-   * @returns {Promise<ApiResult<PageApiResult<UploadFile[]>> | ApiResult<null>>}
+   * @returns {Promise<ApiResult<PageApiResult<UploadFile[]> | null>>}
    */
-  async getFileByPage(
-    findFileDtoByPage: FindFileDtoByPage
-  ): Promise<ApiResult<PageApiResult<UploadFile[]>> | ApiResult<null>> {
+  async getFileByPage(findFileDtoByPage: FindFileDtoByPage): Promise<ApiResult<PageApiResult<UploadFile[]> | null>> {
     try {
       let where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDtoByPage);
       let order = this.buildCommonSort(findFileDtoByPage);
@@ -122,9 +120,9 @@ export class UploadService extends BaseService {
   /**
    * 通过 ID 查询文件
    * @param id 文件ID
-   * @returns {Promise<ApiResult<UploadFile> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<UploadFile | null>>} 统一返回结果
    */
-  async getFileById(id: number): Promise<ApiResult<UploadFile> | ApiResult<null>> {
+  async getFileById(id: number): Promise<ApiResult<UploadFile | null>> {
     try {
       const file = await this.upload.findOne({ where: { id } });
       if (!file) {

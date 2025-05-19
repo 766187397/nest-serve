@@ -50,9 +50,9 @@ export class RoutesService extends BaseService {
   /**
    * 查询所有路由
    * @param {FindRouteDto} findRouteDto 查询条件
-   * @returns {Promise<ApiResult<Route[]> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<Route[] | null>>} 统一返回结果
    */
-  async findAll(findRouteDto: FindRouteDto): Promise<ApiResult<Route[]> | ApiResult<null>> {
+  async findAll(findRouteDto: FindRouteDto): Promise<ApiResult<Route[] | null>> {
     try {
       let order = this.buildCommonSort(findRouteDto);
       let data = await this.routeRepository.find({
@@ -71,7 +71,7 @@ export class RoutesService extends BaseService {
    * @param {number} id 路由的id
    * @returns
    */
-  async findOne(id: number): Promise<ApiResult<Route> | ApiResult<null>> {
+  async findOne(id: number): Promise<ApiResult<Route | null>> {
     try {
       let data = await this.routeRepository.findOne({ where: { id } });
       return ApiResult.success<Route>({ data });
@@ -84,9 +84,9 @@ export class RoutesService extends BaseService {
    * 路由信息修改
    * @param {number} id 路由id
    * @param {UpdateRouteDto} updateRouteDto 路由信息
-   * @returns {Promise<ApiResult<null> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(id: number, updateRouteDto: UpdateRouteDto): Promise<ApiResult<null> | ApiResult<null>> {
+  async update(id: number, updateRouteDto: UpdateRouteDto): Promise<ApiResult<null>> {
     try {
       // 查询当前路由是否存在
       let route = await this.routeRepository.findOne({
@@ -140,12 +140,9 @@ export class RoutesService extends BaseService {
    * 通过角色存在，则返回角色下的所有路由信息
    * @param {number[]} rolesIds 角色ID数组
    * @param {string} platform 平台标识
-   * @returns {Promise<ApiResult<Route[]> | ApiResult<null>>} 统一返回结果
+   * @returns {Promise<ApiResult<Route[] | null>>} 统一返回结果
    */
-  async getRoutesByRoleId(
-    rolesIds: number[],
-    platform: string = "admin"
-  ): Promise<ApiResult<Route[]> | ApiResult<null>> {
+  async getRoutesByRoleId(rolesIds: number[], platform: string = "admin"): Promise<ApiResult<Route[] | null>> {
     try {
       let roles = await this.roleRepository.find({
         where: { id: In(rolesIds) },
