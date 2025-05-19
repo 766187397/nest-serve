@@ -37,20 +37,23 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const statusCode = response.statusCode || "";
     // http异常
     if (exception instanceof HttpException) {
-      console.log("http异常 :>> ");
       status = exception.getStatus();
       message = exception.message;
     }
     // 处理数据库异常
     else if (exception instanceof QueryFailedError) {
-      console.log("处理数据库异常 :>> ");
       message = exception.message;
     }
     // 处理其他Error类型
     else if (exception instanceof Error) {
-      console.log("处理其他Error类型 :>> ");
       message = exception.stack || "Internal server error";
     }
+
+    const { __isApiResult, ...data } = ApiResult.error({
+      code: status,
+      message,
+      data: null,
+    });
 
     // 记录错误日志
     this.loggerService.error(`[${new Date().toISOString()}] Error:`, {
@@ -69,14 +72,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         browser,
         statusCode,
         IP,
+        resData: data,
       },
     });
 
-    const { __isApiResult, ...data } = ApiResult.error({
-      code: status,
-      message,
-      data: null,
-    });
     response.status(status).json(data);
   }
 }
