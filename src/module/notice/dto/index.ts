@@ -1,6 +1,6 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { IsArray, IsDateString, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 /** 创建通知 */
 export class CreateNoticeDto extends CreateBaseDto {
@@ -20,10 +20,15 @@ export class CreateNoticeDto extends CreateBaseDto {
   @IsString({ message: "类型必须是字符串" })
   type: string;
 
-  @ApiProperty({ name: "roleKey", type: Array, required: false, description: "角色权限" })
+  @ApiProperty({ name: "roleKey", type: String, required: false, description: "角色权限" })
   @IsOptional()
-  @IsArray({ message: "角色key必须是数组" })
-  roleKey?: string[];
+  @IsString({ message: "角色权限必须是字符串" })
+  roleKey?: string;
+
+  @ApiProperty({ name: "userIds", type: String, required: false, description: "用户ids（逗号隔开）" })
+  @IsOptional()
+  @IsString({ message: "用户ids必须是字符串" })
+  userIds?: string;
 
   @ApiProperty({ name: "title", type: String, required: true, description: "标题", example: "通知" })
   @IsNotEmpty({ message: "标题不能为空" })
@@ -53,20 +58,25 @@ export class UpdateNoticeDto extends PartialType(CreateNoticeDto) {
   @IsString({ message: "平台标识必须是字符串" })
   platform?: string;
 
-  @ApiProperty({ name: "type", type: String, required: true, description: "类型" })
+  @ApiProperty({ name: "type", type: String, description: "类型" })
   @IsOptional()
   @IsString({ message: "类型必须是字符串" })
   type?: string;
 
-  @ApiProperty({ name: "title", type: String, required: true, description: "标题" })
+  @ApiProperty({ name: "title", type: String, description: "标题" })
   @IsOptional()
   @IsString({ message: "标题必须是字符串" })
   title?: string;
 
-  @ApiProperty({ name: "roleKey", type: Array, required: false, description: "角色权限" })
+  @ApiProperty({ name: "roleKey", type: String, description: "角色权限（逗号隔开）" })
   @IsOptional()
-  @IsArray({ message: "角色权限必须是数组" })
-  roleKey?: string[];
+  @IsString({ message: "角色权限必须是字符串" })
+  roleKey?: string;
+
+  @ApiProperty({ name: "userIds", type: String, required: false, description: "用户ids（逗号隔开）" })
+  @IsOptional()
+  @IsString({ message: "用户ids必须是字符串" })
+  userIds?: string;
 }
 
 /** 查询通知 */

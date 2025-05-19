@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
 import { NoticeService } from "./notice.service";
-import { CreateNoticeDto, UpdateNoticeDto } from "./dto";
+import { CreateNoticeDto, FindNoticeDtoByPage, UpdateNoticeDto } from "./dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 
 @ApiTags("公告")
 @ApiResponse({ status: 200, description: "操作成功" })
@@ -18,26 +19,29 @@ export class NoticeController {
   @Post("create")
   @ApiOperation({ summary: "创建公告" })
   create(@Body() createNoticeDto: CreateNoticeDto) {
-    console.log('createNoticeDto', createNoticeDto)
     return this.noticeService.create(createNoticeDto);
   }
 
-  @Get()
-  findAll() {
-    return this.noticeService.findAll();
+  @Get("page")
+  @ApiOperation({ summary: "查询公告列表(分页)" })
+  findByPage(@Query(new FilterEmptyPipe()) findNoticeDtoByPage: FindNoticeDtoByPage) {
+    return this.noticeService.findByPage(findNoticeDtoByPage);
   }
 
-  @Get(":id")
+  @Get("info/:id")
+  @ApiOperation({ summary: "获取公告" })
   findOne(@Param("id") id: string) {
     return this.noticeService.findOne(+id);
   }
 
-  @Patch(":id")
+  @Patch("update/:id")
+  @ApiOperation({ summary: "更新公告" })
   update(@Param("id") id: string, @Body() updateNoticeDto: UpdateNoticeDto) {
     return this.noticeService.update(+id, updateNoticeDto);
   }
 
-  @Delete(":id")
+  @Delete("delete/:id")
+  @ApiOperation({ summary: "删除公告" })
   remove(@Param("id") id: string) {
     return this.noticeService.remove(+id);
   }
