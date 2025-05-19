@@ -12,9 +12,6 @@ export class Role extends BaseEntity {
   @Column("varchar", { comment: "权限字符串", length: 32 })
   roleKey: string;
 
-  @Column("varchar", { comment: "角色绑定的值", length: 32, nullable: true })
-  value: string;
-
   @Column("varchar", { comment: "角色描述", length: 255, nullable: true })
   description: string;
 

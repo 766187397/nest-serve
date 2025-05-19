@@ -18,11 +18,6 @@ export class CreateRoleDto extends CreateBaseDto {
   @IsString({ message: "角色key必须为字符串" })
   @IsOptional()
   roleKey?: string;
-
-  @ApiProperty({ description: "角色值", example: "0" })
-  @IsString({ message: "角色key必须为字符串" })
-  @IsOptional()
-  value?: string;
 }
 
 /** 更新角色信息 */
@@ -49,11 +44,6 @@ export class FindRoleDto extends FindByParameter {
   @IsString({ message: "角色key必须为字符串" })
   @IsOptional()
   roleKey?: string;
-
-  @ApiProperty({ description: "角色值", example: "0" })
-  @IsString({ message: "角色key必须为字符串" })
-  @IsOptional()
-  value?: string;
 }
 
 /** 分页查询角色信息 */

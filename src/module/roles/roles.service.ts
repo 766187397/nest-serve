@@ -77,7 +77,6 @@ export class RolesService extends BaseService {
           platform: platform,
           name: findRoleDtoByPage?.name ? ILike(`%${findRoleDtoByPage.name}%`) : undefined,
           roleKey: findRoleDtoByPage?.roleKey,
-          value: findRoleDtoByPage?.value,
         },
         order: {
           ...order,
@@ -118,7 +117,6 @@ export class RolesService extends BaseService {
           platform,
           name: findRoleDto?.name ? ILike(`%${findRoleDto.name}%`) : undefined,
           roleKey: findRoleDto?.roleKey,
-          value: findRoleDto?.value,
         },
         order: {
           ...order,
