@@ -63,6 +63,7 @@ export class LoggerInterceptor implements NestInterceptor {
             statusCode,
             IP,
           };
+          console.log('statusCode :>> ', statusCode);
           if (statusCode >= 100 && statusCode < 200) {
             this.loggerService.info("信息响应", data);
           } else if (statusCode >= 200 && statusCode < 300) {
