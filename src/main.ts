@@ -21,6 +21,8 @@ import { ErrorFilter } from "./common/filter/multer";
 import { LoggerService } from "./module/logger/logger.service";
 import { LoggerInterceptor } from "./module/logger/logger.interceptor";
 import { ApiResultInterceptor } from "./common/interceptor/api-result.interceptor";
+import { GlobalExceptionFilter } from "./common/filter/global-exception.filter";
+import { RouteNotFoundFilter } from "./common/filter/route-not-found.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -50,19 +52,28 @@ async function bootstrap() {
     })
   );
 
-  // 使用 ClassSerializerInterceptor
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  // 表单校验过滤器
-  app.useGlobalFilters(new ClassValidatorExceptionFilter());
-  // 文件上传过滤器
-  app.useGlobalFilters(new ErrorFilter());
-
-  // 拦截器的执行顺序是后注册先执行 日志拦截器 需要存储格式化之后的数据，所以需要在 返回格式处理拦截器 之前注册确保数据一致
-  // 自定义日志拦截器
   const loggerService = app.get(LoggerService); // 从 DI 容器中获取 LoggerService
-  app.useGlobalInterceptors(new LoggerInterceptor(loggerService)); // 传递 LoggerService 实例
-  // 返回格式处理拦截器
-  app.useGlobalInterceptors(new ApiResultInterceptor());
+  // 全局过滤器
+  app.useGlobalFilters(
+    // 表单校验过滤器
+    new ClassValidatorExceptionFilter(),
+    // 文件上传过滤器
+    new ErrorFilter(),
+    // 全局的异常过滤器
+    new GlobalExceptionFilter(loggerService),
+    // 404过滤器
+    new RouteNotFoundFilter()
+  );
+
+  // 全局拦截器
+  app.useGlobalInterceptors(
+    // 使用 ClassSerializerInterceptor
+    new ClassSerializerInterceptor(app.get(Reflector)),
+    // 返回格式处理拦截器
+    new ApiResultInterceptor(),
+    // 自定义日志拦截器
+    new LoggerInterceptor(loggerService)
+  );
 
   run(app);
 }

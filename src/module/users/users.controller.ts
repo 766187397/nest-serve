@@ -91,7 +91,7 @@ export class UsersController {
       refresh_token = (req.headers["refresh_token"] as string)?.split(" ")[1]; // 从请求头获取 Bearer Token
     }
     if (!refresh_token) {
-      return res.status(401).json({ code: 401, message: "refreshToken不存在，请先登录！", data: null });
+      res.status(401).json({ code: 401, message: "refreshToken不存在，请先登录！", data: null });
     }
     let { __isApiResult, ...data } = await this.usersService.refreshToken(refresh_token, "admin");
     if (data.code == 200) {

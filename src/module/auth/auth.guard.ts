@@ -2,7 +2,7 @@
 import { ApiResult } from "@/common/utils/result";
 import { getPlatformJwtConfig } from "@/config/jwt";
 import { JWTWhiteList } from "@/config/whiteList";
-import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
+import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { Response } from "express";
@@ -39,7 +39,8 @@ export class AuthGuard implements CanActivate {
     }
     if (!token && !state) {
       let { __isApiResult, ...data } = ApiResult.error({ code: 401, message: "请登录后访问！", data: null });
-      res.status(401).json(data);
+      throw new HttpException("请登录后访问！", HttpStatus.UNAUTHORIZED);
+
       return false;
     }
 
@@ -57,7 +58,7 @@ export class AuthGuard implements CanActivate {
       if (state) {
         return true;
       } else {
-        res.status(401).json(ApiResult.error({ code: 401, message: "授权失败，Token无效！", data: null }));
+        throw new HttpException("授权失败，Token无效！", HttpStatus.UNAUTHORIZED);
         return false;
       }
     }
