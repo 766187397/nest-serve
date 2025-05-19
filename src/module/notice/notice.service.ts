@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { BaseService } from "@/common/service/base";
-import { CreateNoticeDto, FindNoticeDtoByPage, UpdateNoticeDto } from "./dto";
+import { CreateNoticeDto, FindNoticeDtoByPage, FindNoticeDtoByPageByUserOrRole, UpdateNoticeDto } from "./dto";
 import { ApiResult } from "@/common/utils/result";
 import { Notice } from "./entities/notice.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { ILike, Repository } from "typeorm";
 import { PageApiResult } from "@/types/public";
 @Injectable()
 export class NoticeService extends BaseService {
@@ -33,13 +33,9 @@ export class NoticeService extends BaseService {
   /**
    * 分页查询
    * @param {FindNoticeDtoByPage} findNoticeDtoByPage
-   * @param {string} platform 平台
    * @returns {Promise<ApiResult<PageApiResult<Notice[]> | null>>} 统一返回结果
    */
-  async findByPage(
-    findNoticeDtoByPage: FindNoticeDtoByPage,
-    platform?: string
-  ): Promise<ApiResult<PageApiResult<Notice[]> | null>> {
+  async findByPage(findNoticeDtoByPage: FindNoticeDtoByPage): Promise<ApiResult<PageApiResult<Notice[]> | null>> {
     try {
       let { take, skip } = this.buildCommonPaging(findNoticeDtoByPage?.page, findNoticeDtoByPage?.pageSize);
       let where = this.buildCommonQuery(findNoticeDtoByPage);
@@ -47,7 +43,8 @@ export class NoticeService extends BaseService {
       let [data, total] = await this.noticeRepository.findAndCount({
         where: {
           ...where,
-          platform,
+          title: findNoticeDtoByPage?.title ? ILike(`%${findNoticeDtoByPage.title}%`) : undefined,
+          type: findNoticeDtoByPage?.type ? ILike(`%${findNoticeDtoByPage.type}%`) : undefined,
         },
         order,
         take,
@@ -62,6 +59,63 @@ export class NoticeService extends BaseService {
           totalPages,
           page: findNoticeDtoByPage?.page || 1,
           pageSize: findNoticeDtoByPage?.pageSize || 10,
+        },
+      });
+    } catch (error) {
+      return ApiResult.error<null>(error);
+    }
+  }
+
+  /**
+   * 分页查询指定平台，当前角色在通知
+   * @param {FindNoticeDtoByPageByUserOrRole} findNoticeDtoByPageByUserOrRole 分页
+   * @param {string} platform 平台
+   * @param {string[]} roleKeys 角色权限数组
+   * @returns { Promise<ApiResult<PageApiResult<Notice[]> | null>>} 统一返回结果
+   */
+  async findByPageByUserAndRole(
+    findNoticeDtoByPageByUserOrRole: FindNoticeDtoByPageByUserOrRole,
+    platform: string,
+    roleKeys: string[] | undefined,
+    userId: number
+  ): Promise<ApiResult<PageApiResult<Notice[]> | null>> {
+    try {
+      let { take, skip } = this.buildCommonPaging(
+        findNoticeDtoByPageByUserOrRole?.page,
+        findNoticeDtoByPageByUserOrRole?.pageSize
+      );
+      const queryBuilder = this.noticeRepository.createQueryBuilder("notice");
+      // 添加platform精确匹配条件
+      queryBuilder.where("notice.platform  = :platform", { platform });
+      roleKeys?.forEach((role, index) => {
+        const paramName = `role${index}`;
+        const condition = index === 0 ? "where" : "orWhere";
+        queryBuilder[condition](`notice.roleKeys  LIKE :${paramName}`, {
+          [paramName]: `%${role}%`,
+        });
+      });
+
+      // 用户ID匹配
+      queryBuilder.orWhere(`notice.userIds  LIKE :userId`, {
+        userId: `%${userId}%`,
+      });
+
+      // 追加查询roleKeys和userIds同时为空
+      queryBuilder.orWhere(
+        `(notice.roleKeys IS NULL OR notice.roleKeys  = '' AND notice.userIds IS NULL OR notice.userIds  = '')`
+      );
+
+      // 添加分页
+      const [data, total] = await queryBuilder.skip(skip).take(take).getManyAndCount();
+      // 计算总页数
+      const totalPages = Math.ceil(total / take);
+      return ApiResult.success<PageApiResult<Notice[]>>({
+        data: {
+          data,
+          total,
+          totalPages,
+          page: findNoticeDtoByPageByUserOrRole?.page || 1,
+          pageSize: findNoticeDtoByPageByUserOrRole?.pageSize || 10,
         },
       });
     } catch (error) {

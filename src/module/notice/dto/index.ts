@@ -20,10 +20,10 @@ export class CreateNoticeDto extends CreateBaseDto {
   @IsString({ message: "类型必须是字符串" })
   type: string;
 
-  @ApiProperty({ name: "roleKey", type: String, required: false, description: "角色权限" })
+  @ApiProperty({ name: "roleKeys", type: String, required: false, description: "角色权限" })
   @IsOptional()
   @IsString({ message: "角色权限必须是字符串" })
-  roleKey?: string;
+  roleKeys?: string;
 
   @ApiProperty({ name: "userIds", type: String, required: false, description: "用户ids（逗号隔开）" })
   @IsOptional()
@@ -68,10 +68,10 @@ export class UpdateNoticeDto extends PartialType(CreateNoticeDto) {
   @IsString({ message: "标题必须是字符串" })
   title?: string;
 
-  @ApiProperty({ name: "roleKey", type: String, description: "角色权限（逗号隔开）" })
+  @ApiProperty({ name: "roleKeys", type: String, description: "角色权限（逗号隔开）" })
   @IsOptional()
   @IsString({ message: "角色权限必须是字符串" })
-  roleKey?: string;
+  roleKeys?: string;
 
   @ApiProperty({ name: "userIds", type: String, required: false, description: "用户ids（逗号隔开）" })
   @IsOptional()
@@ -94,6 +94,19 @@ export class FindNoticeDto extends FindByParameter {
 
 /** 分页查询通知 */
 export class FindNoticeDtoByPage extends FindNoticeDto {
+  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
+  @IsOptional()
+  @IsString({ message: "page必须是字符串" })
+  page?: string;
+
+  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
+  @IsOptional()
+  @IsString({ message: "pageSize必须是字符串" })
+  pageSize?: string;
+}
+
+/** 分页查询通知 通过用户或角色 */
+export class FindNoticeDtoByPageByUserOrRole {
   @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()
   @IsString({ message: "page必须是字符串" })

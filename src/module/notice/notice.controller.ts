@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from "@nestjs/common";
 import { NoticeService } from "./notice.service";
-import { CreateNoticeDto, FindNoticeDtoByPage, UpdateNoticeDto } from "./dto";
+import { CreateNoticeDto, FindNoticeDtoByPage, FindNoticeDtoByPageByUserOrRole, UpdateNoticeDto } from "./dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
+import { Request } from "express";
+import { User } from "../users/entities/user.entity";
 
 @ApiTags("公告")
 @ApiResponse({ status: 200, description: "操作成功" })
@@ -23,9 +25,21 @@ export class NoticeController {
   }
 
   @Get("page")
-  @ApiOperation({ summary: "查询公告列表(分页)" })
+  @ApiOperation({ summary: "查询公告列表(分页,后端编辑使用查询所有)" })
   findByPage(@Query(new FilterEmptyPipe()) findNoticeDtoByPage: FindNoticeDtoByPage) {
     return this.noticeService.findByPage(findNoticeDtoByPage);
+  }
+
+  @Get("page/userOrRole")
+  @ApiOperation({ summary: "查询公告列表(分页,后台查询当前用户和角色权限对应的公告)" })
+  findByPageByUserOrRole(
+    @Query(new FilterEmptyPipe()) findNoticeDtoByPage: FindNoticeDtoByPageByUserOrRole,
+    @Req() req: Request
+  ) {
+    const userInfo = req.userInfo as User;
+    const roleKeys = userInfo?.roles.map((item) => item.roleKey);
+    console.log("roleKeys", roleKeys);
+    return this.noticeService.findByPageByUserAndRole(findNoticeDtoByPage, "admin", roleKeys, userInfo.id);
   }
 
   @Get("info/:id")
