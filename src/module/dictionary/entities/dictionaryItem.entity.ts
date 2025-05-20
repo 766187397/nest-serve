@@ -10,12 +10,12 @@ export class DictionaryItem extends BaseEntity {
   @JoinColumn({ name: "category_type" })
   category: Dictionary;
 
-  @Column()
+  @Column({ comment: "字典项名称" })
   label: string;
 
-  @Column()
+  @Column({ comment: "字典项值" })
   value: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, comment: "字典项描述" })
   description?: string;
 }
