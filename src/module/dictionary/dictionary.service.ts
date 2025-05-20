@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CreateDictionaryDto, UpdateDictionaryDto } from "./dto";
+import { CreateDictionaryDto, CreateDictionaryItemDto, UpdateDictionaryDto } from "./dto";
 import { BaseService } from "@/common/service/base";
 import { Dictionary } from "./entities/dictionary.entity";
 import { DictionaryItem } from "./entities/dictionaryItem.entity";
@@ -45,5 +45,23 @@ export class DictionaryService extends BaseService {
 
   remove(id: number) {
     return `This action removes a #${id} dictionary`;
+  }
+
+  async createItem(createDictionaryItemDto: CreateDictionaryItemDto): Promise<ApiResult<DictionaryItem | null>> {
+    try {
+      let { categoryId, ...option } = createDictionaryItemDto;
+      let dictionary = await this.dictionaryRepository.findOne({ where: { id: categoryId } });
+      if (!dictionary) {
+        return ApiResult.error<null>("字典分类不存在");
+      }
+
+      let data = await this.dictionaryItemRepository.save({
+        ...option,
+        category: dictionary || undefined,
+      });
+      return ApiResult.success<DictionaryItem>({ data });
+    } catch (error) {
+      return ApiResult.error<null>(error);
+    }
   }
 }
