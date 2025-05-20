@@ -79,7 +79,7 @@ export class DictionaryItemController {
   @Get("all")
   @ApiOperation({ summary: "查询所有字典项" })
   findAll(@Query() findDictionaryDto: FindDictionaryDto) {
-    return this.dictionaryService.findAll(findDictionaryDto);
+    return this.dictionaryService.findAllItem();
   }
 
   @Get("info/:id")

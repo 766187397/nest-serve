@@ -68,3 +68,23 @@ export class CreateDictionaryItemDto extends CreateBaseDto {
 
 /** 更新字典项 */
 export class UpdateDictionaryItemDto extends PartialType(CreateDictionaryItemDto) {}
+
+/** 字典项查询参数 */
+export class FindDictionaryItemDto extends FindByParameter {
+  @ApiProperty({ description: "字典项名称" })
+  @IsString({ message: "字典项名称必须是字符串" })
+  @IsOptional()
+  label?: string;
+}
+/** 分页查询字典项 */
+export class FindDictionaryItemDtoByPage extends PartialType(FindDictionaryDto) {
+  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
+  @IsOptional()
+  @IsString({ message: "page必须是字符串" })
+  page?: string;
+
+  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
+  @IsOptional()
+  @IsString({ message: "pageSize必须是字符串" })
+  pageSize?: string;
+}

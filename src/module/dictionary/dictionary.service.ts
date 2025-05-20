@@ -167,4 +167,7 @@ export class DictionaryService extends BaseService {
       return ApiResult.error<null>(error);
     }
   }
+
+
+  async findAllItem(){}
 }
