@@ -1,6 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
 import { DictionaryService } from "./dictionary.service";
-import { CreateDictionaryDto, CreateDictionaryItemDto, UpdateDictionaryDto } from "./dto";
+import {
+  CreateDictionaryDto,
+  CreateDictionaryItemDto,
+  FindDictionaryDto,
+  FindDictionaryDtoByPage,
+  UpdateDictionaryDto,
+} from "./dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("字典管理")
@@ -21,10 +27,16 @@ export class DictionaryController {
     return this.dictionaryService.create(createDictionaryDto);
   }
 
+  @Get("page")
+  @ApiOperation({ summary: "字典分类分页查询" })
+  findByPage(@Query() findDictionaryDtoByPage: FindDictionaryDtoByPage) {
+    return this.dictionaryService.findByPage(findDictionaryDtoByPage);
+  }
+
   @Get("all")
   @ApiOperation({ summary: "查询所有字典分类" })
-  findAll() {
-    return this.dictionaryService.findAll();
+  findAll(@Query() findDictionaryDto: FindDictionaryDto) {
+    return this.dictionaryService.findAll(findDictionaryDto);
   }
 
   @Get("info/:id")
@@ -66,8 +78,8 @@ export class DictionaryItemController {
 
   @Get("all")
   @ApiOperation({ summary: "查询所有字典项" })
-  findAll() {
-    return this.dictionaryService.findAll();
+  findAll(@Query() findDictionaryDto: FindDictionaryDto) {
+    return this.dictionaryService.findAll(findDictionaryDto);
   }
 
   @Get("info/:id")

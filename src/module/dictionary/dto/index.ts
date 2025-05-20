@@ -23,6 +23,26 @@ export class CreateDictionaryDto extends CreateBaseDto {
 /** 更新字典分类 */
 export class UpdateDictionaryDto extends PartialType(CreateDictionaryDto) {}
 
+/** 字典分类查询参数 */
+export class FindDictionaryDto extends FindByParameter {
+  @ApiProperty({ description: "字典分类名称" })
+  @IsString({ message: "字典分类名称必须是字符串" })
+  @IsOptional()
+  name?: string;
+}
+/** 分页查询字典分类 */
+export class FindDictionaryDtoByPage extends PartialType(FindDictionaryDto) {
+  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
+  @IsOptional()
+  @IsString({ message: "page必须是字符串" })
+  page?: string;
+
+  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
+  @IsOptional()
+  @IsString({ message: "pageSize必须是字符串" })
+  pageSize?: string;
+}
+
 /** 创建字典项 */
 export class CreateDictionaryItemDto extends CreateBaseDto {
   @ApiProperty({ description: "字典分类id" })
