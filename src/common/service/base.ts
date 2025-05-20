@@ -2,6 +2,7 @@ import * as dayjs from "dayjs";
 import { Between, FindOptionsOrderValue } from "typeorm";
 
 export class BaseService {
+  dayjs = dayjs;
   /**
    * 通用的处理查询条件
    * @param {object} query 查询条件
@@ -34,9 +35,7 @@ export class BaseService {
    * @param {{ [key: string]: any }} sort DESC | ASC
    * @returns {{[key: string]: FindOptionsOrderValue}} 处理后的排序条件
    */
-  buildCommonSort(sort: { [key: string]: any } | undefined): {
-    [key: string]: FindOptionsOrderValue;
-  } {
+  buildCommonSort(sort: { [key: string]: any } | undefined): { [key: string]: FindOptionsOrderValue } {
     if (!sort || typeof sort === "undefined") {
       return { createdAt: "DESC", id: "DESC" };
     }

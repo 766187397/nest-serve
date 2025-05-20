@@ -6,6 +6,7 @@ import { Notice } from "./entities/notice.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ILike, Repository } from "typeorm";
 import { PageApiResult } from "@/types/public";
+import { NoticeByPageByUserOrRole } from "@/types/notice";
 @Injectable()
 export class NoticeService extends BaseService {
   constructor(
@@ -71,14 +72,14 @@ export class NoticeService extends BaseService {
    * @param {FindNoticeDtoByPageByUserOrRole} findNoticeDtoByPageByUserOrRole 分页
    * @param {string} platform 平台
    * @param {string[]} roleKeys 角色权限数组
-   * @returns { Promise<ApiResult<PageApiResult<any[]> | null>>} 统一返回结果
+   * @returns {Promise<ApiResult<PageApiResult<NoticeByPageByUserOrRole[]> | null>>} 统一返回结果
    */
   async findByPageByUserAndRole(
     findNoticeDtoByPageByUserOrRole: FindNoticeDtoByPageByUserOrRole,
     platform: string,
     roleKeys: string[] | undefined,
     userId: number
-  ): Promise<ApiResult<PageApiResult<any[]> | null>> {
+  ): Promise<ApiResult<PageApiResult<NoticeByPageByUserOrRole[]> | null>> {
     try {
       let { take, skip } = this.buildCommonPaging(
         findNoticeDtoByPageByUserOrRole?.page,
@@ -110,7 +111,7 @@ export class NoticeService extends BaseService {
       // 计算总页数
       const totalPages = Math.ceil(total / take);
 
-      let filterData = data.map((item) => {
+      let filterData: NoticeByPageByUserOrRole[] = data.map((item) => {
         return {
           id: item.id,
           content: item.content,
@@ -120,13 +121,13 @@ export class NoticeService extends BaseService {
           title: item.title,
           type: item.type,
           // userIds: item.userIds,
-          createdAt: item.createdAt,
-          updatedAt: item.updatedAt,
+          createdAt: this.dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+          updatedAt: this.dayjs(item.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
           // deletedAt: item.deletedAt,
         };
       });
 
-      return ApiResult.success<PageApiResult<any[]>>({
+      return ApiResult.success<PageApiResult<NoticeByPageByUserOrRole[]>>({
         data: {
           data: filterData,
           total,
