@@ -15,6 +15,7 @@ export class JWTWhiteList {
     "/api/v1/admin/users/logIn", // 登录接口
     "/api/v1/admin/users/logIn/setCookie", // 登录接口
     "/api/v1/admin/users/refresh/token", // 登录接口
+    "/api/v1/upload/file", // 文件上传接口
   ];
 }
 
