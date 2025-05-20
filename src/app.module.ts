@@ -19,6 +19,7 @@ import * as winston from "winston";
 import * as DailyRotateFile from "winston-daily-rotate-file";
 import { DebugConfig, ErrorConfig, InfoConfig, WarnConfig } from "./config/logger";
 import { NoticeModule } from './module/notice/notice.module';
+import { DictionaryModule } from './module/dictionary/dictionary.module';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { NoticeModule } from './module/notice/notice.module';
     RoutesModule,
     LoggerModule,
     NoticeModule,
+    DictionaryModule,
   ],
   controllers: [],
   providers: [
