@@ -181,7 +181,7 @@ export class DictionaryService extends BaseService {
   ): Promise<ApiResult<PageApiResult<DictionaryItem[]> | null>> {
     try {
       const category = await this.dictionaryRepository.findOne({
-        where: { id: findDictionaryItemDtoByPage?.categoryId },
+        where: { id: +findDictionaryItemDtoByPage?.categoryId },
       });
       if (!category) {
         return ApiResult.error<null>("字典分类不存在");
@@ -196,7 +196,9 @@ export class DictionaryService extends BaseService {
         where: {
           ...where,
           label: findDictionaryItemDtoByPage?.label ? ILike(`%${findDictionaryItemDtoByPage.label}%`) : undefined,
-          category: category || undefined,
+          category: {
+            id: +findDictionaryItemDtoByPage?.categoryId,
+          },
         },
         order,
         take,
@@ -226,7 +228,7 @@ export class DictionaryService extends BaseService {
   async findItemAll(findDictionaryItemDto: FindDictionaryItemDto): Promise<ApiResult<DictionaryItem[] | null>> {
     try {
       const category = await this.dictionaryRepository.findOne({
-        where: { id: findDictionaryItemDto?.categoryId },
+        where: { id: +findDictionaryItemDto?.categoryId },
       });
       if (!category) {
         return ApiResult.error<null>("字典分类不存在");
@@ -237,7 +239,9 @@ export class DictionaryService extends BaseService {
         where: {
           ...where,
           label: findDictionaryItemDto?.label ? ILike(`%${findDictionaryItemDto.label}%`) : undefined,
-          category: category || undefined,
+          category: {
+            id: +findDictionaryItemDto?.categoryId,
+          },
         },
         order,
       });
