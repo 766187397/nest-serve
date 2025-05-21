@@ -75,9 +75,15 @@ export class FindDictionaryItemDto extends FindByParameter {
   @IsString({ message: "字典项名称必须是字符串" })
   @IsOptional()
   label?: string;
+
+  @ApiProperty({ description: "字典分类id" })
+  @IsNumber({}, { message: "字典分类id必须是数字" })
+  @IsOptional()
+  categoryId?: number;
 }
+
 /** 分页查询字典项 */
-export class FindDictionaryItemDtoByPage extends PartialType(FindDictionaryDto) {
+export class FindDictionaryItemDtoByPage extends PartialType(FindDictionaryItemDto) {
   @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()
   @IsString({ message: "page必须是字符串" })

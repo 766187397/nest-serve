@@ -5,7 +5,10 @@ import {
   CreateDictionaryItemDto,
   FindDictionaryDto,
   FindDictionaryDtoByPage,
+  FindDictionaryItemDto,
+  FindDictionaryItemDtoByPage,
   UpdateDictionaryDto,
+  UpdateDictionaryItemDto,
 } from "./dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
@@ -76,27 +79,33 @@ export class DictionaryItemController {
     return this.dictionaryService.createItem(createDictionaryItemDto);
   }
 
+  @Get("page")
+  @ApiOperation({ summary: "字典分类分页查询" })
+  findByPage(@Query() findDictionaryItemDtoByPage: FindDictionaryItemDtoByPage) {
+    return this.dictionaryService.findItemByPage(findDictionaryItemDtoByPage);
+  }
+
   @Get("all")
   @ApiOperation({ summary: "查询所有字典项" })
-  findAll(@Query() findDictionaryDto: FindDictionaryDto) {
-    return this.dictionaryService.findAllItem();
+  findAll(@Query() findDictionaryItemDto: FindDictionaryItemDto) {
+    return this.dictionaryService.findItemAll(findDictionaryItemDto);
   }
 
   @Get("info/:id")
   @ApiOperation({ summary: "查询字典项详情" })
   findOne(@Param("id") id: string) {
-    return this.dictionaryService.findOne(+id);
+    return this.dictionaryService.findItemOne(+id);
   }
 
   @Patch("update/:id")
   @ApiOperation({ summary: "更新字典项信息" })
-  update(@Param("id") id: string, @Body() updateDictionaryDto: UpdateDictionaryDto) {
-    return this.dictionaryService.update(+id, updateDictionaryDto);
+  update(@Param("id") id: string, @Body() updateDictionaryItemDto: UpdateDictionaryItemDto) {
+    return this.dictionaryService.updateItem(+id, updateDictionaryItemDto);
   }
 
   @Delete("delete/:id")
   @ApiOperation({ summary: "删除字典项" })
   remove(@Param("id") id: string) {
-    return this.dictionaryService.remove(+id);
+    return this.dictionaryService.removeItem(+id);
   }
 }

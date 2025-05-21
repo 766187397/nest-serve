@@ -4,7 +4,10 @@ import {
   CreateDictionaryItemDto,
   FindDictionaryDto,
   FindDictionaryDtoByPage,
+  FindDictionaryItemDto,
+  FindDictionaryItemDtoByPage,
   UpdateDictionaryDto,
+  UpdateDictionaryItemDto,
 } from "./dto";
 import { BaseService } from "@/common/service/base";
 import { Dictionary } from "./entities/dictionary.entity";
@@ -168,6 +171,126 @@ export class DictionaryService extends BaseService {
     }
   }
 
+  /**
+   * 分页查询字典项
+   * @param {FindDictionaryItemDtoByPage} findDictionaryItemDtoByPage    查询字典项DTO
+   * @returns {Promise<ApiResult<PageApiResult<DictionaryItem[]> | null>>}   统一返回结果
+   */
+  async findItemByPage(
+    findDictionaryItemDtoByPage: FindDictionaryItemDtoByPage
+  ): Promise<ApiResult<PageApiResult<DictionaryItem[]> | null>> {
+    try {
+      const category = await this.dictionaryRepository.findOne({
+        where: { id: findDictionaryItemDtoByPage?.categoryId },
+      });
+      if (!category) {
+        return ApiResult.error<null>("字典分类不存在");
+      }
+      let where = this.buildCommonQuery(findDictionaryItemDtoByPage);
+      let order = this.buildCommonSort(findDictionaryItemDtoByPage);
+      let { skip, take } = this.buildCommonPaging(
+        findDictionaryItemDtoByPage.page,
+        findDictionaryItemDtoByPage.pageSize
+      );
+      let [data, total] = await this.dictionaryItemRepository.findAndCount({
+        where: {
+          ...where,
+          label: findDictionaryItemDtoByPage?.label ? ILike(`%${findDictionaryItemDtoByPage.label}%`) : undefined,
+          category: category || undefined,
+        },
+        order,
+        take,
+        skip,
+      });
+      // 计算总页数
+      const totalPages = Math.ceil(total / take);
+      return ApiResult.success<PageApiResult<DictionaryItem[]>>({
+        data: {
+          data,
+          total,
+          totalPages,
+          page: findDictionaryItemDtoByPage?.page || 1,
+          pageSize: findDictionaryItemDtoByPage?.pageSize || 10,
+        },
+      });
+    } catch (error) {
+      return ApiResult.error<null>(error);
+    }
+  }
 
-  async findAllItem(){}
+  /**
+   * 查询所有字典项
+   * @param {FindDictionaryItemDto} findDictionaryItemDto    查询字典项DTO
+   * @returns {Promise<ApiResult<DictionaryItem[] | null>>}   统一返回结果
+   */
+  async findItemAll(findDictionaryItemDto: FindDictionaryItemDto): Promise<ApiResult<DictionaryItem[] | null>> {
+    try {
+      const category = await this.dictionaryRepository.findOne({
+        where: { id: findDictionaryItemDto?.categoryId },
+      });
+      if (!category) {
+        return ApiResult.error<null>("字典分类不存在");
+      }
+      let where = this.buildCommonQuery(findDictionaryItemDto);
+      let order = this.buildCommonSort(findDictionaryItemDto);
+      let data = await this.dictionaryItemRepository.find({
+        where: {
+          ...where,
+          label: findDictionaryItemDto?.label ? ILike(`%${findDictionaryItemDto.label}%`) : undefined,
+          category: category || undefined,
+        },
+        order,
+      });
+      return ApiResult.success<DictionaryItem[]>({ data });
+    } catch (error) {
+      return ApiResult.error<null>(error);
+    }
+  }
+
+  /**
+   * 通过id查询字典项
+   * @param {number} id   id
+   * @returns {Promise<ApiResult<DictionaryItem | null>>}    统一返回结果
+   */
+  async findItemOne(id: number): Promise<ApiResult<DictionaryItem | null>> {
+    try {
+      let data = await this.dictionaryItemRepository.findOne({
+        where: {
+          id: 1,
+        },
+      });
+      return ApiResult.success<DictionaryItem>({ data });
+    } catch (error) {
+      return ApiResult.error<null>(error || "字典查询失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 更新字典项
+   * @param {number} id   id
+   * @param {UpdateDictionaryItemDto} updateDictionaryItemDto   更新字典项DTO
+   * @returns {Promise<ApiResult<null>>}   统一返回结果
+   */
+  async updateItem(id: number, updateDictionaryItemDto: UpdateDictionaryItemDto): Promise<ApiResult<null>> {
+    try {
+      let data = await this.dictionaryItemRepository.update(id, updateDictionaryItemDto);
+      return ApiResult.success<null>();
+    } catch (error) {
+      return ApiResult.error<null>(error || "字典更新失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 删除字典项
+   * @param {number} id   id
+   * @returns {Promise<ApiResult<null>>}   统一返回结果
+   */
+  async removeItem(id: number): Promise<ApiResult<null>> {
+    try {
+      await this.dictionaryItemRepository.softDelete(id);
+      return ApiResult.success<null>();
+    } catch (error) {
+      return ApiResult.error<null>(error || "字典删除失败，请稍后再试");
+    }
+  }
 }
