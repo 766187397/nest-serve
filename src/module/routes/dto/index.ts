@@ -1,33 +1,8 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
-import { ApiProperty, PartialType } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
-export class CreateRouteDto extends CreateBaseDto {
-  @ApiProperty({ description: "平台标识（如admin/web/app/mini等）", required: false })
-  @IsOptional()
-  @IsString({ message: "平台必须为字符串" })
-  platform?: string;
-
-  @ApiProperty({ description: "路由类型：菜单/按钮/API等", required: true })
-  @IsString({ message: "路由类型必须为字符串" })
-  @IsNotEmpty({ message: "路由类型不能为空" })
-  type: string;
-
-  @ApiProperty({ description: "路由名称", required: true })
-  @IsString({ message: "路由名称必须为字符串" })
-  @IsNotEmpty({ message: "路由名称不能为空" })
-  name: string;
-
-  @ApiProperty({ description: "路由显示名称", required: true })
-  @IsString({ message: "路由显示名称必须为字符串" })
-  @IsNotEmpty({ message: "路由显示名称不能为空" })
-  title: string;
-
-  @ApiProperty({ description: "前端路由路径（可以含动态参数）", required: false })
-  @IsString({ message: "路由路径必须为字符串" })
-  @IsNotEmpty({ message: "路由路径不能为空" })
-  path: string;
-
+class RouteOptionalDto extends CreateBaseDto {
   @ApiProperty({ description: "Vue组件路径（物理路径）", required: false })
   @IsOptional()
   @IsString({ message: "组件必须为字符串" })
@@ -54,7 +29,39 @@ export class CreateRouteDto extends CreateBaseDto {
   externalLinks?: boolean;
 }
 
-export class UpdateRouteDto extends PartialType(CreateRouteDto) {
+export class CreateRouteDto extends RouteOptionalDto {
+  @ApiProperty({ description: "平台标识（如admin/web/app/mini等）", required: false })
+  @IsNotEmpty({ message: "平台类型不能为空" })
+  @IsString({ message: "平台必须为字符串" })
+  platform: string;
+
+  @ApiProperty({ description: "路由类型：菜单/按钮/API等", required: true })
+  @IsString({ message: "路由类型必须为字符串" })
+  @IsNotEmpty({ message: "路由类型不能为空" })
+  type: string;
+
+  @ApiProperty({ description: "路由名称", required: true })
+  @IsString({ message: "路由名称必须为字符串" })
+  @IsNotEmpty({ message: "路由名称不能为空" })
+  name: string;
+
+  @ApiProperty({ description: "路由显示名称", required: true })
+  @IsString({ message: "路由显示名称必须为字符串" })
+  @IsNotEmpty({ message: "路由显示名称不能为空" })
+  title: string;
+
+  @ApiProperty({ description: "前端路由路径（可以含动态参数）", required: false })
+  @IsString({ message: "路由路径必须为字符串" })
+  @IsNotEmpty({ message: "路由路径不能为空" })
+  path: string;
+}
+
+export class UpdateRouteDto extends RouteOptionalDto {
+  @ApiProperty({ description: "平台标识（如admin/web/app/mini等）", required: false })
+  @IsOptional()
+  @IsString({ message: "平台必须为字符串" })
+  platform?: string;
+
   @ApiProperty({ description: "路由类型：菜单/按钮/API等", required: false })
   @IsOptional()
   @IsString({ message: "路由类型必须为字符串" })

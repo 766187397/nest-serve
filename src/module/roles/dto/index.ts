@@ -2,13 +2,7 @@ import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
-/** 创建角色 */
-export class CreateRoleDto extends CreateBaseDto {
-  @ApiProperty({ description: "角色名称", example: "admin" })
-  @IsString({ message: "角色名称必须为字符串" })
-  @IsNotEmpty({ message: "角色名称不能为空" })
-  name: string;
-
+class RoleOptionalDto extends CreateBaseDto {
   @ApiProperty({ description: "角色描述", example: "管理员" })
   @IsString({ message: "角色描述必须为字符串" })
   @IsOptional()
@@ -20,8 +14,16 @@ export class CreateRoleDto extends CreateBaseDto {
   roleKey?: string;
 }
 
+/** 创建角色 */
+export class CreateRoleDto extends RoleOptionalDto {
+  @ApiProperty({ description: "角色名称", example: "admin" })
+  @IsString({ message: "角色名称必须为字符串" })
+  @IsNotEmpty({ message: "角色名称不能为空" })
+  name: string;
+}
+
 /** 更新角色信息 */
-export class UpdateRoleDto extends CreateBaseDto {
+export class UpdateRoleDto extends RoleOptionalDto {
   @ApiProperty({ description: "角色名称", example: "admin" })
   @IsString({ message: "角色名称必须为字符串" })
   @IsOptional()

@@ -1,27 +1,9 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
-import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 
-/**
- * 用户创建Dto
- */
-export class CreateUserDto extends CreateBaseDto {
-  @ApiProperty({ description: "账号", example: "admin" })
-  @IsString({ message: "账号字符串" })
-  @IsNotEmpty({ message: "账号是必填项" }) // 必填校验
-  account: string;
-
-  @ApiProperty({ description: "昵称", example: "管理员" })
-  @IsString({ message: "昵称字符串" })
-  @IsNotEmpty({ message: "昵称是必填项" })
-  nickName: string;
-
-  @ApiProperty({ description: "密码", example: "123456" })
-  @IsString({ message: "密码字符串" })
-  @IsNotEmpty({ message: "密码是必填项" })
-  password: string;
-
+/** 由于使用PartialType会丢失装饰器则抽离可选公用的参数 */
+class UserOptionalDto extends CreateBaseDto {
   @ApiProperty({ description: "邮箱", required: false, example: "admin@qq.com" })
   @IsOptional() // 可选
   @IsEmail({}, { message: "邮箱格式错误" })
@@ -48,11 +30,28 @@ export class CreateUserDto extends CreateBaseDto {
   roleIds?: number[];
 }
 
-// PartialType会创建一个新类型，其中所有属性都变为可选 
 /**
- * 用户更新Dto
+ * 用户创建Dto
  */
-export class UpdateUserDto extends PartialType(CreateUserDto) {
+export class CreateUserDto extends UserOptionalDto {
+  @ApiProperty({ description: "账号", example: "admin" })
+  @IsString({ message: "账号字符串" })
+  @IsNotEmpty({ message: "账号是必填项" }) // 必填校验
+  account: string;
+
+  @ApiProperty({ description: "昵称", example: "管理员" })
+  @IsString({ message: "昵称字符串" })
+  @IsNotEmpty({ message: "昵称是必填项" })
+  nickName: string;
+
+  @ApiProperty({ description: "密码", example: "123456" })
+  @IsString({ message: "密码字符串" })
+  @IsNotEmpty({ message: "密码是必填项" })
+  password: string;
+}
+
+/** 用户更新Dto  */
+export class UpdateUserDto extends UserOptionalDto {
   @ApiProperty({ description: "账号", example: "admin" })
   @IsOptional()
   @IsString()

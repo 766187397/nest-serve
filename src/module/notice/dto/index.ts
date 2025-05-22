@@ -1,9 +1,31 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
-import { ApiProperty, PartialType } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
+class NoticeOptionalDto extends CreateBaseDto {
+  @ApiProperty({ name: "roleKeys", type: String, required: false, description: "角色权限" })
+  @IsOptional()
+  @IsString({ message: "角色权限必须是字符串" })
+  roleKeys?: string;
+
+  @ApiProperty({ name: "userIds", type: String, required: false, description: "用户ids（逗号隔开）" })
+  @IsOptional()
+  @IsString({ message: "用户ids必须是字符串" })
+  userIds?: string;
+
+  @ApiProperty({ name: "content", type: String, required: false, description: "内容" })
+  @IsOptional()
+  @IsString({ message: "内容必须是字符串" })
+  content?: string;
+
+  @ApiProperty({ name: "specifyTime", type: String, required: true, description: "指定时间" })
+  @IsOptional()
+  @IsDateString({}, { message: "指定时间必须是日期字符串" })
+  specifyTime?: Date;
+}
+
 /** 创建通知 */
-export class CreateNoticeDto extends CreateBaseDto {
+export class CreateNoticeDto extends NoticeOptionalDto {
   @ApiProperty({
     name: "platform",
     type: String,
@@ -20,34 +42,14 @@ export class CreateNoticeDto extends CreateBaseDto {
   @IsString({ message: "类型必须是字符串" })
   type: string;
 
-  @ApiProperty({ name: "roleKeys", type: String, required: false, description: "角色权限" })
-  @IsOptional()
-  @IsString({ message: "角色权限必须是字符串" })
-  roleKeys?: string;
-
-  @ApiProperty({ name: "userIds", type: String, required: false, description: "用户ids（逗号隔开）" })
-  @IsOptional()
-  @IsString({ message: "用户ids必须是字符串" })
-  userIds?: string;
-
   @ApiProperty({ name: "title", type: String, required: true, description: "标题", example: "通知" })
   @IsNotEmpty({ message: "标题不能为空" })
   @IsString({ message: "标题必须是字符串" })
   title: string;
-
-  @ApiProperty({ name: "content", type: String, required: false, description: "内容" })
-  @IsOptional()
-  @IsString({ message: "内容必须是字符串" })
-  content?: string;
-
-  @ApiProperty({ name: "specifyTime", type: String, required: true, description: "指定时间" })
-  @IsOptional()
-  @IsDateString({}, { message: "指定时间必须是日期字符串" })
-  specifyTime?: Date;
 }
 
 /** 修改通知 */
-export class UpdateNoticeDto extends PartialType(CreateNoticeDto) {
+export class UpdateNoticeDto extends NoticeOptionalDto {
   @ApiProperty({
     name: "platform",
     type: String,
@@ -67,16 +69,6 @@ export class UpdateNoticeDto extends PartialType(CreateNoticeDto) {
   @IsOptional()
   @IsString({ message: "标题必须是字符串" })
   title?: string;
-
-  @ApiProperty({ name: "roleKeys", type: String, description: "角色权限（逗号隔开）" })
-  @IsOptional()
-  @IsString({ message: "角色权限必须是字符串" })
-  roleKeys?: string;
-
-  @ApiProperty({ name: "userIds", type: String, required: false, description: "用户ids（逗号隔开）" })
-  @IsOptional()
-  @IsString({ message: "用户ids必须是字符串" })
-  userIds?: string;
 }
 
 /** 查询通知 */
