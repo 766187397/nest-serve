@@ -13,30 +13,30 @@ export class CreateRouteDto extends CreateBaseDto {
   @IsNotEmpty({ message: "路由类型不能为空" })
   type: string;
 
-  @ApiProperty({ description: "路由显示名称", required: true })
+  @ApiProperty({ description: "路由名称", required: true })
   @IsString({ message: "路由名称必须为字符串" })
   @IsNotEmpty({ message: "路由名称不能为空" })
   name: string;
 
-  @ApiProperty({ description: "权限标识", required: false })
-  @IsOptional()
-  @IsString({ message: "权限标识必须为字符串" })
-  permissions?: string;
+  @ApiProperty({ description: "路由显示名称", required: true })
+  @IsString({ message: "路由显示名称必须为字符串" })
+  @IsNotEmpty({ message: "路由显示名称不能为空" })
+  title: string;
 
   @ApiProperty({ description: "前端路由路径（可以含动态参数）", required: false })
-  @IsOptional()
   @IsString({ message: "路由路径必须为字符串" })
-  path?: string;
+  @IsNotEmpty({ message: "路由路径不能为空" })
+  path: string;
 
   @ApiProperty({ description: "Vue组件路径（物理路径）", required: false })
   @IsOptional()
   @IsString({ message: "组件必须为字符串" })
   component?: string;
 
-  @ApiProperty({ description: "携带信息", required: false })
+  @ApiProperty({ description: "其他携带信息", required: false })
   @IsOptional()
   @IsString({ message: "携带信息必须为字符串" })
-  menu?: string;
+  meta?: string;
 
   @ApiProperty({ description: "图标", required: false })
   @IsOptional()
@@ -60,10 +60,15 @@ export class UpdateRouteDto extends PartialType(CreateRouteDto) {
   @IsString({ message: "路由类型必须为字符串" })
   type: string;
 
-  @ApiProperty({ description: "路由显示名称", required: false })
+  @ApiProperty({ description: "路由名称", required: false })
   @IsOptional()
   @IsString({ message: "路由名称必须为字符串" })
   name: string;
+
+  @ApiProperty({ description: "路由显示名称", required: false })
+  @IsOptional()
+  @IsString({ message: "路由显示名称必须为字符串" })
+  title: string;
 }
 
 export class FindRouteDto extends FindByParameter {
@@ -77,8 +82,13 @@ export class FindRouteDto extends FindByParameter {
   @IsString({ message: "路由类型必须为字符串" })
   type?: string;
 
-  @ApiProperty({ description: "路由显示名称", required: false })
+  @ApiProperty({ description: "路由名称", required: false })
   @IsOptional()
   @IsString({ message: "路由名称必须为字符串" })
   name?: string;
+
+  @ApiProperty({ description: "路由显示名称", required: false })
+  @IsOptional()
+  @IsString({ message: "路由显示名称必须为字符串" })
+  title?: string;
 }

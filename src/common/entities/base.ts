@@ -24,8 +24,8 @@ export abstract class BaseEntity {
   @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
   updatedAt: Date;
 
-  @Exclude({ toPlainOnly: true })
   @DeleteDateColumn({ comment: "删除时间" })
-  @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
+  @Exclude({ toPlainOnly: true })
+  // @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
   deletedAt: Date;
 }

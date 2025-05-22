@@ -6,7 +6,7 @@ import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Roles } from "./roles.decorator";
 
 @ApiTags("admin - 角色管理")
-@ApiBearerAuth("Authorization")
+// @ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
 @ApiResponse({ status: 400, description: "参数错误" })

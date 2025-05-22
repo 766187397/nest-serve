@@ -21,20 +21,25 @@ export class RoutesService extends BaseService {
   /**
    * 创建路由
    * @param {CreateRouteDto} createRouteDto 路由信息
-   * @param {string} platform  平台(admin/web/app/mini)
    * @returns { ApiResult<null>>} 统一返回结果
    */
-  async create(createRouteDto: CreateRouteDto, platform: string = "admin"): Promise<ApiResult<null>> {
+  async create(createRouteDto: CreateRouteDto): Promise<ApiResult<null>> {
     try {
       let parent: Route | null = null;
       if (createRouteDto.parentId) {
         parent = await this.routeRepository.findOne({
-          where: { id: createRouteDto.parentId, platform },
+          where: { id: createRouteDto.parentId, platform: createRouteDto.platform },
           relations: ["children"],
         });
         if (!parent) {
           return ApiResult.error<null>("父级路由不存在");
         }
+      }
+      const routeInfo = await this.routeRepository.findOne({
+        where: { path: createRouteDto.path, platform: createRouteDto.platform },
+      });
+      if (routeInfo) {
+        return ApiResult.error<null>(`路由${routeInfo.path}已存在`);
       }
       const route = this.routeRepository.create({
         ...createRouteDto,
@@ -175,9 +180,31 @@ export class RoutesService extends BaseService {
         })
         // 执行查询并返回实体对象数组
         .getMany();
-      return ApiResult.success<Route[]>({ data, entities: Route });
+      const routeList = this.handleRoutes(data);
+      return ApiResult.success<Route[]>({ data: routeList, entities: Route });
     } catch (error) {
       return ApiResult.error<null>(error || "获取路由失败，请稍后再试");
     }
+  }
+
+  private handleRoutes(routes: Route[]) {
+    return routes.map((route) => {
+      route.children = this.handleRoutes(route.children);
+      let meta: any = {};
+      try {
+        meta = JSON.parse(route.meta);
+      } catch (error) {
+        meta = {};
+      }
+      return {
+        ...route,
+        meta: {
+          ...meta,
+          icon: route.icon,
+          title: route.title,
+          externalLinks: route.externalLinks,
+        },
+      };
+    });
   }
 }

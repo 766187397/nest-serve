@@ -8,11 +8,11 @@ export class Route extends BaseEntity {
   @Column({ default: "", comment: "路由类型：菜单/按钮/API等" })
   type: string;
 
-  @Column({ default: "", comment: "路由显示名称" })
+  @Column({ default: "", comment: "路由名称（跳转）" })
   name: string;
 
-  @Column({ default: "", comment: "权限标识" })
-  permissions: string;
+  @Column({ default: "", comment: "路由显示名称" })
+  title: string;
 
   @Column({ default: "", comment: "前端路由路径（含动态参数）" })
   path: string;
@@ -20,8 +20,8 @@ export class Route extends BaseEntity {
   @Column({ default: "", comment: "Vue组件路径（物理路径）" })
   component: string;
 
-  @Column({ default: "", comment: "携带信息" })
-  menu: string;
+  @Column({ default: "", comment: "其他携带信息json字符串(object对象的形式)" })
+  meta: string;
 
   @Column({ default: "", comment: "图标标识" })
   icon: string;

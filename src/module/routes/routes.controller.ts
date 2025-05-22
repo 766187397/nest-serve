@@ -6,7 +6,7 @@ import { Request, Response } from "express";
 import { User } from "@/module/users/entities/user.entity";
 
 @ApiTags("admin - 路由管理")
-@ApiBearerAuth("Authorization")
+// @ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
 @ApiResponse({ status: 400, description: "参数错误" })
@@ -21,7 +21,7 @@ export class RoutesController {
   @Post("create")
   @ApiOperation({ summary: "创建路由" })
   create(@Body() createRouteDto: CreateRouteDto) {
-    return this.routesService.create(createRouteDto, "admin");
+    return this.routesService.create(createRouteDto);
   }
 
   @Get("all")
@@ -49,8 +49,9 @@ export class RoutesController {
   }
 
   @Get("/by/role")
+  @Get("/by/role/:type")
   @ApiOperation({ summary: "根据登录用户的角色ids获取路由" })
-  async getRoutesByRoleId(@Req() req: Request, @Res() res: Response) {
+  async getRoutesByRoleId(@Req() req: Request, @Res() res: Response, @Param("type") type?: string) {
     const userInfo = req.userInfo as User;
     const rolesIds = userInfo.roles.map((item) => item.id);
     let { __isApiResult, ...data } = await this.routesService.getRoutesByRoleId(rolesIds, userInfo.platform);
