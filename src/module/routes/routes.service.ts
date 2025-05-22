@@ -190,7 +190,9 @@ export class RoutesService extends BaseService {
 
   private handleRoutes(routes: Route[]) {
     return routes.map((route) => {
-      route.children = this.handleRoutes(route.children);
+      if (route.children) {
+        route.children = this.handleRoutes(route.children);
+      }
       let meta: any = {};
       try {
         meta = JSON.parse(route.meta);
