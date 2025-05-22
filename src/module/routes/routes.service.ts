@@ -145,9 +145,14 @@ export class RoutesService extends BaseService {
    * 通过角色存在，则返回角色下的所有路由信息
    * @param {number[]} rolesIds 角色ID数组
    * @param {string} platform 平台标识
+   * @param {string} type 路由类型
    * @returns {Promise<ApiResult<Route[] | null>>} 统一返回结果
    */
-  async getRoutesByRoleId(rolesIds: number[], platform: string = "admin"): Promise<ApiResult<Route[] | null>> {
+  async getRoutesByRoleId(
+    rolesIds: number[],
+    platform: string = "admin",
+    type?: string
+  ): Promise<ApiResult<Route[] | null>> {
     try {
       let roles = await this.roleRepository.find({
         where: { id: In(rolesIds) },
