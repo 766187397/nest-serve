@@ -1,12 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from "@nestjs/common";
 import { NoticeService } from "./notice.service";
 import { CreateNoticeDto, FindNoticeDtoByPage, FindNoticeDtoByPageByUserOrRole, UpdateNoticeDto } from "./dto";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request } from "express";
 import { User } from "../users/entities/user.entity";
 
 @ApiTags("公告")
+@ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
 @ApiResponse({ status: 400, description: "参数错误" })

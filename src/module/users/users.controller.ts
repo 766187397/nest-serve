@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res, Req } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage, LogInDto } from "./dto/index";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request, Response } from "express";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
@@ -9,6 +9,7 @@ import { ApiResult } from "@/common/utils/result";
 import { UserLogin } from "@/types/user";
 
 @ApiTags("admin - 用户管理")
+@ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
 @ApiResponse({ status: 400, description: "参数错误" })

@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res } from "@nestjs/common";
 import { RoutesService } from "./routes.service";
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from "./dto";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request, Response } from "express";
 import { User } from "@/module/users/entities/user.entity";
 
 @ApiTags("admin - 路由管理")
+@ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
 @ApiResponse({ status: 400, description: "参数错误" })

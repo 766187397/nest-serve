@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res, StreamableFile, Header } from "@nestjs/common";
 import { LoggerService } from "./logger.service";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 
 @ApiTags("admin - 日志")
+@ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
 @ApiResponse({ status: 400, description: "参数错误" })

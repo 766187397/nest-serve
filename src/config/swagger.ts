@@ -5,5 +5,16 @@ export class SwaggerConfig {
     .setDescription("NestJS API description") // API 文档的描述
     .setVersion("1.0") // API 的版本
     .addServer(global.url, "项目地址")
+    .addBearerAuth(
+      {
+        type: "http",
+        scheme: "Bearer",
+        bearerFormat: "JWT",
+        name: "Authorization",
+        description: "输入 Token",
+        in: "header",
+      },
+      "Authorization"
+    )
     .build();
 }

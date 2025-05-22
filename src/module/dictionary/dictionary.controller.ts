@@ -10,9 +10,10 @@ import {
   UpdateDictionaryDto,
   UpdateDictionaryItemDto,
 } from "./dto";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("字典管理")
+@ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
 @ApiResponse({ status: 400, description: "参数错误" })
