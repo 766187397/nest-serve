@@ -49,9 +49,9 @@ export class RoutesController {
   }
 
   @Get("/by/role")
-  @Get("/by/role/:type")
   @ApiOperation({ summary: "根据登录用户的角色ids获取路由" })
-  async getRoutesByRoleId(@Req() req: Request, @Res() res: Response, @Param("type") type?: string) {
+  async getRoutesByRoleId(@Req() req: Request, @Res() res: Response) {
+    const type = req.query.type as string;
     const userInfo = req.userInfo as User;
     const rolesIds = userInfo.roles.map((item) => item.id);
     let { __isApiResult, ...data } = await this.routesService.getRoutesByRoleId(rolesIds, userInfo.platform, type);

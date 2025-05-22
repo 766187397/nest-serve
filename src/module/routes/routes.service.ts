@@ -154,25 +154,19 @@ export class RoutesService extends BaseService {
     type?: string
   ): Promise<ApiResult<Route[] | null>> {
     try {
-      let roles = await this.roleRepository.find({
-        where: { id: In(rolesIds) },
-        relations: ["routes"],
-      });
-      let routeIds: any = [];
-      if (roles && roles.length > 0) {
-        routeIds = roles.map((item) => {
-          return item.routes.map((item) => {
-            return item.id;
-          });
-        });
-      }
-      routeIds = [...new Set(routeIds.flat(Infinity))];
-      let data = await this.routeRepository
-        // 创建 QueryBuilder，别名设为 'parent'（主表）
-        .createQueryBuilder("parent")
+      const queryBuilderRole = this.roleRepository
+        .createQueryBuilder("role")
+        .select("route.id", "routeId")
+        .leftJoin("role.routes", "route")
+        .where("role.id  IN (:...ids)", { ids: rolesIds })
+        .groupBy("route.id");
+
+      const routeIds = (await queryBuilderRole.getRawMany()).map((item) => item.routeId);
+      const queryBuilderRoute = this.routeRepository
+        .createQueryBuilder("route")
         // 关联查询子节点（核心过滤逻辑）
         .leftJoinAndSelect(
-          "parent.children", // 关联字段路径（父实体的 children 属性）
+          "route.children", // 关联字段路径（父实体的 children 属性）
           "child", // 子表别名（自定义）
           "child.id  IN (:...routeIds)", // 子节点过滤条件（SQL条件片段）
           { routeIds } // 参数注入（防SQL注入）
@@ -182,9 +176,11 @@ export class RoutesService extends BaseService {
           id: In(routeIds), // 主表ID在 routeIds 中
           parentId: IsNull(), // 主表的 parentId 为空（查根节点）
           platform, // 平台条件（变量值自动绑定）
-        })
-        // 执行查询并返回实体对象数组
-        .getMany();
+        });
+      if (type) {
+        queryBuilderRoute.andWhere("route.type = :type", { type });
+      }
+      const data = await queryBuilderRoute.getMany();
       const routeList = this.handleRoutes(data);
       return ApiResult.success<Route[]>({ data: routeList, entities: Route });
     } catch (error) {
