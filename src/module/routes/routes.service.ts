@@ -196,7 +196,7 @@ export class RoutesService extends BaseService {
       }
       let meta: any = {};
       try {
-        meta = JSON.parse(route.meta);
+        meta = JSON.parse(route.meta as string);
       } catch (error) {
         meta = {};
       }
@@ -204,12 +204,14 @@ export class RoutesService extends BaseService {
         path: route.path,
         name: route.name,
         component: route.component,
+        redirect: (route as Route).redirect,
         meta: {
           ...meta,
           title: (route as Route).title,
           icon: (route as Route).icon,
           externalLinks: (route as Route).externalLinks,
           type: (route as Route).type,
+          status: (route as Route).status,
         },
         children: route.children || [],
       };

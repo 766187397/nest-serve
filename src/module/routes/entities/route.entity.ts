@@ -29,6 +29,9 @@ export class Route extends BaseEntity {
   @Column({ default: false, comment: "是否为外链" })
   externalLinks: boolean;
 
+  @Column({ default: "", comment: "重定向地址" })
+  redirect: string;
+
   // 树形结构关系
   @OneToMany(() => Route, (route) => route.parentId)
   children: Route[];

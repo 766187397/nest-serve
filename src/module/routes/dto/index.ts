@@ -27,6 +27,11 @@ class RouteOptionalDto extends CreateBaseDto {
   @IsOptional()
   @IsBoolean({ message: "是否为外链必须为布尔值" })
   externalLinks?: boolean;
+
+  @ApiProperty({ description: "重定向地址", default: false, required: false })
+  @IsOptional()
+  @IsString({ message: "是否为重定向必须为字符串" })
+  redirect?: string;
 }
 
 export class CreateRouteDto extends RouteOptionalDto {
