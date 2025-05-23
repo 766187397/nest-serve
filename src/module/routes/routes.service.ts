@@ -6,6 +6,7 @@ import { In, IsNull, Repository } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { ApiResult } from "@/common/utils/result";
 import { Role } from "@/module/roles/entities/role.entity";
+import { RoleRoutes } from "@/types/routes";
 
 @Injectable()
 export class RoutesService extends BaseService {
@@ -146,13 +147,13 @@ export class RoutesService extends BaseService {
    * @param {number[]} rolesIds 角色ID数组
    * @param {string} platform 平台标识
    * @param {string} type 路由类型
-   * @returns {Promise<ApiResult<Route[] | null>>} 统一返回结果
+   * @returns {Promise<ApiResult<RoleRoutes[] | null>>} 统一返回结果
    */
   async getRoutesByRoleId(
     rolesIds: number[],
     platform: string = "admin",
     type?: string
-  ): Promise<ApiResult<Route[] | null>> {
+  ): Promise<ApiResult<RoleRoutes[] | null>> {
     try {
       const queryBuilderRole = this.roleRepository
         .createQueryBuilder("role")
@@ -182,14 +183,14 @@ export class RoutesService extends BaseService {
       }
       const data = await queryBuilderRoute.getMany();
       const routeList = this.handleRoutes(data);
-      return ApiResult.success<Route[]>({ data: routeList, entities: Route });
+      return ApiResult.success<RoleRoutes[]>({ data: routeList });
     } catch (error) {
       return ApiResult.error<null>(error || "获取路由失败，请稍后再试");
     }
   }
 
-  private handleRoutes(routes: Route[]) {
-    return routes.map((route) => {
+  private handleRoutes(routes: Route[] | RoleRoutes[]): RoleRoutes[] {
+    return routes.map((route: Route | RoleRoutes) => {
       if (route.children) {
         route.children = this.handleRoutes(route.children);
       }
@@ -200,13 +201,17 @@ export class RoutesService extends BaseService {
         meta = {};
       }
       return {
-        ...route,
+        path: route.path,
+        name: route.name,
+        component: route.component,
         meta: {
           ...meta,
-          icon: route.icon,
-          title: route.title,
-          externalLinks: route.externalLinks,
+          title: (route as Route).title,
+          icon: (route as Route).icon,
+          externalLinks: (route as Route).externalLinks,
+          type: (route as Route).type,
         },
+        children: route.children || [],
       };
     });
   }
