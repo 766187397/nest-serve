@@ -37,10 +37,10 @@ export class RoutesService extends BaseService {
         }
       }
       const routeInfo = await this.routeRepository.findOne({
-        where: { path: createRouteDto.path, platform: createRouteDto.platform },
+        where: { name: createRouteDto.name, platform: createRouteDto.platform },
       });
       if (routeInfo) {
-        return ApiResult.error<null>(`路由${routeInfo.path}已存在`);
+        return ApiResult.error<null>(`路由${routeInfo.name}已存在`);
       }
       const route = this.routeRepository.create({
         ...createRouteDto,
