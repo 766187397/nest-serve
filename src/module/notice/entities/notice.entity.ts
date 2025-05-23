@@ -11,13 +11,13 @@ export class Notice extends BaseEntity {
   @Column({ type: "varchar", comment: "指定角色权限", default: "" })
   roleKeys?: string;
 
-  @Column({ type: "text", comment: "用户id", default: "" })
+  @Column({ type: "text", comment: "用户id", nullable: true })
   userIds?: string;
 
   @Column({ type: "varchar", length: 50, comment: "标题", default: "" })
   title: string;
-
-  @Column({ type: "text", comment: "内容", default: "" })
+  /** text 需要设置可以为空，不能有默认值""等 */
+  @Column({ type: "text", comment: "内容", nullable: true })
   content?: string;
 
   @Column({ type: "date", comment: "指定时间", nullable: true })
