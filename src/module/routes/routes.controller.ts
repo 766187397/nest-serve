@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res } from "@nestjs/common";
 import { RoutesService } from "./routes.service";
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from "./dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request, Response } from "express";
 import { User } from "@/module/users/entities/user.entity";
 
@@ -49,6 +49,13 @@ export class RoutesController {
   }
 
   @Get("/by/role")
+  @ApiQuery({
+    name: "type",
+    description: "路由类型",
+    required: false,
+    type: "string",
+    example: "menu",
+  })
   @ApiOperation({ summary: "根据登录用户的角色ids获取路由" })
   async getRoutesByRoleId(@Req() req: Request, @Res() res: Response) {
     const type = req.query.type as string;
