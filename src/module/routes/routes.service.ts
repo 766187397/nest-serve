@@ -157,7 +157,7 @@ export class RoutesService extends BaseService {
     try {
       console.log("rolesIds", rolesIds);
       if (rolesIds.length === 0) {
-        return ApiResult.error<null>("当前用户未绑定角色！");
+        return ApiResult.error<null>("当前用户未绑定角色，无法获取绑定的路由信息！");
       }
       const queryBuilderRole = this.roleRepository
         .createQueryBuilder("role")
