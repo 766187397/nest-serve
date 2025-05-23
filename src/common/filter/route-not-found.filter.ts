@@ -9,7 +9,6 @@ export class RouteNotFoundFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    console.log("自定义路由不存在响应 :>> ");
     // 自定义路由不存在响应
     const { __isApiResult, ...data } = ApiResult.error<null>({
       code: 404,

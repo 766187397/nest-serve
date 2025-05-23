@@ -8,7 +8,7 @@ export class Notice extends BaseEntity {
   @Column({ type: "varchar", length: 30, comment: "通知类型", default: "" })
   type: string;
 
-  @Column({ type: "text", comment: "指定角色权限", default: "" })
+  @Column({ type: "varchar", comment: "指定角色权限", default: "" })
   roleKeys?: string;
 
   @Column({ type: "text", comment: "用户id", default: "" })

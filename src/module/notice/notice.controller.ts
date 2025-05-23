@@ -39,7 +39,6 @@ export class NoticeController {
   ) {
     const userInfo = req.userInfo as User;
     const roleKeys = userInfo?.roles.map((item) => item.roleKey);
-    console.log("roleKeys", roleKeys);
     return this.noticeService.findByPageByUserAndRole(findNoticeDtoByPage, "admin", roleKeys, userInfo.id);
   }
 

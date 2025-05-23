@@ -57,7 +57,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
     // http异常
     else if (exception instanceof HttpException) {
-      console.log("exception", exception);
       console.log("http异常");
       status = exception.getStatus();
       message =
