@@ -62,6 +62,6 @@ export class RoutesController {
     const userInfo = req.userInfo as User;
     const rolesIds = userInfo.roles.map((item) => item.id);
     let { __isApiResult, ...data } = await this.routesService.getRoutesByRoleId(rolesIds, userInfo.platform, type);
-    res.json(data);
+    res.status(data.code).json(data);
   }
 }
