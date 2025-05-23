@@ -10,9 +10,8 @@ export interface UserLogin {
     sort: number;
     status: number;
     platform: string;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date;
+    createdAt: Date | string;
+    updatedAt: Date | string;
   };
   token_type: string;
   access_token: string;

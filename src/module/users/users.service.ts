@@ -239,11 +239,15 @@ export class UsersService extends BaseService {
       if (data.status === 2) {
         return ApiResult.error<null>("当前账号已被禁用，请联系管理员！");
       }
-      let { password, ...info } = data;
+      let { password, deletedAt, ...info } = data;
 
       let options = getPlatformJwtConfig(platform) as JwtConfig;
       let userInfo = {
-        userInfo: info,
+        userInfo: {
+          ...info,
+          createdAt: this.dayjs(info.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+          updatedAt: this.dayjs(info.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
+        },
         token_type: "Bearer ",
         access_token: this.jwtService.sign(info, {
           secret: options.secret,
