@@ -281,6 +281,7 @@ export class UsersService extends BaseService {
       });
       let user = await this.userRepository.findOne({
         where: { id, platform },
+        relations: ["roles"],
       });
       if (!user) {
         return ApiResult.error<null>({
