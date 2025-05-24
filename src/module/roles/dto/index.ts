@@ -12,6 +12,11 @@ class RoleOptionalDto extends CreateBaseDto {
   @IsString({ message: "角色key必须为字符串" })
   @IsOptional()
   roleKey?: string;
+
+  @ApiProperty({ description: "路由id", required: false, example: [1] })
+  @IsOptional()
+  @IsArray({ message: "routeIds必须为数字数组" })
+  routeIds?: number[];
 }
 
 /** 创建角色 */
@@ -28,11 +33,6 @@ export class UpdateRoleDto extends RoleOptionalDto {
   @IsString({ message: "角色名称必须为字符串" })
   @IsOptional()
   name?: string;
-
-  @ApiProperty({ description: "路由id", required: false, example: [1] })
-  @IsOptional()
-  @IsArray({ message: "routeIds必须为数字数组" })
-  routeIds?: number[];
 }
 
 /** 查询所有角色信息 */

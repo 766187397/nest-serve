@@ -4,6 +4,8 @@ import { Repository } from "typeorm";
 import { bcryptService } from "@/common/utils/bcrypt-hash";
 import { User } from "@/module/users/entities/user.entity";
 import { Role } from "../roles/entities/role.entity";
+import { Route } from "../routes/entities/route.entity";
+import { CreateRouteDto } from "../routes/dto";
 
 @Injectable()
 export class defaultData implements OnApplicationBootstrap {
@@ -12,10 +14,14 @@ export class defaultData implements OnApplicationBootstrap {
     private readonly userRepository: Repository<User>,
 
     @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>
+    private readonly roleRepository: Repository<Role>,
+
+    @InjectRepository(Route)
+    private readonly routeRepository: Repository<Route>
   ) {}
 
   async onApplicationBootstrap() {
+    await this.seedRoutes();
     await this.seedRoles();
     await this.seedUsers();
   }
@@ -37,6 +43,7 @@ export class defaultData implements OnApplicationBootstrap {
           email: "admin@example.com",
           sex: "0",
           platform: "admin",
+          roles: admin ? [admin] : [],
         },
         {
           account: "test",
@@ -46,6 +53,7 @@ export class defaultData implements OnApplicationBootstrap {
           password,
           sex: "0",
           platform: "web",
+          roles: web ? [web] : [],
         },
       ];
 
@@ -53,9 +61,12 @@ export class defaultData implements OnApplicationBootstrap {
     }
   }
 
+  /** 角色数据信息 */
   private async seedRoles() {
     const count = await this.roleRepository.count();
     if (count === 0) {
+      const route1 = await this.routeRepository.findOne({ where: { platform: "admin", path: "/home" } }); // 获取路由
+      const route2 = await this.routeRepository.findOne({ where: { platform: "web", path: "/home" } }); // 获取路由
       // 如果没有角色，插入默认数据
       const roles = [
         {
@@ -63,15 +74,50 @@ export class defaultData implements OnApplicationBootstrap {
           roleKey: "admin",
           description: "拥有所有权限",
           platform: "admin",
+          routeIds: [route1],
         },
         {
           name: "普通用户",
           roleKey: "web",
           description: "拥有所有权限",
           platform: "web",
+          routeIds: [route2],
         },
       ];
       await this.roleRepository.save(roles); // 插入数据
+    }
+  }
+
+  /** 路由数据信息 */
+  private async seedRoutes() {
+    const count = await this.routeRepository.count();
+    if (count === 0) {
+      // 如果没有路由，插入默认数据
+      const routes = [
+        {
+          platform: "admin",
+          type: "menu",
+          name: "home",
+          title: "首页",
+          path: "/home",
+          component: "Home/Index",
+          externalLinks: false,
+          redirect: "",
+          meta: "",
+        },
+        {
+          platform: "web",
+          type: "menu",
+          name: "home",
+          title: "首页",
+          path: "/home",
+          component: "Home/Index",
+          externalLinks: false,
+          redirect: "",
+          meta: "",
+        },
+      ];
+      await this.routeRepository.save(routes); // 插入数据
     }
   }
 }
