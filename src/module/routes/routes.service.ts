@@ -155,7 +155,6 @@ export class RoutesService extends BaseService {
     type?: string
   ): Promise<ApiResult<RoleRoutes[] | null>> {
     try {
-      console.log("rolesIds", rolesIds);
       if (rolesIds.length === 0) {
         return ApiResult.error<null>("当前用户未绑定角色，无法获取绑定的路由信息！");
       }
