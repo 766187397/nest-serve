@@ -239,7 +239,7 @@ export class UsersService extends BaseService {
       if (data.status === 2) {
         return ApiResult.error<null>("当前账号已被禁用，请联系管理员！");
       }
-      let { password, deletedAt, ...info } = data;
+      let { password, deletedAt, platform: userPlatform, ...info } = data;
 
       let options = getPlatformJwtConfig(platform) as JwtConfig;
       let userInfo = {

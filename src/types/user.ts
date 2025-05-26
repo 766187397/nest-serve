@@ -9,7 +9,7 @@ export interface UserLogin {
     id: number;
     sort: number;
     status: number;
-    platform: string;
+    platform?: string;
     createdAt: Date | string;
     updatedAt: Date | string;
   };

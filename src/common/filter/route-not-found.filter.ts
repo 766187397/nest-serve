@@ -12,7 +12,7 @@ export class RouteNotFoundFilter implements ExceptionFilter {
     // 自定义路由不存在响应
     const { __isApiResult, ...data } = ApiResult.error<null>({
       code: 404,
-      message: "请求的路由不存在,请检查API路径是否正确",
+      message: "请求的路由不存在或者请求方式错误,请检查API路径和请求方式是否正确",
       data: null,
     });
     response.status(404).json(data);
