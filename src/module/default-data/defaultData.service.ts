@@ -5,7 +5,6 @@ import { bcryptService } from "@/common/utils/bcrypt-hash";
 import { User } from "@/module/users/entities/user.entity";
 import { Role } from "../roles/entities/role.entity";
 import { Route } from "../routes/entities/route.entity";
-import { CreateRouteDto } from "../routes/dto";
 
 @Injectable()
 export class defaultData implements OnApplicationBootstrap {
@@ -101,6 +100,7 @@ export class defaultData implements OnApplicationBootstrap {
           title: "首页",
           path: "/home",
           component: "home/Index",
+          icon: "HomeFilled",
           externalLinks: false,
           redirect: "",
           meta: "",
@@ -112,6 +112,7 @@ export class defaultData implements OnApplicationBootstrap {
           title: "首页",
           path: "/home",
           component: "home/Index",
+          icon: "HomeFilled",
           externalLinks: false,
           redirect: "",
           meta: "",
