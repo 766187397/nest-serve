@@ -5,7 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { Brackets, ILike, In, Repository, UpdateResult } from "typeorm";
 import { BaseService } from "@/common/service/base";
-import { JwtService } from "@nestjs/jwt";
+import { JwtService, TokenExpiredError } from "@nestjs/jwt";
 import { bcryptService } from "@/common/utils/bcrypt-hash";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
 import { PageApiResult } from "@/types/public";
@@ -303,6 +303,9 @@ export class UsersService extends BaseService {
         },
       });
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        return ApiResult.error<null>({ data: null, message: "用户身份信息过期，请重新登录！", code: 401 });
+      }
       return ApiResult.error<null>(error || "刷新token失败，请重新登录！");
     }
   }
