@@ -80,7 +80,10 @@ export class RoutesService extends BaseService {
    */
   async findOne(id: number): Promise<ApiResult<Route | null>> {
     try {
-      let data = await this.routeRepository.findOne({ where: { id } });
+      let data = await this.routeRepository.findOne({
+        where: { id },
+        relations: ["children", "parentId"],
+      });
       return ApiResult.success<Route>({ data });
     } catch (error) {
       return ApiResult.error<null>(error || "路由查询失败，请稍后再试");
