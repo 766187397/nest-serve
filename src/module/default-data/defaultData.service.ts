@@ -123,7 +123,7 @@ export class defaultData implements OnApplicationBootstrap {
           name: "systemRoute",
           title: "后台路由",
           path: "/system/route",
-          component: "system/route/adminRoute",
+          component: "system/route/AdminRoute",
           icon: "",
           externalLinks: false,
           redirect: "",
