@@ -91,6 +91,17 @@ export class defaultData implements OnApplicationBootstrap {
   private async seedRoutes() {
     const count = await this.routeRepository.count();
     if (count === 0) {
+      const system = await this.routeRepository.save({
+        platform: "admin",
+        type: "menu",
+        name: "system",
+        title: "系统管理",
+        path: "/system",
+        icon: "Setting",
+        externalLinks: false,
+        redirect: "",
+        meta: "",
+      });
       // 如果没有路由，插入默认数据
       const routes = [
         {
@@ -104,6 +115,20 @@ export class defaultData implements OnApplicationBootstrap {
           externalLinks: false,
           redirect: "",
           meta: "",
+          sort: 2,
+        },
+        {
+          platform: "admin",
+          type: "menu",
+          name: "systemRoute",
+          title: "后台路由",
+          path: "/system/route",
+          component: "system/route/adminRoute",
+          icon: "",
+          externalLinks: false,
+          redirect: "",
+          meta: "",
+          parentId: system,
         },
         {
           platform: "web",

@@ -180,6 +180,12 @@ export class RoutesService extends BaseService {
           id: In(routeIds), // 主表ID在 routeIds 中
           parentId: IsNull(), // 主表的 parentId 为空（查根节点）
           platform, // 平台条件（变量值自动绑定）
+        })
+        // 排序
+        .orderBy({
+          "route.sort": "ASC",
+          "child.sort": "ASC",
+          "route.createdAt": "ASC",
         });
       if (type) {
         queryBuilderRoute.andWhere("route.type = :type", { type });
