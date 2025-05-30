@@ -23,7 +23,6 @@ export class ApiResultInterceptor implements NestInterceptor {
       map((data) => {
         if (data?.__isApiResult) {
           delete data.__isApiResult;
-          console.log('data.code', data.code)
           response.status(data.code);
           return {
             code: data.code,

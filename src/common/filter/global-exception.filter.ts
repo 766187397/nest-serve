@@ -44,7 +44,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       "";
 
     const statusCode = response.statusCode || "";
-    // console.log("exception", exception);
     // 表单校验异常
     if (exception instanceof BadRequestException) {
       status = exception.getStatus();
