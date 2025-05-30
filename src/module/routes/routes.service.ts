@@ -62,7 +62,6 @@ export class RoutesService extends BaseService {
     try {
       console.log("findRouteDto.platform", findRouteDto.platform);
       let order = this.buildCommonSort(findRouteDto?.sort);
-      console.log('order', order)
       let data = await this.routeRepository.find({
         where: { parentId: IsNull(), platform: findRouteDto.platform },
         order: { ...order },
