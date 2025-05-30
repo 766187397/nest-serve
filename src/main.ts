@@ -46,7 +46,7 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true, // 自动转换类型
       whitelist: true, // 只允许 DTO 中声明的字段 仅对DTO中的生效
-      forbidNonWhitelisted: true, // 如果有非法字段，抛出异常 仅对DTO中的生效
+      // forbidNonWhitelisted: true, // 如果有非法字段，抛出异常 仅对DTO中的生效
     })
   );
 

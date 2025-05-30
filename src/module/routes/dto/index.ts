@@ -62,6 +62,11 @@ export class CreateRouteDto extends RouteOptionalDto {
 }
 
 export class UpdateRouteDto extends RouteOptionalDto {
+  @ApiProperty({ description: "前端路由路径（可以含动态参数）", required: false })
+  @IsString({ message: "路由路径必须为字符串" })
+  @IsNotEmpty({ message: "路由路径不能为空" })
+  path?: string;
+
   @ApiProperty({ description: "平台标识（如admin/web/app/mini等）", required: false })
   @IsOptional()
   @IsString({ message: "平台必须为字符串" })

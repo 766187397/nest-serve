@@ -60,7 +60,9 @@ export class RoutesService extends BaseService {
    */
   async findAll(findRouteDto: FindRouteDto): Promise<ApiResult<Route[] | null>> {
     try {
+      console.log("findRouteDto.platform", findRouteDto.platform);
       let order = this.buildCommonSort(findRouteDto?.sort);
+      console.log('order', order)
       let data = await this.routeRepository.find({
         where: { parentId: IsNull(), platform: findRouteDto.platform },
         order: { ...order },
@@ -105,6 +107,9 @@ export class RoutesService extends BaseService {
 
       // 如果有新的 parentId，查询对应的父级路由
       if (updateRouteDto.parentId) {
+        if (updateRouteDto.parentId == route.id) {
+          return ApiResult.error("父级路由不能为当前路由");
+        }
         const parentRoute = await this.routeRepository.findOne({
           where: { id: updateRouteDto.parentId, platform: updateRouteDto.platform },
         });
