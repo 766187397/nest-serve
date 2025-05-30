@@ -69,7 +69,7 @@ export class RolesService extends BaseService {
     try {
       let { take, skip } = this.buildCommonPaging(findRoleDtoByPage?.page, findRoleDtoByPage?.pageSize);
       let where = this.buildCommonQuery(findRoleDtoByPage);
-      let order = this.buildCommonSort(findRoleDtoByPage);
+      let order = this.buildCommonSort(findRoleDtoByPage?.sort);
       // 查询符合条件的用户
       const [data, total] = await this.roleRepository.findAndCount({
         where: {
@@ -110,7 +110,7 @@ export class RolesService extends BaseService {
   async findAll(findRoleDto: FindRoleDto, platform: string = "admin"): Promise<ApiResult<Role[] | null>> {
     try {
       let where = this.buildCommonQuery(findRoleDto);
-      let order = this.buildCommonSort(findRoleDto);
+      let order = this.buildCommonSort(findRoleDto?.sort);
       let data = await this.roleRepository.find({
         where: {
           ...where,

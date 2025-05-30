@@ -32,18 +32,19 @@ export class BaseService {
 
   /**
    * 处理默认排序 处理createdAt和id
-   * @param {{ [key: string]: any }} sort DESC | ASC
+   * @param {FindOptionsOrderValue | undefined} sort 排序条件sort DESC | ASC
    * @returns {{[key: string]: FindOptionsOrderValue}} 处理后的排序条件
    */
-  buildCommonSort(sort: { [key: string]: any } | undefined): { [key: string]: FindOptionsOrderValue } {
-    if (!sort || typeof sort === "undefined") {
+  buildCommonSort(sort: FindOptionsOrderValue | undefined): { [key: string]: FindOptionsOrderValue } {
+    const sortAll = ["ASC", "DESC", "asc", "desc"];
+
+    if (typeof sort === "undefined") {
       return { createdAt: "DESC", id: "DESC" };
     }
-
-    return {
-      createdAt: "DESC",
-      id: "DESC",
-    };
+    if (sortAll.includes(sort as string)) {
+      return { createdAt: sort, id: sort };
+    }
+    return { createdAt: "DESC", id: "DESC" };
   }
 
   /**

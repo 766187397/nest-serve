@@ -56,7 +56,7 @@ export class DictionaryService extends BaseService {
   ): Promise<ApiResult<PageApiResult<Dictionary[]> | null>> {
     try {
       let where = this.buildCommonQuery(findDictionaryDtoByPage);
-      let order = this.buildCommonSort(findDictionaryDtoByPage);
+      let order = this.buildCommonSort(findDictionaryDtoByPage?.sort);
       let { skip, take } = this.buildCommonPaging(findDictionaryDtoByPage.page, findDictionaryDtoByPage.pageSize);
       let [data, total] = await this.dictionaryRepository.findAndCount({
         where: {
@@ -91,7 +91,7 @@ export class DictionaryService extends BaseService {
   async findAll(findDictionaryDto: FindDictionaryDto): Promise<ApiResult<Dictionary[] | null>> {
     try {
       let where = this.buildCommonQuery(findDictionaryDto);
-      let order = this.buildCommonSort(findDictionaryDto);
+      let order = this.buildCommonSort(findDictionaryDto?.sort);
       let data = await this.dictionaryRepository.find({
         where: {
           ...where,
@@ -187,7 +187,7 @@ export class DictionaryService extends BaseService {
         return ApiResult.error<null>("字典分类不存在");
       }
       let where = this.buildCommonQuery(findDictionaryItemDtoByPage);
-      let order = this.buildCommonSort(findDictionaryItemDtoByPage);
+      let order = this.buildCommonSort(findDictionaryItemDtoByPage?.sort);
       let { skip, take } = this.buildCommonPaging(
         findDictionaryItemDtoByPage.page,
         findDictionaryItemDtoByPage.pageSize
@@ -234,7 +234,7 @@ export class DictionaryService extends BaseService {
         return ApiResult.error<null>("字典分类不存在");
       }
       let where = this.buildCommonQuery(findDictionaryItemDto);
-      let order = this.buildCommonSort(findDictionaryItemDto);
+      let order = this.buildCommonSort(findDictionaryItemDto?.sort);
       let data = await this.dictionaryItemRepository.find({
         where: {
           ...where,

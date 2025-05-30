@@ -51,7 +51,7 @@ export class UploadService extends BaseService {
   async getFileAll(findFileDto: FindFileDto): Promise<ApiResult<UploadFile[] | null>> {
     try {
       let where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDto);
-      let order = this.buildCommonSort(findFileDto);
+      let order = this.buildCommonSort(findFileDto?.sort);
       const files = await this.upload.find({
         where: {
           ...where,
@@ -82,7 +82,7 @@ export class UploadService extends BaseService {
   async getFileByPage(findFileDtoByPage: FindFileDtoByPage): Promise<ApiResult<PageApiResult<UploadFile[]> | null>> {
     try {
       let where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDtoByPage);
-      let order = this.buildCommonSort(findFileDtoByPage);
+      let order = this.buildCommonSort(findFileDtoByPage?.sort);
       const { take, skip } = this.buildCommonPaging(findFileDtoByPage.page, findFileDtoByPage.pageSize);
       const [data, total] = await this.upload.findAndCount({
         where: {

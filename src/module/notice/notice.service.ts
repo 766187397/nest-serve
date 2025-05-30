@@ -40,7 +40,7 @@ export class NoticeService extends BaseService {
     try {
       let { take, skip } = this.buildCommonPaging(findNoticeDtoByPage?.page, findNoticeDtoByPage?.pageSize);
       let where = this.buildCommonQuery(findNoticeDtoByPage);
-      let order = this.buildCommonSort(findNoticeDtoByPage);
+      let order = this.buildCommonSort(findNoticeDtoByPage?.sort);
       let [data, total] = await this.noticeRepository.findAndCount({
         where: {
           ...where,

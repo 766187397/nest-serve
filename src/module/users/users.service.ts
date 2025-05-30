@@ -79,7 +79,7 @@ export class UsersService extends BaseService {
     try {
       let { take, skip } = this.buildCommonPaging(findUserDtoByPage?.page, findUserDtoByPage?.pageSize);
       let where = this.buildCommonQuery(findUserDtoByPage);
-      let order = this.buildCommonSort(findUserDtoByPage);
+      let order = this.buildCommonSort(findUserDtoByPage?.sort);
       // 查询符合条件的用户
       const [data, total] = await this.userRepository.findAndCount({
         where: {
@@ -122,7 +122,7 @@ export class UsersService extends BaseService {
   async findAll(findUserDto?: FindUserDto, platform: string = "admin"): Promise<ApiResult<User[] | null>> {
     try {
       let where = this.buildCommonQuery(findUserDto);
-      let order = this.buildCommonSort(findUserDto);
+      let order = this.buildCommonSort(findUserDto?.sort);
       let data = await this.userRepository.find({
         where: {
           ...where,
