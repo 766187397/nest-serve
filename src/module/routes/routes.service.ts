@@ -190,10 +190,10 @@ export class RoutesService extends BaseService {
         })
         // 排序
         .orderBy({
-          "route.sort": "ASC",
-          "child.sort": "ASC",
-          "route.createdAt": "ASC",
-          "child.createdAt": "ASC",
+          "route.sort": "DESC",
+          "child.sort": "DESC",
+          "route.createdAt": "DESC",
+          "child.createdAt": "DESC",
         });
       if (type) {
         queryBuilderRoute.andWhere("route.type = :type", { type });
