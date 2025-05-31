@@ -182,11 +182,6 @@ export class defaultData implements OnApplicationBootstrap {
           name: "公共状态",
           description: "公共状态:State的具体值（启用禁用）",
         },
-        {
-          type: "whether",
-          name: "是/否",
-          description: "是/否：通用的是/否值",
-        },
       ];
       // 插入字段项目数据
       const dictionaryList = await this.dictionaryRepository.save(dictionaries);
@@ -233,18 +228,6 @@ export class defaultData implements OnApplicationBootstrap {
           label: "禁用",
           value: "0",
           description: "公共状态：禁用",
-        },
-        {
-          category: dictionaryList[3],
-          label: "是",
-          value: "1",
-          description: "布尔判断：是",
-        },
-        {
-          category: dictionaryList[3],
-          label: "否",
-          value: "0",
-          description: "布尔判断：否",
         },
       ];
 
