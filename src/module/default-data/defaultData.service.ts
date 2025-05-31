@@ -64,8 +64,8 @@ export class defaultData implements OnApplicationBootstrap {
   private async seedRoles() {
     const count = await this.roleRepository.count();
     if (count === 0) {
-      const route1 = await this.routeRepository.findOne({ where: { platform: "admin", path: "/home" } }); // 获取路由
-      const route2 = await this.routeRepository.findOne({ where: { platform: "web", path: "/home" } }); // 获取路由
+      const route1 = await this.routeRepository.find({ where: { platform: "admin" } }); // 获取路由
+      const route2 = await this.routeRepository.find({ where: { platform: "web" } }); // 获取路由
       // 如果没有角色，插入默认数据
       const roles = [
         {
@@ -73,14 +73,14 @@ export class defaultData implements OnApplicationBootstrap {
           roleKey: "admin",
           description: "拥有所有权限",
           platform: "admin",
-          routeIds: [route1],
+          routes: route1,
         },
         {
           name: "普通用户",
           roleKey: "web",
           description: "拥有所有权限",
           platform: "web",
-          routeIds: [route2],
+          routes: route2,
         },
       ];
       await this.roleRepository.save(roles); // 插入数据
