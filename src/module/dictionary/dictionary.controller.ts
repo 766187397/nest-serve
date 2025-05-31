@@ -81,7 +81,7 @@ export class DictionaryItemController {
   }
 
   @Get("page")
-  @ApiOperation({ summary: "字典分类分页查询" })
+  @ApiOperation({ summary: "字典项分页查询" })
   findByPage(@Query() findDictionaryItemDtoByPage: FindDictionaryItemDtoByPage) {
     return this.dictionaryService.findItemByPage(findDictionaryItemDtoByPage);
   }

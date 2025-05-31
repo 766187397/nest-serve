@@ -180,8 +180,12 @@ export class DictionaryService extends BaseService {
     findDictionaryItemDtoByPage: FindDictionaryItemDtoByPage
   ): Promise<ApiResult<PageApiResult<DictionaryItem[]> | null>> {
     try {
+      let dictionaryId;
+      if (findDictionaryItemDtoByPage?.categoryId) {
+        dictionaryId = +findDictionaryItemDtoByPage?.categoryId;
+      }
       const category = await this.dictionaryRepository.findOne({
-        where: { id: +findDictionaryItemDtoByPage?.categoryId },
+        where: { id: dictionaryId, type: findDictionaryItemDtoByPage?.type },
       });
       if (!category) {
         return ApiResult.error<null>("字典分类不存在");
@@ -197,7 +201,8 @@ export class DictionaryService extends BaseService {
           ...where,
           label: findDictionaryItemDtoByPage?.label ? ILike(`%${findDictionaryItemDtoByPage.label}%`) : undefined,
           category: {
-            id: +findDictionaryItemDtoByPage?.categoryId,
+            id: dictionaryId,
+            type: findDictionaryItemDtoByPage?.type,
           },
         },
         order,
@@ -227,8 +232,12 @@ export class DictionaryService extends BaseService {
    */
   async findItemAll(findDictionaryItemDto: FindDictionaryItemDto): Promise<ApiResult<DictionaryItem[] | null>> {
     try {
+      let dictionaryId;
+      if (findDictionaryItemDto?.categoryId) {
+        dictionaryId = +findDictionaryItemDto?.categoryId;
+      }
       const category = await this.dictionaryRepository.findOne({
-        where: { id: +findDictionaryItemDto?.categoryId },
+        where: { id: dictionaryId, type: findDictionaryItemDto?.type },
       });
       if (!category) {
         return ApiResult.error<null>("字典分类不存在");
@@ -240,7 +249,8 @@ export class DictionaryService extends BaseService {
           ...where,
           label: findDictionaryItemDto?.label ? ILike(`%${findDictionaryItemDto.label}%`) : undefined,
           category: {
-            id: +findDictionaryItemDto?.categoryId,
+            id: dictionaryId,
+            type: findDictionaryItemDto?.type,
           },
         },
         order,

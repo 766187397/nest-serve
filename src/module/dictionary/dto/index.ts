@@ -11,12 +11,12 @@ class DictionaryOptionalDto extends CreateBaseDto {
 
 /** 创建字典分类 */
 export class CreateDictionaryDto extends DictionaryOptionalDto {
-  @ApiProperty({ description: "字典分类类型" })
+  @ApiProperty({ description: "字典分类类型(为一标识方便后续查询)" })
   @IsNotEmpty({ message: "字典分类类型是必填项" })
   @IsString({ message: "字典分类类型必须是字符串" })
   type: string;
 
-  @ApiProperty({ description: "字典分类名称" })
+  @ApiProperty({ description: "字典分类名称(显示名称)" })
   @IsNotEmpty({ message: "字典分类名称是必填项" })
   @IsString({ message: "字典分类名称必须是字符串" })
   name: string;
@@ -97,8 +97,13 @@ export class FindDictionaryItemDto extends FindByParameter {
 
   @ApiProperty({ type: "string", description: "字典分类id" })
   @IsString({ message: "字典分类id必须是字符串" })
-  @IsNotEmpty({ message: "字典分类id是必填项" })
-  categoryId: string;
+  @IsOptional()
+  categoryId?: string;
+
+  @ApiProperty({ type: "string", description: "字典分类id" })
+  @IsString({ message: "字典分类type必须是字符串" })
+  @IsOptional()
+  type?: string;
 }
 
 /** 分页查询字典项 */

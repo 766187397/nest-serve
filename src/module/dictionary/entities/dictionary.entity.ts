@@ -6,10 +6,10 @@ import { DictionaryItem } from "./dictionaryItem.entity";
 // 复合索引 优化同时查询id和deletedAt的情况
 @Index("IDX_dictionary_id_deletedAt", ["id", "deletedAt"])
 export class Dictionary extends BaseEntity {
-  @Column({ unique: true, comment: "字典分类类型" })
+  @Column({ unique: true, comment: "字典分类类型（为一标识方便后续查询）" })
   type: string;
 
-  @Column({ comment: "字典名称" })
+  @Column({ comment: "字典名称（显示名称）" })
   name: string;
 
   @Column({ nullable: true, comment: "字典描述" })
