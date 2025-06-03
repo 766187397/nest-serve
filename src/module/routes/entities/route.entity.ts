@@ -33,10 +33,10 @@ export class Route extends BaseEntity {
   redirect: string;
 
   // 树形结构关系
-  @OneToMany(() => Route, (route) => route.parentId)
+  @OneToMany(() => Route, (route) => route.parent)
   children: Route[];
 
   @ManyToOne(() => Route, (route) => route.children)
-  @JoinColumn({ name: "parentId" })
-  parentId: Route;
+  @JoinColumn({ name: "parent" })
+  parent: Route;
 }

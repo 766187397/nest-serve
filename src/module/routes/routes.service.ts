@@ -44,7 +44,7 @@ export class RoutesService extends BaseService {
       }
       const route = this.routeRepository.create({
         ...createRouteDto,
-        parentId: parent || undefined,
+        parent: parent || undefined,
       });
       await this.routeRepository.save(route);
       return ApiResult.success<null>();
@@ -63,7 +63,7 @@ export class RoutesService extends BaseService {
       console.log("findRouteDto.platform", findRouteDto.platform);
       let order = this.buildCommonSort(findRouteDto?.sort);
       let data = await this.routeRepository.find({
-        where: { parentId: IsNull(), platform: findRouteDto.platform },
+        where: { parent: IsNull(), platform: findRouteDto.platform },
         order: { ...order },
         relations: ["children"],
       });
@@ -82,7 +82,7 @@ export class RoutesService extends BaseService {
     try {
       let data = await this.routeRepository.findOne({
         where: { id },
-        relations: ["children", "parentId"],
+        relations: ["children", "parent"],
       });
       return ApiResult.success<Route>({ data });
     } catch (error) {
@@ -101,13 +101,13 @@ export class RoutesService extends BaseService {
       // 查询当前路由是否存在
       let route = await this.routeRepository.findOne({
         where: { id },
-        relations: ["children", "parentId"],
+        relations: ["children", "parent"],
       });
       if (!route) {
         return ApiResult.error("路由不存在");
       }
 
-      // 如果有新的 parentId，查询对应的父级路由
+      // 如果有新的 parent，查询对应的父级路由
       if (updateRouteDto.parentId) {
         if (updateRouteDto.parentId == route.id) {
           return ApiResult.error("父级路由不能为当前路由");
@@ -118,13 +118,13 @@ export class RoutesService extends BaseService {
         if (!parentRoute) {
           return ApiResult.error("父级路由不存在");
         }
-        route.parentId = parentRoute || null; // 如果 parentId 为 null，则设置为 null
+        route.parent = parentRoute || null; // 如果 parent 为 null，则设置为 null
       }
 
       // 更新其他字段
       Object.assign(route, {
         ...updateRouteDto,
-        parentId: route.parentId, // 确保 parentId 类型一致
+        parent: route.parent, // 确保 parent 类型一致
       });
 
       // 保存更新后的路由
@@ -185,7 +185,7 @@ export class RoutesService extends BaseService {
         // WHERE 主表条件组合
         .where({
           id: In(routeIds), // 主表ID在 routeIds 中
-          parentId: IsNull(), // 主表的 parentId 为空（查根节点）
+          parent: IsNull(), // 主表的 parent 为空（查根节点）
           platform, // 平台条件（变量值自动绑定）
         })
         // 排序

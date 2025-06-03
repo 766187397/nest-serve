@@ -143,7 +143,7 @@ export class defaultData implements OnApplicationBootstrap {
           externalLinks: false,
           redirect: "",
           meta: "",
-          parentId: system,
+          parent: system,
         },
         {
           platform: "web",
