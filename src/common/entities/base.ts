@@ -1,10 +1,14 @@
 import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
 import { Exclude, Transform } from "class-transformer";
+import { v4 as uuidv4 } from "uuid";
 import * as dayjs from "dayjs";
 
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn({ comment: "ID" })
   id: number;
+
+  @Column({ unique: true, comment: "UUID" })
+  uuid: string = uuidv4();
 
   @Column({ default: 1, comment: "排序" })
   sort: number;
@@ -13,7 +17,11 @@ export abstract class BaseEntity {
   status: number;
 
   @Exclude({ toPlainOnly: true })
-  @Column({ default: "admin", comment: "平台标识（如admin/web/app/mini），具体更加数据来定义，如果app和mini的数据就是前台的就和前台使用一样的字段不要修改即可" })
+  @Column({
+    default: "admin",
+    comment:
+      "平台标识（如admin/web/app/mini），具体更加数据来定义，如果app和mini的数据就是前台的就和前台使用一样的字段不要修改即可",
+  })
   platform: string;
 
   @CreateDateColumn({ comment: "创建时间" })
