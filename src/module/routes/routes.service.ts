@@ -60,7 +60,6 @@ export class RoutesService extends BaseService {
    */
   async findAll(findRouteDto: FindRouteDto): Promise<ApiResult<Route[] | null>> {
     try {
-      console.log("findRouteDto.platform", findRouteDto.platform);
       let order = this.buildCommonSort(findRouteDto?.sort);
       let data = await this.routeRepository.find({
         where: { parent: IsNull(), platform: findRouteDto.platform },
