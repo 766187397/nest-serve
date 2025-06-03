@@ -1,3 +1,5 @@
+import { Route } from "@/module/routes/entities/route.entity";
+
 export interface RoleRoutes {
   path: string;
   name: string;
@@ -12,3 +14,5 @@ export interface RoleRoutes {
   };
   children?: RoleRoutes[];
 }
+
+export type RouteInfo = ({ parentId?: number } & Route) | null;

@@ -6,7 +6,7 @@ import { In, IsNull, Repository } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { ApiResult } from "@/common/utils/result";
 import { Role } from "@/module/roles/entities/role.entity";
-import { RoleRoutes } from "@/types/routes";
+import { RoleRoutes, RouteInfo } from "@/types/routes";
 
 @Injectable()
 export class RoutesService extends BaseService {
@@ -80,10 +80,13 @@ export class RoutesService extends BaseService {
    */
   async findOne(id: number): Promise<ApiResult<Route | null>> {
     try {
-      let data = await this.routeRepository.findOne({
+      let data: RouteInfo = await this.routeRepository.findOne({
         where: { id },
         relations: ["children", "parent"],
       });
+      if (data && data.parent) {
+        data.parentId = data.parent.id;
+      }
       return ApiResult.success<Route>({ data });
     } catch (error) {
       return ApiResult.error<null>(error || "路由查询失败，请稍后再试");
