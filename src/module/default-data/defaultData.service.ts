@@ -135,7 +135,7 @@ export class defaultData implements OnApplicationBootstrap {
         {
           platform: "admin",
           type: "menu",
-          name: "systemRoute",
+          name: "AdminManage",
           title: "admin路由管理",
           path: "/system/admin-manage",
           component: "system/route/AdminManage",
@@ -148,7 +148,7 @@ export class defaultData implements OnApplicationBootstrap {
         {
           platform: "admin",
           type: "menu",
-          name: "systemRoute",
+          name: "WebManage",
           title: "web路由管理",
           path: "/system/web-manage",
           component: "system/route/WebManage",
