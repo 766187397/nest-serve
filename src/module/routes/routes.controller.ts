@@ -5,7 +5,7 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@ne
 import { Request, Response } from "express";
 import { User } from "@/module/users/entities/user.entity";
 
-@ApiTags("admin - 路由管理")
+@ApiTags("public - 路由管理")
 // @ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
@@ -14,7 +14,7 @@ import { User } from "@/module/users/entities/user.entity";
 @ApiResponse({ status: 403, description: "权限不足" })
 @ApiResponse({ status: 404, description: "请求资源不存在" })
 @ApiResponse({ status: 500, description: "服务器异常，请联系管理员" })
-@Controller("api/v1/admin/routes")
+@Controller("api/v1/public/routes")
 export class RoutesController {
   constructor(private readonly routesService: RoutesService) {}
 

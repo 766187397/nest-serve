@@ -133,11 +133,12 @@ export class defaultData implements OnApplicationBootstrap {
         parent: system,
       });
 
+      // 用户管理
       const user = await this.routeRepository.save({
         platform: "admin",
         type: "menu",
         name: "user",
-        title: "路由管理",
+        title: "用户管理",
         path: "/system/user",
         icon: "User",
         externalLinks: false,
@@ -145,7 +146,7 @@ export class defaultData implements OnApplicationBootstrap {
         meta: "",
         parent: system,
       });
-
+      
       // 最后一级路由
       const routes = [
         {
@@ -193,7 +194,7 @@ export class defaultData implements OnApplicationBootstrap {
           name: "userAdmin",
           title: "admin用户",
           path: "/system/user/admin",
-          component: "system/user/admin",
+          component: "system/user/Admin",
           icon: "",
           externalLinks: false,
           redirect: "",
@@ -202,11 +203,11 @@ export class defaultData implements OnApplicationBootstrap {
         },
         {
           platform: "admin",
-          type: "menu",
+          type: "menu", 
           name: "userWeb",
           title: "web用户",
           path: "/system/user/web",
-          component: "system/user/web",
+          component: "system/user/Web",
           icon: "",
           externalLinks: false,
           redirect: "",

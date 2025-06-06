@@ -47,6 +47,7 @@ export class AuthGuard implements CanActivate {
         user = this.jwtService.verify(token as string, {
           secret: options.secret,
         });
+        console.log('user', user)
         req.userInfo = user; // 将用户信息附加到请求对象上
       }
       return true;
