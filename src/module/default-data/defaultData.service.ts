@@ -165,6 +165,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "RouteWeb",
+          title: "web路由",
           path: "/system/route/web",
           component: "system/route/Web",
           icon: "",
