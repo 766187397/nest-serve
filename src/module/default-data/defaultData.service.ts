@@ -106,6 +106,7 @@ export class defaultData implements OnApplicationBootstrap {
   private async seedRoutes() {
     const count = await this.routeRepository.count();
     if (count === 0) {
+      // 系统管理
       const system = await this.routeRepository.save({
         platform: "admin",
         type: "menu",
@@ -114,9 +115,24 @@ export class defaultData implements OnApplicationBootstrap {
         path: "/system",
         icon: "Setting",
         externalLinks: false,
-        redirect: "",
+        redirect: "/system/route",
         meta: "",
       });
+
+      // 路由管理
+      const route = await this.routeRepository.save({
+        platform: "admin",
+        type: "menu",
+        name: "route",
+        title: "路由管理",
+        path: "/system/route",
+        icon: "Menu",
+        externalLinks: false,
+        redirect: "/system/route/admin",
+        meta: "",
+        parent: system,
+      });
+
       // 如果没有路由，插入默认数据
       const routes = [
         {
@@ -135,28 +151,27 @@ export class defaultData implements OnApplicationBootstrap {
         {
           platform: "admin",
           type: "menu",
-          name: "AdminManage",
-          title: "admin路由管理",
-          path: "/system/admin-manage",
-          component: "system/route/AdminManage",
+          name: "RouteAdmin",
+          title: "admin路由",
+          path: "/system/route/admin",
+          component: "system/route/Admin",
           icon: "",
           externalLinks: false,
           redirect: "",
           meta: "",
-          parent: system,
+          parent: route,
         },
         {
           platform: "admin",
           type: "menu",
-          name: "WebManage",
-          title: "web路由管理",
-          path: "/system/web-manage",
-          component: "system/route/WebManage",
+          name: "RouteWeb",
+          path: "/system/route/web",
+          component: "system/route/Web",
           icon: "",
           externalLinks: false,
           redirect: "",
           meta: "",
-          parent: system,
+          parent: route,
         },
         {
           platform: "web",
