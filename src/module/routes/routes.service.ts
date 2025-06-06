@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from "./dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Route } from "./entities/route.entity";
-import { In, IsNull, Repository } from "typeorm";
+import { In, IsNull, Repository, TreeRepository } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { ApiResult } from "@/common/utils/result";
 import { Role } from "@/module/roles/entities/role.entity";
@@ -13,6 +13,8 @@ export class RoutesService extends BaseService {
   constructor(
     @InjectRepository(Route)
     private readonly routeRepository: Repository<Route>,
+    @InjectRepository(Route)
+    private readonly treeRouteRepository: TreeRepository<Route>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>
   ) {
@@ -66,7 +68,11 @@ export class RoutesService extends BaseService {
         order: { ...order },
         relations: ["children"],
       });
-      return ApiResult.success<Route[]>({ data });
+
+      // 2. 遍历每个顶层节点，构建子树
+      const trees = await Promise.all(data.map((route) => this.treeRouteRepository.findDescendantsTree(route)));
+
+      return ApiResult.success<Route[]>({ data: trees });
     } catch (error) {
       return ApiResult.error<null>(error || "路由查询失败，请稍后再试");
     }
@@ -175,33 +181,31 @@ export class RoutesService extends BaseService {
         .groupBy("route.id");
 
       const routeIds = (await queryBuilderRole.getRawMany()).map((item) => item.routeId);
-      const queryBuilderRoute = this.routeRepository
-        .createQueryBuilder("route")
-        // 关联查询子节点（核心过滤逻辑）
-        .leftJoinAndSelect(
-          "route.children", // 关联字段路径（父实体的 children 属性）
-          "child", // 子表别名（自定义）
-          "child.id  IN (:...routeIds)", // 子节点过滤条件（SQL条件片段）
-          { routeIds } // 参数注入（防SQL注入）
-        )
-        // WHERE 主表条件组合
-        .where({
-          id: In(routeIds), // 主表ID在 routeIds 中
-          parent: IsNull(), // 主表的 parent 为空（查根节点）
-          platform, // 平台条件（变量值自动绑定）
-        })
-        // 排序
-        .orderBy({
-          "route.sort": "DESC",
-          "child.sort": "DESC",
-          "route.createdAt": "DESC",
-          "child.createdAt": "DESC",
-        });
-      if (type) {
-        queryBuilderRoute.andWhere("route.type = :type", { type });
+      // 没有绑定路由
+      if (routeIds.length === 0) {
+        return ApiResult.success<RoleRoutes[]>({ data: [] }); // 无权限
       }
-      const data = await queryBuilderRoute.getMany();
-      const routeList = this.handleRoutes(data);
+
+      // 2. 获取顶层路由节点（parent IS NULL + platform）
+      const rootRoutes = await this.routeRepository.find({
+        where: {
+          id: In(routeIds),
+          parent: IsNull(),
+          platform,
+          ...(type ? { type } : {}),
+        },
+        order: {
+          sort: "DESC",
+          createdAt: "DESC",
+        },
+      });
+
+      // 3. 对每个根节点查询完整子树（使用 findDescendantsTree）
+      const trees = await Promise.all(rootRoutes.map((route) => this.treeRouteRepository.findDescendantsTree(route)));
+
+      // 4. 你已有的格式化函数
+      const routeList = this.handleRoutes(trees);
+
       return ApiResult.success<RoleRoutes[]>({ data: routeList });
     } catch (error) {
       return ApiResult.error<null>(error || "获取路由失败，请稍后再试");

@@ -1,9 +1,10 @@
 import { BaseEntity } from "@/common/entities/base";
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, Tree, TreeChildren, TreeParent } from "typeorm";
 
 @Entity("route", { comment: "路由表" })
 // 复合索引 优化同时查询id和deletedAt的情况
 @Index("IDX_route_id_deletedAt", ["id", "deletedAt"])
+@Tree("materialized-path")
 export class Route extends BaseEntity {
   @Column({ default: "", comment: "路由类型：菜单/按钮/API等" })
   type: string;
@@ -33,10 +34,12 @@ export class Route extends BaseEntity {
   redirect: string;
 
   // 树形结构关系
-  @OneToMany(() => Route, (route) => route.parent)
+  // @OneToMany(() => Route, (route) => route.parent)
+  @TreeChildren()
   children: Route[];
 
-  @ManyToOne(() => Route, (route) => route.children)
-  @JoinColumn({ name: "parent" })
+  // @ManyToOne(() => Route, (route) => route.children)
+  // @JoinColumn({ name: "parent" })
+  @TreeParent()
   parent: Route;
 }

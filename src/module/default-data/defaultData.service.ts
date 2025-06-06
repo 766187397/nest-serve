@@ -126,7 +126,7 @@ export class defaultData implements OnApplicationBootstrap {
         name: "route",
         title: "路由管理",
         path: "/system/route",
-        icon: "Menu",
+        icon: "Paperclip",
         externalLinks: false,
         redirect: "/system/route/admin",
         meta: "",
