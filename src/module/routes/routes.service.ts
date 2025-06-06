@@ -22,7 +22,7 @@ export class RoutesService extends BaseService {
   /**
    * 创建路由
    * @param {CreateRouteDto} createRouteDto 路由信息
-   * @returns { ApiResult<null>>} 统一返回结果
+   * @returns { ApiResult<null> } 统一返回结果
    */
   async create(createRouteDto: CreateRouteDto): Promise<ApiResult<null>> {
     try {
