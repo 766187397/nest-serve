@@ -27,17 +27,18 @@ node版本>=20
 ## 接口设计
 
 > 自定义接口按照下面的规则开发，但是第三方库有单独的要则按照库的标准来
+>
+> 平台：当前平台的配置只写了这几个（admin、web、mini、app），如果需要增加修改jwt中的getPlatformJwtConfig
 
 /api/v1/admin/*
 
 - api：表示请求的接口
 - v1：接口版本
 - admin：平台
-  - public：公共模块
   - admin：后台
   - web：web端
   - mini：小程序
-
+  - app：安卓/iOS等
 - *：具体的模块接口
 
 

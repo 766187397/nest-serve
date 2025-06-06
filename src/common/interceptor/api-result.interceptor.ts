@@ -34,8 +34,8 @@ export class ApiResultInterceptor implements NestInterceptor {
         else if (whiteState) {
           return data;
         }
-        // 如果请求路径以 /api/v1/ 开头，又不是自定义的请求格式，则包装响应格式
-        else if (request.url.startsWith("/api/v1/")) {
+        // 如果请求路径以 /api/v 开头，又不是自定义的请求格式，则包装响应格式
+        else if (request.url.startsWith("/api/v")) {
           return {
             code: 200,
             message: "操作成功",
