@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsNumber, IsOptional, IsString, Matches } from "class-validator";
 import { FindOptionsOrderValue } from "typeorm";
 
 /**
@@ -43,11 +44,19 @@ export class FindByParameter {
 
   @ApiProperty({
     type: "string",
-    description: "时间范围(根据创建时间查询)以逗号分隔，也兼容了数组，长度必须为2，时间需要精确到时分秒防止查询同一天为空",
+    description:
+      "时间范围(根据创建时间查询)以逗号分隔，也兼容了数组，长度必须为2，时间需要精确到时分秒防止查询同一天为空",
     required: false,
     example: "2025-1-1 10:10:10,2025-1-2 23:59:59",
   })
+  @Transform(({ value }) => (value === "" ? undefined : value))
   @IsOptional()
+  @Matches(
+    /^(\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2})[,，至到](\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2})$/,
+    {
+      message: "日期范围格式错误，应为“YYYY-M-D HH:MM:SS,YYYY-M-D HH:MM:SS”或使用中文分隔符“，”、“至”、“到”",
+    }
+  )
   // @IsString({ message: "时间范围必须为字符串，并且需要使用逗号隔开" })
   time?: string | string[];
 }

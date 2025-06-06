@@ -1,15 +1,18 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
 import { ApiProperty } from "@nestjs/swagger";
+import { Transform } from "class-transformer";
 import { IsArray, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 
 /** 由于使用PartialType会丢失装饰器则抽离可选公用的参数 */
 class UserOptionalDto extends CreateBaseDto {
   @ApiProperty({ description: "邮箱", required: false, example: "admin@qq.com" })
+  @Transform(({ value }) => (value === "" ? undefined : value))
   @IsOptional() // 可选
   @IsEmail({}, { message: "邮箱格式错误" })
   email?: string;
 
   @ApiProperty({ description: "手机号", required: false, example: "13800138000" })
+  @Transform(({ value }) => (value === "" ? undefined : value))
   @IsOptional()
   @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" }) // 正则校验
   phone?: string;
@@ -81,12 +84,15 @@ export class FindUserDto extends FindByParameter {
   @IsString()
   nickName?: string | undefined;
 
+  // Transform 空值处理
   @ApiProperty({ type: "string", description: "邮箱", required: false, example: "admin@qq.com" })
+  @Transform(({ value }) => (value === "" ? undefined : value))
   @IsOptional()
   @IsEmail({}, { message: "邮箱格式错误" })
   email?: string | undefined;
 
   @ApiProperty({ type: "string", description: "手机号", required: false, example: "13800138000" })
+  @Transform(({ value }) => (value === "" ? undefined : value))
   @IsOptional()
   @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" })
   phone?: string | undefined;
