@@ -48,7 +48,7 @@ export class defaultData implements OnApplicationBootstrap {
       const password = await bcryptService.encryptStr("123456");
       const admin = await this.roleRepository.findOne({ where: { roleKey: "admin" } }); // 获取角色
       const web = await this.roleRepository.findOne({ where: { roleKey: "web" } }); // 获取角色
-      const users = [
+      const defaultData = [
         {
           account: "admin",
           nickName: "管理员",
@@ -71,6 +71,7 @@ export class defaultData implements OnApplicationBootstrap {
         },
       ];
 
+      const users = defaultData.map((item) => this.roleRepository.create(item));
       await this.userRepository.save(users); // 插入数据
     }
   }
@@ -82,7 +83,7 @@ export class defaultData implements OnApplicationBootstrap {
       const route1 = await this.routeRepository.find({ where: { platform: "admin" } }); // 获取路由
       const route2 = await this.routeRepository.find({ where: { platform: "web" } }); // 获取路由
       // 如果没有角色，插入默认数据
-      const roles = [
+      const defaultData = [
         {
           name: "超级管理员",
           roleKey: "admin",
@@ -98,6 +99,7 @@ export class defaultData implements OnApplicationBootstrap {
           routes: route2,
         },
       ];
+      const roles = defaultData.map((item) => this.routeRepository.create(item));
       await this.roleRepository.save(roles); // 插入数据
     }
   }
@@ -107,7 +109,7 @@ export class defaultData implements OnApplicationBootstrap {
     const count = await this.routeRepository.count();
     if (count === 0) {
       // 系统管理
-      const system = await this.routeRepository.save({
+      const systemData = this.routeRepository.create({
         platform: "admin",
         type: "menu",
         name: "system",
@@ -118,9 +120,10 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "/system/route",
         meta: "",
       });
+      const system = await this.routeRepository.save(systemData);
 
       // 路由管理
-      const route = await this.routeRepository.save({
+      const routeData = this.routeRepository.create({
         platform: "admin",
         type: "menu",
         name: "route",
@@ -132,9 +135,10 @@ export class defaultData implements OnApplicationBootstrap {
         meta: "",
         parent: system,
       });
+      const route = await this.routeRepository.save(routeData);
 
       // 用户管理
-      const user = await this.routeRepository.save({
+      const userData = this.routeRepository.create({
         platform: "admin",
         type: "menu",
         name: "user",
@@ -146,9 +150,10 @@ export class defaultData implements OnApplicationBootstrap {
         meta: "",
         parent: system,
       });
-      
+      const user = await this.routeRepository.save(userData);
+
       // 最后一级路由
-      const routes = [
+      const routesData = [
         {
           platform: "admin",
           type: "menu",
@@ -203,7 +208,7 @@ export class defaultData implements OnApplicationBootstrap {
         },
         {
           platform: "admin",
-          type: "menu", 
+          type: "menu",
           name: "userWeb",
           title: "web用户",
           path: "/system/user/web",
@@ -227,6 +232,7 @@ export class defaultData implements OnApplicationBootstrap {
           meta: "",
         },
       ];
+      const routes = routesData.map((item) => this.routeRepository.create(item));
       await this.routeRepository.save(routes); // 插入数据
     }
   }
@@ -235,7 +241,8 @@ export class defaultData implements OnApplicationBootstrap {
   private async seedDictionary() {
     const count = await this.dictionaryRepository.count();
     if (count === 0) {
-      const dictionaries = [
+      // 插入字典类型
+      const dictionariesData = [
         {
           type: "platform",
           name: "平台",
@@ -252,10 +259,11 @@ export class defaultData implements OnApplicationBootstrap {
           description: "公共状态:State的具体值（启用禁用）",
         },
       ];
-      // 插入字段项目数据
+      const dictionaries = dictionariesData.map((item) => this.dictionaryRepository.create(item));
       const dictionaryList = await this.dictionaryRepository.save(dictionaries);
 
-      const dictionariesItem = [
+      // 插入字典项
+      const dictionariesItemData = [
         {
           category: dictionaryList[0],
           label: "后台",
@@ -300,6 +308,7 @@ export class defaultData implements OnApplicationBootstrap {
         },
       ];
 
+      const dictionariesItem = dictionariesItemData.map((item) => this.dictionaryItemRepository.create(item));
       await this.dictionaryItemRepository.save(dictionariesItem); // 插入数据
     }
   }
