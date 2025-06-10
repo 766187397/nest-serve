@@ -58,13 +58,14 @@ export class RoutesService extends BaseService {
   /**
    * 查询所有路由
    * @param {FindRouteDto} findRouteDto 查询条件
+   * @param {string} platform 平台标识（如admin/web/app/mini等）
    * @returns {Promise<ApiResult<Route[] | null>>} 统一返回结果
    */
-  async findAll(findRouteDto: FindRouteDto): Promise<ApiResult<Route[] | null>> {
+  async findAll(findRouteDto: FindRouteDto, platform: string = "admin"): Promise<ApiResult<Route[] | null>> {
     try {
       let order = this.buildCommonSort(findRouteDto?.sort);
       let data = await this.routeRepository.find({
-        where: { parent: IsNull(), platform: findRouteDto.platform },
+        where: { parent: IsNull(), platform },
         order: { ...order },
         relations: ["children"],
       });

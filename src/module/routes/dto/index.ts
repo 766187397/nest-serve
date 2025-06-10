@@ -89,11 +89,6 @@ export class UpdateRouteDto extends RouteOptionalDto {
 }
 
 export class FindRouteDto extends FindByParameter {
-  @ApiProperty({ description: "平台标识（如admin/web/app/mini等）", required: false })
-  @IsOptional()
-  @IsString({ message: "平台必须为字符串" })
-  platform?: string;
-
   @ApiProperty({ description: "路由类型：菜单/按钮/API等", required: false })
   @IsOptional()
   @IsString({ message: "路由类型必须为字符串" })

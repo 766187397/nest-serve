@@ -24,10 +24,16 @@ export class RoutesController {
     return this.routesService.create(createRouteDto);
   }
 
-  @Get("all")
-  @ApiOperation({ summary: "查询所有路由" })
-  findAll(@Query() findRouteDto: FindRouteDto) {
-    return this.routesService.findAll(findRouteDto);
+  @Get("all/admin")
+  @ApiOperation({ summary: "查询admin所有路由" })
+  findAllAdmin(@Query() findRouteDto: FindRouteDto) {
+    return this.routesService.findAll(findRouteDto, "admin");
+  }
+
+  @Get("all/web")
+  @ApiOperation({ summary: "查询web所有路由" })
+  findAllWeb(@Query() findRouteDto: FindRouteDto) {
+    return this.routesService.findAll(findRouteDto, "web");
   }
 
   @Get("info/:id")
