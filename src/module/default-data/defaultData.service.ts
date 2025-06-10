@@ -71,7 +71,7 @@ export class defaultData implements OnApplicationBootstrap {
         },
       ];
 
-      const users = defaultData.map((item) => this.roleRepository.create(item));
+      const users = defaultData.map((item) => this.userRepository.create(item));
       await this.userRepository.save(users); // 插入数据
     }
   }
@@ -99,7 +99,7 @@ export class defaultData implements OnApplicationBootstrap {
           routes: route2,
         },
       ];
-      const roles = defaultData.map((item) => this.routeRepository.create(item));
+      const roles = defaultData.map((item) => this.roleRepository.create(item));
       await this.roleRepository.save(roles); // 插入数据
     }
   }
