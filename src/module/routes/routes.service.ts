@@ -24,14 +24,15 @@ export class RoutesService extends BaseService {
   /**
    * 创建路由
    * @param {CreateRouteDto} createRouteDto 路由信息
+   * @param {string} platform 路由信息
    * @returns { ApiResult<null> } 统一返回结果
    */
-  async create(createRouteDto: CreateRouteDto): Promise<ApiResult<null>> {
+  async create(createRouteDto: CreateRouteDto, platform: string = "admin"): Promise<ApiResult<null>> {
     try {
       let parent: Route | null = null;
       if (createRouteDto.parentId) {
         parent = await this.routeRepository.findOne({
-          where: { id: createRouteDto.parentId, platform: createRouteDto.platform },
+          where: { id: createRouteDto.parentId, platform },
           relations: ["children"],
         });
         if (!parent) {
@@ -39,7 +40,7 @@ export class RoutesService extends BaseService {
         }
       }
       const routeInfo = await this.routeRepository.findOne({
-        where: { name: createRouteDto.name, platform: createRouteDto.platform },
+        where: { name: createRouteDto.name, platform },
       });
       if (routeInfo) {
         return ApiResult.error<null>(`路由${routeInfo.name}已存在`);

@@ -25,10 +25,10 @@ import { User } from "@/module/users/entities/user.entity";
 export class RoutesController {
   constructor(private readonly routesService: RoutesService) {}
 
-  @Post("create")
+  @Post("create/:platform")
   @ApiOperation({ summary: "创建路由" })
-  create(@Body() createRouteDto: CreateRouteDto) {
-    return this.routesService.create(createRouteDto);
+  create(@Param("platform") platform: string, @Body() createRouteDto: CreateRouteDto) {
+    return this.routesService.create(createRouteDto, platform);
   }
 
   @Get("all/:platform")
