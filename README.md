@@ -160,3 +160,21 @@ nest-serve
 └── tsconfig.json
 ```
 
+
+
+
+
+## 根实体定义
+
+> common/entities/base
+>
+> 项目的实体都继承与这个跟实体
+
+**重点字段**
+
+- id：唯一标识
+  - 自增标识，存储大小较小、查询速度快
+- uuid：生成的标识
+  - uuid生成的唯一标识标识，特殊隐私信息或特殊信息的接口可以使用也方便多数据库存储，当前demo未使用，与id查询一样
+- platform：平台标识：admin/web/app/mini
+

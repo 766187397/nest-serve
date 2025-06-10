@@ -14,7 +14,7 @@ export abstract class BaseEntity {
   @PrimaryGeneratedColumn({ comment: "ID" })
   id: number;
 
-  @Column({ type: "text", length: 36, comment: "排序" })
+  @Column({ type: "text", length: 36, comment: "uuid" })
   uuid: string;
 
   @Column({ default: 1, comment: "排序" })
