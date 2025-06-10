@@ -1,10 +1,21 @@
-import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  BeforeInsert,
+} from "typeorm";
 import { Exclude, Transform } from "class-transformer";
 import * as dayjs from "dayjs";
+import { v4 as uuidv4 } from "uuid";
 
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn({ comment: "ID" })
   id: number;
+
+  @Column({ type: "text", length: 36, comment: "排序" })
+  uuid: string;
 
   @Column({ default: 1, comment: "排序" })
   sort: number;
@@ -28,4 +39,11 @@ export abstract class BaseEntity {
   @Exclude({ toPlainOnly: true })
   // @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
   deletedAt: Date;
+
+  @BeforeInsert()
+  generateId() {
+    if (!this.uuid) {
+      this.uuid = uuidv4();
+    }
+  }
 }

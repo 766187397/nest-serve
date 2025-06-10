@@ -167,7 +167,7 @@ export class NoticeService extends BaseService {
       if (!notice) {
         return ApiResult.error<null>("通知不存在");
       }
-      notice = { ...notice, ...updateNoticeDto };
+      Object.assign(notice, updateNoticeDto);
       let data = await this.noticeRepository.save(notice);
       return ApiResult.success<Notice>({ data });
     } catch (error) {

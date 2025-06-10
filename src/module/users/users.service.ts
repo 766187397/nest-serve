@@ -176,7 +176,7 @@ export class UsersService extends BaseService {
       if (!userInfo) {
         return ApiResult.error("用户不存在");
       }
-      userInfo = { ...userInfo, ...updateUserDto };
+      Object.assign(userInfo, updateUserDto);
       // 查询角色
       if (updateUserDto.roleIds && updateUserDto.roleIds.length > 0) {
         const roles = await this.roleRepository.find({

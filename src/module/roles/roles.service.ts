@@ -158,7 +158,8 @@ export class RolesService extends BaseService {
       if (!role) {
         return ApiResult.error("角色不存在");
       }
-      role = { ...role, ...updateRoleDto };
+      // role = { ...role, ...updateRoleDto };
+      Object.assign(role, updateRoleDto);
       if (updateRoleDto.routeIds) {
         role.routes = await this.routeRepository.find({ where: { id: In(updateRoleDto.routeIds) } });
       }
