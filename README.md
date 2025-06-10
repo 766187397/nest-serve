@@ -40,6 +40,9 @@ node版本>=20
   - mini：小程序
   - app：安卓/iOS等
 - *：具体的模块接口
+- 特殊后缀：后台还需要查询其他平台的数据，后台的大部分接口需要加上平台标识
+  - 例如：all/:platform，platform：admin/web/mini/app等
+
 
 
 

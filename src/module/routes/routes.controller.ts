@@ -1,11 +1,18 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res } from "@nestjs/common";
 import { RoutesService } from "./routes.service";
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from "./dto";
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request, Response } from "express";
 import { User } from "@/module/users/entities/user.entity";
 
 @ApiTags("admin - 路由管理")
+@ApiParam({
+  name: "platform",
+  required: true,
+  description: "带有/:platform的参数。平台标识，如:admin/web/mini/app",
+  example: "admin",
+  enum: ["admin", "web", "mini", "app"],
+})
 // @ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
@@ -24,16 +31,10 @@ export class RoutesController {
     return this.routesService.create(createRouteDto);
   }
 
-  @Get("all/admin")
-  @ApiOperation({ summary: "查询admin所有路由" })
-  findAllAdmin(@Query() findRouteDto: FindRouteDto) {
-    return this.routesService.findAll(findRouteDto, "admin");
-  }
-
-  @Get("all/web")
-  @ApiOperation({ summary: "查询web所有路由" })
-  findAllWeb(@Query() findRouteDto: FindRouteDto) {
-    return this.routesService.findAll(findRouteDto, "web");
+  @Get("all/:platform")
+  @ApiOperation({ summary: "查询所有路由" })
+  findAllAdmin(@Param("platform") platform: string, @Query() findRouteDto: FindRouteDto) {
+    return this.routesService.findAll(findRouteDto, platform);
   }
 
   @Get("info/:id")
