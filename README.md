@@ -42,8 +42,12 @@ node版本>=20
 - *：具体的模块接口
 - 特殊后缀：后台还需要查询其他平台的数据，后台的大部分接口需要加上平台标识
   - all/:platform
+  - info/:platform/:uuid
+    - platform：一般使用uuid和id不会怎么使用platform
+    - uuid：通常非admin一般使用uuid
   - info/:platform/:id
     - platform少见，一般使用uuid和id不会怎么使用platform
+    - id：通常非admin一般使用id
   - platform：admin/web/mini/app等
 
 
