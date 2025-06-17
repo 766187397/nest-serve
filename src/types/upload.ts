@@ -3,7 +3,7 @@ export interface UploadFile {
   url: string;
   fileName: any;
   size: any;
-  id: number;
+  id: string;
   sort: number;
   status: number;
   platform: string;

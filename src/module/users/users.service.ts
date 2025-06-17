@@ -144,11 +144,11 @@ export class UsersService extends BaseService {
 
   /**
    * 通过ID查询详情
-   * @param {number} id
+   * @param {string} id
    * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<User | null>>} 统一返回结果
    */
-  async findOne(id: number, platform: string = "admin"): Promise<ApiResult<User | null>> {
+  async findOne(id: string, platform: string = "admin"): Promise<ApiResult<User | null>> {
     try {
       let data = await this.userRepository.findOne({ where: { id, platform } });
       if (!data) {
@@ -162,11 +162,11 @@ export class UsersService extends BaseService {
 
   /**
    * 修改用户信息
-   * @param {number} id 用户ID
+   * @param {string} id 用户ID
    * @param updateUserDto 更新用户信息
    * @returns {Promise<ApiResult<User | null>>} 统一返回结果
    */
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<ApiResult<User | null>> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<ApiResult<User | null>> {
     try {
       // 查询用户
       let userInfo = await this.userRepository.findOne({
@@ -202,10 +202,10 @@ export class UsersService extends BaseService {
 
   /**
    * 删除用户信息
-   * @param {number} id 用户ID
+   * @param {string} id 用户ID
    * @returns {Promise<ApiResult<UpdateResult | null>>} 统一返回结果
    */
-  async remove(id: number): Promise<ApiResult<UpdateResult | null>> {
+  async remove(id: string): Promise<ApiResult<UpdateResult | null>> {
     try {
       let data = await this.userRepository.softDelete(id);
       return ApiResult.success<UpdateResult>({ data });

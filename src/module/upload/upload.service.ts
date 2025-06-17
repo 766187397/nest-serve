@@ -122,7 +122,7 @@ export class UploadService extends BaseService {
    * @param id 文件ID
    * @returns {Promise<ApiResult<UploadFile | null>>} 统一返回结果
    */
-  async getFileById(id: number): Promise<ApiResult<UploadFile | null>> {
+  async getFileById(id: string): Promise<ApiResult<UploadFile | null>> {
     try {
       const file = await this.upload.findOne({ where: { id } });
       if (!file) {
@@ -146,7 +146,7 @@ export class UploadService extends BaseService {
    * @param id 文件ID
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async deleteFileById(id: number): Promise<ApiResult<null>> {
+  async deleteFileById(id: string): Promise<ApiResult<null>> {
     try {
       await this.upload.softDelete(id);
       return ApiResult.success<null>({

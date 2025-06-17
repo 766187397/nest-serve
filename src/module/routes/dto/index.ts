@@ -21,7 +21,7 @@ class RouteOptionalDto extends CreateBaseDto {
   @ApiProperty({ description: "父级路由id", required: false })
   @IsOptional()
   @IsInt({ message: "父级路由id必须为数字" })
-  parentId?: number;
+  parentId?: string;
 
   @ApiProperty({ description: "是否为外链", default: false, required: false })
   @IsOptional()

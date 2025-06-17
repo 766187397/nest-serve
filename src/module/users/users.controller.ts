@@ -42,19 +42,19 @@ export class UsersController {
   @Get("info/:id")
   @ApiOperation({ summary: "查询用户详情" })
   findOne(@Param("id") id: string) {
-    return this.usersService.findOne(+id, "admin");
+    return this.usersService.findOne(id, "admin");
   }
 
   @Patch("update/:id")
   @ApiOperation({ summary: "更新用户信息" })
   update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete("delete/:id")
   @ApiOperation({ summary: "删除用户" })
   remove(@Param("id") id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 
   @Post("logIn")

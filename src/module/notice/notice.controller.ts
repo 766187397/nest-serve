@@ -45,18 +45,18 @@ export class NoticeController {
   @Get("info/:id")
   @ApiOperation({ summary: "获取公告" })
   findOne(@Param("id") id: string) {
-    return this.noticeService.findOne(+id);
+    return this.noticeService.findOne(id);
   }
 
   @Patch("update/:id")
   @ApiOperation({ summary: "更新公告" })
   update(@Param("id") id: string, @Body() updateNoticeDto: UpdateNoticeDto) {
-    return this.noticeService.update(+id, updateNoticeDto);
+    return this.noticeService.update(id, updateNoticeDto);
   }
 
   @Delete("delete/:id")
   @ApiOperation({ summary: "删除公告" })
   remove(@Param("id") id: string) {
-    return this.noticeService.remove(+id);
+    return this.noticeService.remove(id);
   }
 }

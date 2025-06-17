@@ -107,10 +107,10 @@ export class DictionaryService extends BaseService {
 
   /**
    * 查询单个字典分类
-   * @param {number} id   id
+   * @param {string} id   id
    * @returns {Promise<ApiResult<Dictionary | null>>}    统一返回结果
    */
-  async findOne(id: number): Promise<ApiResult<Dictionary | null>> {
+  async findOne(id: string): Promise<ApiResult<Dictionary | null>> {
     try {
       let data = await this.dictionaryRepository.findOne({ where: { id } });
       return ApiResult.success<Dictionary>({ data });
@@ -121,11 +121,11 @@ export class DictionaryService extends BaseService {
 
   /**
    * 更新字典分类
-   * @param {number} id   id
+   * @param {string} id   id
    * @param {UpdateDictionaryDto} updateDictionaryDto   更新字典分类DTO
    * @returns {Promise<ApiResult<null>>}   统一返回结果
    */
-  async update(id: number, updateDictionaryDto: UpdateDictionaryDto): Promise<ApiResult<null>> {
+  async update(id: string, updateDictionaryDto: UpdateDictionaryDto): Promise<ApiResult<null>> {
     try {
       await this.dictionaryRepository.update(id, updateDictionaryDto);
       return ApiResult.success<null>();
@@ -139,7 +139,7 @@ export class DictionaryService extends BaseService {
    * @param id   id
    * @returns {Promise<ApiResult<null>>}   统一返回结果
    */
-  async remove(id: number): Promise<ApiResult<null>> {
+  async remove(id: string): Promise<ApiResult<null>> {
     try {
       await this.dictionaryRepository.delete(id);
       return ApiResult.success<null>();
@@ -263,14 +263,14 @@ export class DictionaryService extends BaseService {
 
   /**
    * 通过id查询字典项
-   * @param {number} id   id
+   * @param {string} id   id
    * @returns {Promise<ApiResult<DictionaryItem | null>>}    统一返回结果
    */
-  async findItemOne(id: number): Promise<ApiResult<DictionaryItem | null>> {
+  async findItemOne(id: string): Promise<ApiResult<DictionaryItem | null>> {
     try {
       let data = await this.dictionaryItemRepository.findOne({
         where: {
-          id: 1,
+          id,
         },
       });
       return ApiResult.success<DictionaryItem>({ data });
@@ -281,11 +281,11 @@ export class DictionaryService extends BaseService {
 
   /**
    * 更新字典项
-   * @param {number} id   id
+   * @param {string} id   id
    * @param {UpdateDictionaryItemDto} updateDictionaryItemDto   更新字典项DTO
    * @returns {Promise<ApiResult<null>>}   统一返回结果
    */
-  async updateItem(id: number, updateDictionaryItemDto: UpdateDictionaryItemDto): Promise<ApiResult<null>> {
+  async updateItem(id: string, updateDictionaryItemDto: UpdateDictionaryItemDto): Promise<ApiResult<null>> {
     try {
       let data = await this.dictionaryItemRepository.update(id, updateDictionaryItemDto);
       return ApiResult.success<null>();
@@ -296,10 +296,10 @@ export class DictionaryService extends BaseService {
 
   /**
    * 删除字典项
-   * @param {number} id   id
+   * @param {string} id   id
    * @returns {Promise<ApiResult<null>>}   统一返回结果
    */
-  async removeItem(id: number): Promise<ApiResult<null>> {
+  async removeItem(id: string): Promise<ApiResult<null>> {
     try {
       await this.dictionaryItemRepository.softDelete(id);
       return ApiResult.success<null>();

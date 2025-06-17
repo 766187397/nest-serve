@@ -5,17 +5,18 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   BeforeInsert,
+  PrimaryColumn,
 } from "typeorm";
 import { Exclude, Transform } from "class-transformer";
 import * as dayjs from "dayjs";
 import { v4 as uuidv4 } from "uuid";
 
 export abstract class BaseEntity {
-  @PrimaryGeneratedColumn({ comment: "ID" })
-  id: number;
+  // @PrimaryGeneratedColumn({ comment: "ID" })
+  // id: string;
 
-  @Column({ type: "text", length: 36, comment: "uuid" })
-  uuid: string;
+  @PrimaryColumn({ type: "text", length: 36, comment: "uuid" })
+  id: string;
 
   @Column({ default: 1, comment: "排序" })
   sort: number;
@@ -42,8 +43,8 @@ export abstract class BaseEntity {
 
   @BeforeInsert()
   generateId() {
-    if (!this.uuid) {
-      this.uuid = uuidv4();
+    if (!this.id) {
+      this.id = uuidv4();
     }
   }
 }

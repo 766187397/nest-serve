@@ -78,7 +78,7 @@ export class NoticeService extends BaseService {
     findNoticeDtoByPageByUserOrRole: FindNoticeDtoByPageByUserOrRole,
     platform: string,
     roleKeys: string[] | undefined,
-    userId: number
+    userId: string
   ): Promise<ApiResult<PageApiResult<NoticeByPageByUserOrRole[]> | null>> {
     try {
       let { take, skip } = this.buildCommonPaging(
@@ -143,10 +143,10 @@ export class NoticeService extends BaseService {
 
   /**
    * 通过id查看详情
-   * @param {number} id
+   * @param {string} id
    * @returns { Promise<ApiResult<Notice | null>>} 统一返回结果
    */
-  async findOne(id: number): Promise<ApiResult<Notice | null>> {
+  async findOne(id: string): Promise<ApiResult<Notice | null>> {
     try {
       let data = await this.noticeRepository.findOne({ where: { id } });
       return ApiResult.success<Notice | null>({ data });
@@ -157,11 +157,11 @@ export class NoticeService extends BaseService {
 
   /**
    * 更新通知
-   * @param {number} id
+   * @param {string} id
    * @param {UpdateNoticeDto} updateNoticeDto
    * @returns { Promise<ApiResult<Notice | null>>} 统一返回结果
    */
-  async update(id: number, updateNoticeDto: UpdateNoticeDto): Promise<ApiResult<Notice | null>> {
+  async update(id: string, updateNoticeDto: UpdateNoticeDto): Promise<ApiResult<Notice | null>> {
     try {
       let notice = await this.noticeRepository.findOne({ where: { id } });
       if (!notice) {
@@ -177,10 +177,10 @@ export class NoticeService extends BaseService {
 
   /**
    * 删除通知
-   * @param {number} id
+   * @param {string} id
    * @returns { Promise<ApiResult<null>>} 统一返回结果
    */
-  async remove(id: number): Promise<ApiResult<null>> {
+  async remove(id: string): Promise<ApiResult<null>> {
     try {
       await this.noticeRepository.softDelete(id);
       return ApiResult.success<null>({});

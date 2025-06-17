@@ -15,4 +15,4 @@ export interface RoleRoutes {
   children?: RoleRoutes[];
 }
 
-export type RouteInfo = ({ parentId?: number } & Route) | null;
+export type RouteInfo = ({ parentId?: string } & Route) | null;

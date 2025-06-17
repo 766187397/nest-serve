@@ -82,10 +82,10 @@ export class RoutesService extends BaseService {
 
   /**
    * 通过id查询详情
-   * @param {number} id 路由的id
+   * @param {string} id 路由的id
    * @returns
    */
-  async findOne(id: number): Promise<ApiResult<Route | null>> {
+  async findOne(id: string): Promise<ApiResult<Route | null>> {
     try {
       let data: RouteInfo = await this.routeRepository.findOne({
         where: { id },
@@ -102,11 +102,11 @@ export class RoutesService extends BaseService {
 
   /**
    * 路由信息修改
-   * @param {number} id 路由id
+   * @param {string} id 路由id
    * @param {UpdateRouteDto} updateRouteDto 路由信息
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(id: number, updateRouteDto: UpdateRouteDto): Promise<ApiResult<null>> {
+  async update(id: string, updateRouteDto: UpdateRouteDto): Promise<ApiResult<null>> {
     try {
       // 查询当前路由是否存在
       let route = await this.routeRepository.findOne({
@@ -147,10 +147,10 @@ export class RoutesService extends BaseService {
 
   /**
    * 删除路由信息
-   * @param {number} id 路由id
+   * @param {string} id 路由id
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async remove(id: number): Promise<ApiResult<null>> {
+  async remove(id: string): Promise<ApiResult<null>> {
     try {
       await this.routeRepository.softDelete(id);
       return ApiResult.success<null>();
@@ -161,13 +161,13 @@ export class RoutesService extends BaseService {
 
   /**
    * 通过角色存在，则返回角色下的所有路由信息
-   * @param {number[]} rolesIds 角色ID数组
+   * @param {string[]} rolesIds 角色ID数组
    * @param {string} platform 平台标识
    * @param {string} type 路由类型
    * @returns {Promise<ApiResult<RoleRoutes[] | null>>} 统一返回结果
    */
   async getRoutesByRoleId(
-    rolesIds: number[],
+    rolesIds: string[],
     platform: string = "admin",
     type?: string
   ): Promise<ApiResult<RoleRoutes[] | null>> {

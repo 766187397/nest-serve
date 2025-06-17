@@ -46,19 +46,19 @@ export class DictionaryController {
   @Get("info/:id")
   @ApiOperation({ summary: "查询字典分类详情" })
   findOne(@Param("id") id: string) {
-    return this.dictionaryService.findOne(+id);
+    return this.dictionaryService.findOne(id);
   }
 
   @Patch("update/:id")
   @ApiOperation({ summary: "更新字典分类信息" })
   update(@Param("id") id: string, @Body() updateDictionaryDto: UpdateDictionaryDto) {
-    return this.dictionaryService.update(+id, updateDictionaryDto);
+    return this.dictionaryService.update(id, updateDictionaryDto);
   }
 
   @Delete("delete/:id")
   @ApiOperation({ summary: "删除字典分类" })
   remove(@Param("id") id: string) {
-    return this.dictionaryService.remove(+id);
+    return this.dictionaryService.remove(id);
   }
 }
 
@@ -95,18 +95,18 @@ export class DictionaryItemController {
   @Get("info/:id")
   @ApiOperation({ summary: "查询字典项详情" })
   findOne(@Param("id") id: string) {
-    return this.dictionaryService.findItemOne(+id);
+    return this.dictionaryService.findItemOne(id);
   }
 
   @Patch("update/:id")
   @ApiOperation({ summary: "更新字典项信息" })
   update(@Param("id") id: string, @Body() updateDictionaryItemDto: UpdateDictionaryItemDto) {
-    return this.dictionaryService.updateItem(+id, updateDictionaryItemDto);
+    return this.dictionaryService.updateItem(id, updateDictionaryItemDto);
   }
 
   @Delete("delete/:id")
   @ApiOperation({ summary: "删除字典项" })
   remove(@Param("id") id: string) {
-    return this.dictionaryService.removeItem(+id);
+    return this.dictionaryService.removeItem(id);
   }
 }

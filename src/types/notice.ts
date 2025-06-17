@@ -1,5 +1,5 @@
 export interface NoticeByPageByUserOrRole {
-  id: number;
+  id: string;
   content?: string | undefined;
   title: string;
   type: string;

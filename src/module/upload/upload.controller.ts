@@ -48,14 +48,14 @@ export class UploadController {
   @Get(":id")
   @ApiParam({ name: "id", required: true, description: "文件 ID" })
   @ApiOperation({ summary: "根据id获取文件" })
-  getFileById(@Query("id") id: number) {
+  getFileById(@Query("id") id: string) {
     return this.uploadService.getFileById(id);
   }
 
   @Delete(":id")
   @ApiOperation({ summary: "根据id删除文件" })
   @ApiParam({ name: "id", required: true, description: "文件 ID" })
-  deleteFileById(@Param("id") id: number) {
+  deleteFileById(@Param("id") id: string) {
     return this.uploadService.deleteFileById(id);
   }
 }

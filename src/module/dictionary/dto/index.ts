@@ -57,7 +57,7 @@ export class CreateDictionaryItemDto extends DictionaryItemOptionalDto {
   @ApiProperty({ description: "字典分类id" })
   @IsNotEmpty({ message: "字典分类id是必填项" })
   @IsNumber({}, { message: "字典分类id必须是数字" })
-  categoryId: number;
+  categoryId: string;
 
   @ApiProperty({ description: "字典项名称" })
   @IsNotEmpty({ message: "字典项名称是必填项" })

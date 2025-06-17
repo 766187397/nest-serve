@@ -6,7 +6,7 @@ export interface UserLogin {
     phone: string;
     sex: string;
     avatar: string;
-    id: number;
+    id: string;
     sort: number;
     status: number;
     platform?: string;
