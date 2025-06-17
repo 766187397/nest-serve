@@ -258,6 +258,11 @@ export class defaultData implements OnApplicationBootstrap {
           name: "公共状态",
           description: "公共状态:State的具体值（启用禁用）",
         },
+        {
+          type: "userSex",
+          name: "用户性别",
+          description: "用户性别:0未知 1男 2女",
+        },
       ];
       const dictionaries = dictionariesData.map((item) => this.dictionaryRepository.create(item));
       const dictionaryList = await this.dictionaryRepository.save(dictionaries);
@@ -305,6 +310,24 @@ export class defaultData implements OnApplicationBootstrap {
           label: "禁用",
           value: "0",
           description: "公共状态：禁用",
+        },
+        {
+          category: dictionaryList[3],
+          label: "未知",
+          value: "0",
+          description: "用户性别:未知",
+        },
+        {
+          category: dictionaryList[3],
+          label: "男",
+          value: "1",
+          description: "用户性别:男",
+        },
+        {
+          category: dictionaryList[3],
+          label: "女",
+          value: "2",
+          description: "用户性别:女",
         },
       ];
 

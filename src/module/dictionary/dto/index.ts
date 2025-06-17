@@ -100,7 +100,7 @@ export class FindDictionaryItemDto extends FindByParameter {
   @IsOptional()
   categoryId?: string;
 
-  @ApiProperty({ type: "string", description: "字典分类id" })
+  @ApiProperty({ type: "string", description: "字典分类型名称" })
   @IsString({ message: "字典分类type必须是字符串" })
   @IsOptional()
   type?: string;
