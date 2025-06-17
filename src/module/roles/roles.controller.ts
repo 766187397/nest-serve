@@ -18,22 +18,22 @@ import { Roles } from "./roles.decorator";
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
-  @Post("create")
+  @Post("create/:platform")
   @ApiOperation({ summary: "创建角色" })
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.rolesService.create(createRoleDto, "admin");
+  create(@Param("platform") platform: string, @Body() createRoleDto: CreateRoleDto) {
+    return this.rolesService.create(createRoleDto, platform);
   }
 
-  @Get("page")
+  @Get("page/:platform")
   @ApiOperation({ summary: "查询角色列表(分页)" })
-  findByPage(@Query(new FilterEmptyPipe()) findRoleDtoByPage: FindRoleDtoByPage) {
-    return this.rolesService.findByPage(findRoleDtoByPage, "admin");
+  findByPage(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findRoleDtoByPage: FindRoleDtoByPage) {
+    return this.rolesService.findByPage(findRoleDtoByPage, platform);
   }
 
-  @Get("all")
+  @Get("all/:platform")
   @ApiOperation({ summary: "查询角色列表(不分页)" })
-  findAll(@Body() findRoleDto: FindRoleDto) {
-    return this.rolesService.findAll(findRoleDto, "admin");
+  findAll(@Param("platform") platform: string, @Body() findRoleDto: FindRoleDto) {
+    return this.rolesService.findAll(findRoleDto, platform);
   }
 
   @Get(":id")
