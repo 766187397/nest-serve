@@ -108,8 +108,25 @@ export class defaultData implements OnApplicationBootstrap {
   private async seedRoutes() {
     const count = await this.routeRepository.count();
     if (count === 0) {
+      //#region admin路由数据
+      // 首页
+      const adminHomeData = this.routeRepository.create({
+        platform: "web",
+        type: "menu",
+        name: "home",
+        title: "首页",
+        path: "/home",
+        component: "home/Index",
+        icon: "HomeFilled",
+        externalLinks: false,
+        redirect: "",
+        meta: "",
+      });
+
+      await this.routeRepository.save(adminHomeData);
+
       // 系统管理
-      const systemData = this.routeRepository.create({
+      const adminSystemData = this.routeRepository.create({
         platform: "admin",
         type: "menu",
         name: "system",
@@ -120,10 +137,10 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "/system/route",
         meta: "",
       });
-      const system = await this.routeRepository.save(systemData);
+      const adminSystem = await this.routeRepository.save(adminSystemData);
 
       // 路由管理
-      const routeData = this.routeRepository.create({
+      const adminRouteData = this.routeRepository.create({
         platform: "admin",
         type: "menu",
         name: "route",
@@ -133,40 +150,11 @@ export class defaultData implements OnApplicationBootstrap {
         externalLinks: false,
         redirect: "/system/route/admin",
         meta: "",
-        parent: system,
+        parent: adminSystem,
       });
-      const route = await this.routeRepository.save(routeData);
-
-      // 用户管理
-      const userData = this.routeRepository.create({
-        platform: "admin",
-        type: "menu",
-        name: "user",
-        title: "用户管理",
-        path: "/system/user",
-        icon: "User",
-        externalLinks: false,
-        redirect: "/system/user/admin",
-        meta: "",
-        parent: system,
-      });
-      const user = await this.routeRepository.save(userData);
-
-      // 最后一级路由
-      const routesData = [
-        {
-          platform: "admin",
-          type: "menu",
-          name: "home",
-          title: "首页",
-          path: "/home",
-          component: "home/Index",
-          icon: "HomeFilled",
-          externalLinks: false,
-          redirect: "",
-          meta: "",
-          sort: 2,
-        },
+      const adminRoute = await this.routeRepository.save(adminRouteData);
+      // 路由页面
+      const adminRoutePageData = this.routeRepository.create([
         {
           platform: "admin",
           type: "menu",
@@ -178,7 +166,7 @@ export class defaultData implements OnApplicationBootstrap {
           externalLinks: false,
           redirect: "",
           meta: "",
-          parent: route,
+          parent: adminRoute,
         },
         {
           platform: "admin",
@@ -191,8 +179,28 @@ export class defaultData implements OnApplicationBootstrap {
           externalLinks: false,
           redirect: "",
           meta: "",
-          parent: route,
+          parent: adminRoute,
         },
+      ]);
+      await this.routeRepository.save(adminRoutePageData);
+
+      // 用户管理
+      const userData = this.routeRepository.create({
+        platform: "admin",
+        type: "menu",
+        name: "user",
+        title: "用户管理",
+        path: "/system/user",
+        icon: "User",
+        externalLinks: false,
+        redirect: "/system/user/admin",
+        meta: "",
+        parent: adminSystem,
+      });
+      const user = await this.routeRepository.save(userData);
+
+      // 用户页面
+      const adminUserPageData = this.routeRepository.create([
         {
           platform: "admin",
           type: "menu",
@@ -219,21 +227,73 @@ export class defaultData implements OnApplicationBootstrap {
           meta: "",
           parent: user,
         },
+      ]);
+      await this.routeRepository.save(adminUserPageData);
+
+      // 角色管理
+      const adminRoleData = this.routeRepository.create({
+        platform: "admin",
+        type: "menu",
+        name: "role",
+        title: "角色管理",
+        path: "/system/role",
+        icon: "Lock",
+        externalLinks: false,
+        redirect: "/system/role/admin",
+        meta: "",
+        parent: adminSystem,
+      });
+      const role = await this.routeRepository.save(adminRoleData);
+
+      // 角色页面
+      const adminRolePageData = this.routeRepository.create([
         {
-          platform: "web",
+          platform: "admin",
           type: "menu",
-          name: "home",
-          title: "首页",
-          path: "/home",
-          component: "home/Index",
-          icon: "HomeFilled",
+          name: "roleAdmin",
+          title: "admin角色",
+          path: "/system/role/admin",
+          component: "system/role/Admin",
+          icon: "",
           externalLinks: false,
           redirect: "",
           meta: "",
+          parent: role,
         },
-      ];
-      const routes = routesData.map((item) => this.routeRepository.create(item));
-      await this.routeRepository.save(routes); // 插入数据
+        {
+          platform: "admin",
+          type: "menu",
+          name: "roleWeb",
+          title: "web角色",
+          path: "/system/role/web",
+          component: "system/role/Web",
+          icon: "",
+          externalLinks: false,
+          redirect: "",
+          meta: "",
+          parent: role,
+        },
+      ]);
+      await this.routeRepository.save(adminRolePageData);
+
+      //#endregion
+
+      //#region web路由数据
+      const webHomeData = this.routeRepository.create({
+        platform: "admin",
+        type: "menu",
+        name: "home",
+        title: "首页",
+        path: "/home",
+        component: "home/Index",
+        icon: "HomeFilled",
+        externalLinks: false,
+        redirect: "",
+        meta: "",
+        sort: 2,
+      });
+      await this.routeRepository.save(webHomeData);
+      //#endregion
     }
   }
 
