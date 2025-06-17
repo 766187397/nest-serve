@@ -27,11 +27,12 @@ export class UploadService extends BaseService {
       if (!file) {
         return ApiResult.error("文件不能为空！");
       }
-      const savedFile = await this.upload.save({
+      const fileData = this.upload.create({
         url: "/" + file.path.replace(/\\/g, "/"),
         fileName: file.filename,
         size: file.size,
       });
+      const savedFile = await this.upload.save(fileData);
       return ApiResult.success<UploadFile>({
         data: { ...savedFile, completePath: global.url + "/" + file.path.replace(/\\/g, "/") },
         message: "上传成功",
