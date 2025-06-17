@@ -57,16 +57,17 @@ export class CreateUserDto extends UserOptionalDto {
 export class UpdateUserDto extends UserOptionalDto {
   @ApiProperty({ description: "账号", example: "admin" })
   @IsOptional()
-  @IsString()
+  @IsString({ message: "账号字符串" })
   account?: string | undefined;
 
   @ApiProperty({ description: "昵称", example: "管理员" })
   @IsOptional()
-  @IsString()
+  @IsString({ message: "昵称字符串" })
   nickName?: string | undefined;
 
   @ApiProperty({ description: "密码", example: "123456" })
-  @IsString()
+  @IsOptional()
+  @IsString({ message: "密码字符串" })
   password?: string | undefined;
 }
 

@@ -175,6 +175,10 @@ export class UsersService extends BaseService {
       if (!userInfo) {
         return ApiResult.error("用户不存在");
       }
+      // 密码处理
+      if (updateUserDto.password === "") {
+        delete updateUserDto.password;
+      }
       Object.assign(userInfo, updateUserDto);
       // 查询角色
       if (updateUserDto.roleIds && updateUserDto.roleIds.length > 0) {
