@@ -21,28 +21,28 @@ import { UserLogin } from "@/types/user";
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post("create")
+  @Post("create/:platform")
   @ApiOperation({ summary: "创建用户" })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto, "admin");
+  create(@Param("platform") platform: string, @Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto, platform);
   }
 
-  @Get("page")
+  @Get("page/:platform")
   @ApiOperation({ summary: "查询用户列表(分页)" })
-  findByPage(@Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage) {
-    return this.usersService.findByPage(findUserDtoByPage, "admin");
+  findByPage(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage) {
+    return this.usersService.findByPage(findUserDtoByPage, platform);
   }
 
-  @Get("all")
+  @Get("all/:platform")
   @ApiOperation({ summary: "查询用户列表(不分页)" })
-  findAll(@Query(new FilterEmptyPipe()) findUserDto: FindUserDto) {
-    return this.usersService.findAll(findUserDto, "admin");
+  findAll(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findUserDto: FindUserDto) {
+    return this.usersService.findAll(findUserDto, platform);
   }
 
   @Get("info/:id")
   @ApiOperation({ summary: "查询用户详情" })
   findOne(@Param("id") id: string) {
-    return this.usersService.findOne(id, "admin");
+    return this.usersService.findOne(id);
   }
 
   @Patch("update/:id")

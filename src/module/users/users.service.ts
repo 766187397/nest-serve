@@ -145,12 +145,11 @@ export class UsersService extends BaseService {
   /**
    * 通过ID查询详情
    * @param {string} id
-   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<User | null>>} 统一返回结果
    */
-  async findOne(id: string, platform: string = "admin"): Promise<ApiResult<User | null>> {
+  async findOne(id: string): Promise<ApiResult<User | null>> {
     try {
-      let data = await this.userRepository.findOne({ where: { id, platform } });
+      let data = await this.userRepository.findOne({ where: { id } });
       if (!data) {
         return ApiResult.error<null>("用户不存在");
       }
