@@ -42,12 +42,8 @@ node版本>=20
 - *：具体的模块接口
 - 特殊后缀：后台还需要查询其他平台的数据，后台的大部分接口需要加上平台标识
   - all/:platform
-  - info/:platform/:uuid
-    - platform：一般使用uuid和id不会怎么使用platform
-    - uuid：通常非admin一般使用uuid
   - info/:platform/:id
-    - platform少见，一般使用uuid和id不会怎么使用platform
-    - id：通常非admin一般使用id
+    - platform少见，一般使用id不会怎么使用platform
   - platform：admin/web/mini/app等
 
 
@@ -173,8 +169,6 @@ nest-serve
 **重点字段**
 
 - id：唯一标识
-  - 自增标识，存储大小较小、查询速度快
-- uuid：生成的标识
-  - uuid生成的唯一标识标识，特殊隐私信息或特殊信息的接口可以使用也方便多数据库存储，当前demo未使用，与id查询一样
+  - 使用的uuid，方便使用多数据库，也防止修改id防止泄露其他的用户信息
 - platform：平台标识：admin/web/app/mini
 
