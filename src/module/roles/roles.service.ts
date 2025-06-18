@@ -136,7 +136,10 @@ export class RolesService extends BaseService {
    */
   async findOne(id: string, platform: string = "admin"): Promise<ApiResult<Role | null>> {
     try {
-      let data = await this.roleRepository.findOne({ where: { id, platform } });
+      let data = await this.roleRepository.findOne({
+        where: { id, platform },
+        relations: ["routes"],
+      });
       if (!data) {
         return ApiResult.error<null>("角色不存在");
       }

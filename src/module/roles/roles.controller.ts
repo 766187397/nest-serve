@@ -36,7 +36,7 @@ export class RolesController {
     return this.rolesService.findAll(findRoleDto, platform);
   }
 
-  @Get(":id")
+  @Get("info/:id")
   @ApiOperation({ summary: "查询角色详情" })
   findOne(@Param("id") id: string) {
     return this.rolesService.findOne(id);
