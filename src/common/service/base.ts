@@ -39,12 +39,12 @@ export class BaseService {
     const sortAll = ["ASC", "DESC", "asc", "desc"];
 
     if (typeof sort === "undefined") {
-      return { sort: "DESC", createdAt: "DESC", id: "DESC" };
+      return { sort: "DESC", createdAt: "DESC" };
     }
     if (sortAll.includes(sort as string)) {
-      return { sort: sort, createdAt: sort, id: sort };
+      return { sort: sort, createdAt: sort };
     }
-    return { sort: "DESC", createdAt: "DESC", id: "DESC" };
+    return { sort: "DESC", createdAt: "DESC" };
   }
 
   /**
