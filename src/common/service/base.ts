@@ -18,7 +18,7 @@ export class BaseService {
     }
     let time: string[] = [];
     if (typeof query.time === "string") {
-      time = query.time.split(/[\s,，、到至]+/);
+      time = query.time.split(/[,，、到至]+/);
     } else if (Array.isArray(query.time)) {
       time = query.time;
     }
