@@ -109,12 +109,19 @@ export class RoutesService extends BaseService {
   async update(id: string, updateRouteDto: UpdateRouteDto): Promise<ApiResult<null>> {
     try {
       // 查询当前路由是否存在
-      let route = await this.routeRepository.findOne({
+      const route = await this.routeRepository.findOne({
         where: { id },
         relations: ["children", "parent"],
       });
       if (!route) {
         return ApiResult.error("路由不存在");
+      }
+
+      const exist = await this.routeRepository.findOne({
+        where: { name: route.name },
+      });
+      if (exist) {
+        return ApiResult.error<null>(`路由${exist.name}已存在`);
       }
 
       // 如果有新的 parent，查询对应的父级路由

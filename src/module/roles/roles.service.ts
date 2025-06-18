@@ -3,7 +3,7 @@ import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from "./
 import { BaseService } from "@/common/service/base";
 import { Role } from "./entities/role.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Brackets, ILike, In, Repository, UpdateResult } from "typeorm";
+import { Brackets, ILike, In, Not, Repository, UpdateResult } from "typeorm";
 import { ApiResult } from "@/common/utils/result";
 import { PageApiResult } from "@/types/public";
 import { Route } from "@/module/routes/entities/route.entity";
@@ -154,10 +154,21 @@ export class RolesService extends BaseService {
    */
   async update(id: string, updateRoleDto: UpdateRoleDto): Promise<ApiResult<null>> {
     try {
-      let role = await this.roleRepository.findOne({ where: { id } });
+      const role = await this.roleRepository.findOne({ where: { id } });
       if (!role) {
         return ApiResult.error("角色不存在");
       }
+
+      const exist = await this.roleRepository.find({
+        where: [
+          { id: Not(id), name: role.name },
+          { id: Not(id), roleKey: role.roleKey },
+        ],
+      });
+      if (exist && exist.length > 0) {
+        return ApiResult.error("角色名称或角色标识已存在");
+      }
+
       // role = { ...role, ...updateRoleDto };
       Object.assign(role, updateRoleDto);
       if (updateRoleDto.routeIds) {

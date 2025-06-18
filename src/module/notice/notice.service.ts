@@ -163,7 +163,7 @@ export class NoticeService extends BaseService {
    */
   async update(id: string, updateNoticeDto: UpdateNoticeDto): Promise<ApiResult<null>> {
     try {
-      let notice = await this.noticeRepository.findOne({ where: { id } });
+      const notice = await this.noticeRepository.findOne({ where: { id } });
       if (!notice) {
         return ApiResult.error<null>("通知不存在");
       }

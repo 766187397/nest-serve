@@ -3,7 +3,7 @@ import { CreateUserDto, FindUserDto, FindUserDtoByPage, LogInDto, UpdateUserDto 
 import { ApiResult } from "@/common/utils/result";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
-import { Brackets, ILike, In, Repository, UpdateResult } from "typeorm";
+import { Brackets, ILike, In, Not, Repository, UpdateResult } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { JwtService, TokenExpiredError } from "@nestjs/jwt";
 import { bcryptService } from "@/common/utils/bcrypt-hash";
@@ -168,12 +168,24 @@ export class UsersService extends BaseService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<ApiResult<null>> {
     try {
       // 查询用户
-      let userInfo = await this.userRepository.findOne({
+      const userInfo = await this.userRepository.findOne({
         where: { id },
         relations: ["roles"],
       });
       if (!userInfo) {
         return ApiResult.error("用户不存在");
+      }
+      // 查询是否存在账号、电话号码或邮箱
+      const exist = await this.userRepository.find({
+        where: [
+          { id: Not(id), account: userInfo.account },
+          { id: Not(id), phone: userInfo.phone },
+          { id: Not(id), email: userInfo.email },
+        ],
+      });
+
+      if (exist && exist.length > 0) {
+        return ApiResult.error<null>("当前用户已存在账号、电话号码或邮箱！");
       }
       // 密码处理
       if (updateUserDto.password === "") {

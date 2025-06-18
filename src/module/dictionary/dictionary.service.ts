@@ -127,6 +127,11 @@ export class DictionaryService extends BaseService {
    */
   async update(id: string, updateDictionaryDto: UpdateDictionaryDto): Promise<ApiResult<null>> {
     try {
+      const dictionary = await this.dictionaryRepository.findOne({ where: { id: id } });
+      const exist = await this.dictionaryRepository.findOne({ where: { type: dictionary?.type } });
+      if (exist) {
+        return ApiResult.error<null>("字典类型已存在");
+      }
       await this.dictionaryRepository.update(id, updateDictionaryDto);
       return ApiResult.success<null>();
     } catch (error) {
