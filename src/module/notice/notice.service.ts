@@ -159,17 +159,17 @@ export class NoticeService extends BaseService {
    * 更新通知
    * @param {string} id
    * @param {UpdateNoticeDto} updateNoticeDto
-   * @returns { Promise<ApiResult<Notice | null>>} 统一返回结果
+   * @returns { Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(id: string, updateNoticeDto: UpdateNoticeDto): Promise<ApiResult<Notice | null>> {
+  async update(id: string, updateNoticeDto: UpdateNoticeDto): Promise<ApiResult<null>> {
     try {
       let notice = await this.noticeRepository.findOne({ where: { id } });
       if (!notice) {
         return ApiResult.error<null>("通知不存在");
       }
       Object.assign(notice, updateNoticeDto);
-      let data = await this.noticeRepository.save(notice);
-      return ApiResult.success<Notice>({ data });
+      await this.noticeRepository.save(notice);
+      return ApiResult.success<null>();
     } catch (error) {
       return ApiResult.error<null>(error);
     }

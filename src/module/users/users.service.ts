@@ -163,9 +163,9 @@ export class UsersService extends BaseService {
    * 修改用户信息
    * @param {string} id 用户ID
    * @param updateUserDto 更新用户信息
-   * @returns {Promise<ApiResult<User | null>>} 统一返回结果
+   * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<ApiResult<User | null>> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<ApiResult<null>> {
     try {
       // 查询用户
       let userInfo = await this.userRepository.findOne({
@@ -196,8 +196,8 @@ export class UsersService extends BaseService {
       }
 
       // 重新设置信息
-      let data = await this.userRepository.save(userInfo);
-      return ApiResult.success<User>({ data });
+      await this.userRepository.save(userInfo);
+      return ApiResult.success<null>();
     } catch (error) {
       return ApiResult.error<null>(error || "用户更新失败，请稍后再试");
     }

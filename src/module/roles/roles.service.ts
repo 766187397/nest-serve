@@ -150,9 +150,9 @@ export class RolesService extends BaseService {
    * 更新角色
    * @param {string} id 角色ID
    * @param {UpdateRoleDto} updateRoleDto 更新角色信息
-   * @returns {Promise<ApiResult<Role | null>>} 统一返回结果
+   * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<ApiResult<Role | null>> {
+  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<ApiResult<null>> {
     try {
       let role = await this.roleRepository.findOne({ where: { id } });
       if (!role) {
@@ -163,8 +163,8 @@ export class RolesService extends BaseService {
       if (updateRoleDto.routeIds) {
         role.routes = await this.routeRepository.find({ where: { id: In(updateRoleDto.routeIds) } });
       }
-      let data = await this.roleRepository.save(role);
-      return ApiResult.success<Role>({ data });
+      await this.roleRepository.save(role);
+      return ApiResult.success<null>();
     } catch (error) {
       return ApiResult.error<null>(error || "角色更新失败，请稍后再试");
     }
