@@ -276,6 +276,23 @@ export class defaultData implements OnApplicationBootstrap {
       ]);
       await this.routeRepository.save(adminRolePageData);
 
+      // 数据字典
+      const dictionaryData = this.routeRepository.create({
+        platform: "admin",
+        type: "menu",
+        name: "dictionary",
+        title: "数据字典",
+        path: "/system/dictionary",
+        component: "system/dictionary/Index",
+        icon: "Collection",
+        externalLinks: false,
+        redirect: "",
+        meta: "",
+        parent: role,
+      });
+
+      await this.routeRepository.save(dictionaryData);
+
       //#endregion
 
       //#region web路由数据
