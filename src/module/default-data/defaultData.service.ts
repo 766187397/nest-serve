@@ -288,7 +288,7 @@ export class defaultData implements OnApplicationBootstrap {
         externalLinks: false,
         redirect: "",
         meta: "",
-        parent: role,
+        parent: adminSystem,
       });
 
       await this.routeRepository.save(dictionaryData);
