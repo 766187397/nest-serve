@@ -13,7 +13,7 @@ import { BaseService } from "@/common/service/base";
 import { Dictionary } from "./entities/dictionary.entity";
 import { DictionaryItem } from "./entities/dictionaryItem.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, Repository } from "typeorm";
+import { ILike, Not, Repository } from "typeorm";
 import { ApiResult } from "@/common/utils/result";
 import { PageApiResult } from "@/types/public";
 
@@ -127,8 +127,9 @@ export class DictionaryService extends BaseService {
    */
   async update(id: string, updateDictionaryDto: UpdateDictionaryDto): Promise<ApiResult<null>> {
     try {
-      const dictionary = await this.dictionaryRepository.findOne({ where: { id: id } });
-      const exist = await this.dictionaryRepository.findOne({ where: { type: dictionary?.type } });
+      const exist = await this.dictionaryRepository.findOne({
+        where: { id: Not(id), type: updateDictionaryDto?.type },
+      });
       if (exist) {
         return ApiResult.error<null>("字典类型已存在");
       }

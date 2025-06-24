@@ -23,7 +23,17 @@ export class CreateDictionaryDto extends DictionaryOptionalDto {
 }
 
 /** 更新字典分类 */
-export class UpdateDictionaryDto extends DictionaryOptionalDto {}
+export class UpdateDictionaryDto extends DictionaryOptionalDto {
+  @ApiProperty({ description: "字典分类类型(为一标识方便后续查询)" })
+  @IsOptional()
+  @IsString({ message: "字典分类类型必须是字符串" })
+  type?: string;
+
+  @ApiProperty({ description: "字典分类名称(显示名称)" })
+  @IsOptional()
+  @IsString({ message: "字典分类名称必须是字符串" })
+  name?: string;
+}
 
 /** 字典分类查询参数 */
 export class FindDictionaryDto extends FindByParameter {
