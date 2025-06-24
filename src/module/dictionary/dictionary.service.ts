@@ -142,12 +142,23 @@ export class DictionaryService extends BaseService {
 
   /**
    * 删除字段分类
-   * @param id   id
+   * @param {string} id   id
    * @returns {Promise<ApiResult<null>>}   统一返回结果
    */
   async remove(id: string): Promise<ApiResult<null>> {
     try {
-      await this.dictionaryRepository.delete(id);
+      let dictionary = await this.dictionaryRepository.findOneBy({ id });
+      if (!dictionary) {
+        return ApiResult.error<null>("字典不存在");
+      } else {
+        // let dictionaryItem = await this.dictionaryItemRepository.find({
+        //   category: dictionary,
+        // });
+        // if (dictionaryItem) {
+        //   await this.dictionaryItemRepository.softDelete();
+        // }
+      }
+      await this.dictionaryRepository.softDelete(id);
       return ApiResult.success<null>();
     } catch (error) {
       return ApiResult.error<null>(error || "字典删除失败，请稍后再试");
