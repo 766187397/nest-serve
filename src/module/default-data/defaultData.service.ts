@@ -293,6 +293,22 @@ export class defaultData implements OnApplicationBootstrap {
 
       await this.routeRepository.save(dictionaryData);
 
+      // 数据字典子页面
+      const dictionaryDataChild = this.routeRepository.create({
+        platform: "admin",
+        type: "button",
+        name: "dictionaryChild",
+        title: "数据字典项",
+        path: "/system/dictionary",
+        component: "system/dictionary/Child",
+        icon: "",
+        externalLinks: false,
+        redirect: "",
+        meta: "",
+        parent: adminSystem,
+      });
+
+      await this.routeRepository.save(dictionaryDataChild);
       //#endregion
 
       //#region web路由数据
