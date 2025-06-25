@@ -152,7 +152,7 @@ export class DictionaryService extends BaseService {
         return ApiResult.error<null>("字典不存在");
       } else {
         let dictionaryItem = await this.dictionaryItemRepository.find({
-          where: { category: dictionary },
+          where: { category: { id: dictionary.id } },
         });
         if (dictionaryItem) {
           dictionaryItem.forEach(async (item) => {
