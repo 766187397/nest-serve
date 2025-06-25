@@ -7,7 +7,7 @@ import { Dictionary } from "./dictionary.entity";
 @Index("IDX_dictionary_item_id_deletedAt", ["id", "deletedAt"])
 export class DictionaryItem extends BaseEntity {
   @ManyToOne(() => Dictionary)
-  @JoinColumn({ name: "category_type" })
+  @JoinColumn({ name: "category" })
   category: Dictionary;
 
   @Column({ comment: "字典项名称" })

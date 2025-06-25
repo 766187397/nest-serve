@@ -151,12 +151,14 @@ export class DictionaryService extends BaseService {
       if (!dictionary) {
         return ApiResult.error<null>("字典不存在");
       } else {
-        // let dictionaryItem = await this.dictionaryItemRepository.find({
-        //   category: dictionary,
-        // });
-        // if (dictionaryItem) {
-        //   await this.dictionaryItemRepository.softDelete();
-        // }
+        let dictionaryItem = await this.dictionaryItemRepository.find({
+          where: { category: dictionary },
+        });
+        if (dictionaryItem) {
+          dictionaryItem.forEach(async (item) => {
+            await this.dictionaryItemRepository.softDelete(item.id);
+          });
+        }
       }
       await this.dictionaryRepository.softDelete(id);
       return ApiResult.success<null>();
