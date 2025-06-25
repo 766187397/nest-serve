@@ -121,6 +121,7 @@ export class defaultData implements OnApplicationBootstrap {
         externalLinks: false,
         redirect: "",
         meta: "",
+        sort: 9,
       });
 
       await this.routeRepository.save(adminHomeData);
@@ -136,6 +137,7 @@ export class defaultData implements OnApplicationBootstrap {
         externalLinks: false,
         redirect: "/system/route",
         meta: "",
+        sort: 8,
       });
       const adminSystem = await this.routeRepository.save(adminSystemData);
 
@@ -151,6 +153,7 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "/system/route/admin",
         meta: "",
         parent: adminSystem,
+        sort: 7,
       });
       const adminRoute = await this.routeRepository.save(adminRouteData);
       // 路由页面
@@ -167,6 +170,7 @@ export class defaultData implements OnApplicationBootstrap {
           redirect: "",
           meta: "",
           parent: adminRoute,
+          sort: 9,
         },
         {
           platform: "admin",
@@ -180,6 +184,7 @@ export class defaultData implements OnApplicationBootstrap {
           redirect: "",
           meta: "",
           parent: adminRoute,
+          sort: 8,
         },
       ]);
       await this.routeRepository.save(adminRoutePageData);
@@ -196,6 +201,7 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "/system/user/admin",
         meta: "",
         parent: adminSystem,
+        sort: 9,
       });
       const user = await this.routeRepository.save(userData);
 
@@ -213,6 +219,7 @@ export class defaultData implements OnApplicationBootstrap {
           redirect: "",
           meta: "",
           parent: user,
+          sort: 9,
         },
         {
           platform: "admin",
@@ -226,6 +233,7 @@ export class defaultData implements OnApplicationBootstrap {
           redirect: "",
           meta: "",
           parent: user,
+          sort: 8,
         },
       ]);
       await this.routeRepository.save(adminUserPageData);
@@ -242,6 +250,7 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "/system/role/admin",
         meta: "",
         parent: adminSystem,
+        sort: 8,
       });
       const role = await this.routeRepository.save(adminRoleData);
 
@@ -259,6 +268,7 @@ export class defaultData implements OnApplicationBootstrap {
           redirect: "",
           meta: "",
           parent: role,
+          sort: 9,
         },
         {
           platform: "admin",
@@ -272,6 +282,7 @@ export class defaultData implements OnApplicationBootstrap {
           redirect: "",
           meta: "",
           parent: role,
+          sort: 8,
         },
       ]);
       await this.routeRepository.save(adminRolePageData);
@@ -289,6 +300,7 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "",
         meta: "",
         parent: adminSystem,
+        sort: 1,
       });
 
       await this.routeRepository.save(dictionaryData);
@@ -306,6 +318,7 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "",
         meta: "",
         parent: adminSystem,
+        sort: 1,
       });
 
       await this.routeRepository.save(dictionaryDataChild);
