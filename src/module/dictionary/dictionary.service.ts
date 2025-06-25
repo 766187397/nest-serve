@@ -201,7 +201,7 @@ export class DictionaryService extends BaseService {
     try {
       let dictionaryId;
       if (findDictionaryItemDtoByPage?.categoryId) {
-        dictionaryId = +findDictionaryItemDtoByPage?.categoryId;
+        dictionaryId = findDictionaryItemDtoByPage?.categoryId;
       }
       const category = await this.dictionaryRepository.findOne({
         where: { id: dictionaryId, type: findDictionaryItemDtoByPage?.type },
@@ -253,7 +253,7 @@ export class DictionaryService extends BaseService {
     try {
       let dictionaryId;
       if (findDictionaryItemDto?.categoryId) {
-        dictionaryId = +findDictionaryItemDto?.categoryId;
+        dictionaryId = findDictionaryItemDto?.categoryId;
       }
       const category = await this.dictionaryRepository.findOne({
         where: { id: dictionaryId, type: findDictionaryItemDto?.type },
