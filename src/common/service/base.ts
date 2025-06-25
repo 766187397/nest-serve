@@ -1,6 +1,14 @@
 import * as dayjs from "dayjs";
 import { Between, FindOptionsOrderValue } from "typeorm";
 
+type SortKey<T> = keyof T;
+type SortOrder = "asc" | "desc";
+
+interface SortCondition<T> {
+  key: SortKey<T>;
+  order?: SortOrder;
+}
+
 export class BaseService {
   dayjs = dayjs;
   /**
@@ -32,10 +40,10 @@ export class BaseService {
 
   /**
    * 处理默认排序 处理createdAt和id
-   * @param {FindOptionsOrderValue | undefined} sort 排序条件sort DESC | ASC
+   * @param {FindOptionsOrderValue} sort 排序条件sort DESC | ASC
    * @returns {{[key: string]: FindOptionsOrderValue}} 处理后的排序条件
    */
-  buildCommonSort(sort: FindOptionsOrderValue | undefined): { [key: string]: FindOptionsOrderValue } {
+  buildCommonSort(sort?: FindOptionsOrderValue): { [key: string]: FindOptionsOrderValue } {
     const sortAll = ["ASC", "DESC", "asc", "desc"];
 
     if (typeof sort === "undefined") {

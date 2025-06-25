@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from "./dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Route } from "./entities/route.entity";
-import { In, IsNull, Repository, TreeRepository } from "typeorm";
+import { In, IsNull, Not, Repository, TreeRepository } from "typeorm";
 import { BaseService } from "@/common/service/base";
 import { ApiResult } from "@/common/utils/result";
 import { Role } from "@/module/roles/entities/role.entity";
@@ -66,18 +66,45 @@ export class RoutesService extends BaseService {
     try {
       let order = this.buildCommonSort(findRouteDto?.sort);
       let data = await this.routeRepository.find({
-        where: { parent: IsNull(), platform },
+        where: {
+          platform,
+          type: findRouteDto.type,
+        },
         order: { ...order },
-        relations: ["children"],
+        relations: ["parent"],
       });
-
-      // 2. 遍历每个顶层节点，构建子树
-      const trees = await Promise.all(data.map((route) => this.treeRouteRepository.findDescendantsTree(route)));
+      let trees = this.buildTree(data);
 
       return ApiResult.success<Route[]>({ data: trees });
     } catch (error) {
       return ApiResult.error<null>(error || "路由查询失败，请稍后再试");
     }
+  }
+
+  /**
+   * 构造树形结构
+   * @param nodes 路由列表
+   * @returns  {Route[]} 树形结构
+   */
+  buildTree(nodes: Route[]): Route[] {
+    const nodeMap = new Map<string, Route>();
+    const roots: Route[] = [];
+
+    for (const node of nodes) {
+      node.children = [];
+      nodeMap.set(node.id, node);
+    }
+
+    for (const node of nodes) {
+      const parentId = node.parent?.id;
+      if (parentId && nodeMap.has(parentId)) {
+        nodeMap.get(parentId)!.children.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+
+    return roots;
   }
 
   /**
@@ -118,7 +145,7 @@ export class RoutesService extends BaseService {
       }
 
       const exist = await this.routeRepository.findOne({
-        where: { name: route.name },
+        where: { id: Not(id), name: route.name },
       });
       if (exist) {
         return ApiResult.error<null>(`路由${exist.name}已存在`);
@@ -195,22 +222,22 @@ export class RoutesService extends BaseService {
         return ApiResult.success<RoleRoutes[]>({ data: [] }); // 无权限
       }
 
-      // 2. 获取顶层路由节点（parent IS NULL + platform）
+      let order = this.buildCommonSort();
+      // 2. 获取顶层路由节点
       const rootRoutes = await this.routeRepository.find({
         where: {
           id: In(routeIds),
-          parent: IsNull(),
           platform,
-          ...(type ? { type } : {}),
+          type,
         },
-        order: {
-          sort: "DESC",
-          createdAt: "DESC",
-        },
+        order: { ...order },
+        relations: ["parent"],
       });
 
-      // 3. 对每个根节点查询完整子树（使用 findDescendantsTree）
-      const trees = await Promise.all(rootRoutes.map((route) => this.treeRouteRepository.findDescendantsTree(route)));
+      // // 3. 对每个根节点查询完整子树（使用 findDescendantsTree）
+      // const trees = await Promise.all(rootRoutes.map((route) => this.treeRouteRepository.findDescendantsTree(route)));
+
+      const trees = this.buildTree(rootRoutes);
 
       // 4. 你已有的格式化函数
       const routeList = this.handleRoutes(trees);

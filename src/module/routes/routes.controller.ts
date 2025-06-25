@@ -4,6 +4,7 @@ import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from "./dto";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request, Response } from "express";
 import { User } from "@/module/users/entities/user.entity";
+import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 
 @ApiTags("admin - 路由管理")
 @ApiParam({
@@ -33,7 +34,7 @@ export class RoutesController {
 
   @Get("all/:platform")
   @ApiOperation({ summary: "查询所有路由" })
-  findAllAdmin(@Param("platform") platform: string, @Query() findRouteDto: FindRouteDto) {
+  findAllAdmin(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findRouteDto: FindRouteDto) {
     return this.routesService.findAll(findRouteDto, platform);
   }
 
