@@ -111,7 +111,7 @@ export class defaultData implements OnApplicationBootstrap {
       //#region admin路由数据
       // 首页
       const adminHomeData = this.routeRepository.create({
-        platform: "web",
+        platform: "admin",
         type: "menu",
         name: "home",
         title: "首页",
@@ -311,7 +311,7 @@ export class defaultData implements OnApplicationBootstrap {
         type: "button",
         name: "dictionaryChild",
         title: "数据字典项",
-        path: "/system/dictionary",
+        path: "/system/dictionary/child",
         component: "system/dictionary/Child",
         icon: "",
         externalLinks: false,
@@ -326,7 +326,7 @@ export class defaultData implements OnApplicationBootstrap {
 
       //#region web路由数据
       const webHomeData = this.routeRepository.create({
-        platform: "admin",
+        platform: "web",
         type: "menu",
         name: "home",
         title: "首页",
