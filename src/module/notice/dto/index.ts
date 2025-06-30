@@ -73,12 +73,12 @@ export class UpdateNoticeDto extends NoticeOptionalDto {
 
 /** 查询通知 */
 export class FindNoticeDto extends FindByParameter {
-  @ApiProperty({ name: "type", type: String, required: true, description: "类型" })
+  @ApiProperty({ name: "type", type: String, description: "类型" })
   @IsOptional()
   @IsString({ message: "类型必须是字符串" })
   type?: string;
 
-  @ApiProperty({ name: "title", type: String, required: true, description: "标题" })
+  @ApiProperty({ name: "title", type: String, description: "标题" })
   @IsOptional()
   @IsString({ message: "标题必须是字符串" })
   title?: string;

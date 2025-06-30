@@ -300,7 +300,7 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "",
         meta: "",
         parent: adminSystem,
-        sort: 1,
+        sort: 6,
       });
 
       await this.routeRepository.save(dictionaryData);
@@ -318,10 +318,29 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "",
         meta: "",
         parent: adminSystem,
-        sort: 1,
+        sort: 6,
       });
 
       await this.routeRepository.save(dictionaryDataChild);
+
+      // 通知公告
+      const noticeData = this.routeRepository.create({
+        platform: "admin",
+        type: "menu",
+        name: "notice",
+        title: "通知公告",
+        path: "/system/notice",
+        component: "system/notice/Index",
+        icon: "Message",
+        externalLinks: false,
+        redirect: "",
+        meta: "",
+        parent: adminSystem,
+        sort: 5,
+      });
+
+      await this.routeRepository.save(noticeData);
+
       //#endregion
 
       //#region web路由数据
