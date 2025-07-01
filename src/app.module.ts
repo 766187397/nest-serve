@@ -7,7 +7,7 @@ import { Knife4jModule } from "./module/knife4j/knife4j.module";
 import { ApiResultInterceptor } from "@/common/interceptor/api-result.interceptor";
 import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { AuthModule } from "./module/auth/auth.module";
-import { DefaultDataModule } from "./module/default-data/default-data.module";
+import { DefaultDataModule } from "./module/defaultData/defaultData.module";
 import { UploadModule } from "./module/upload/upload.module";
 import { RolesModule } from "./module/roles/roles.module";
 import { RolesGuard } from "./module/roles/roles.guard";
@@ -18,8 +18,8 @@ import { LoggerModule } from "./module/logger/logger.module";
 import * as winston from "winston";
 import * as DailyRotateFile from "winston-daily-rotate-file";
 import { DebugConfig, ErrorConfig, InfoConfig, WarnConfig } from "./config/logger";
-import { NoticeModule } from './module/notice/notice.module';
-import { DictionaryModule } from './module/dictionary/dictionary.module';
+import { NoticeModule } from "./module/notice/notice.module";
+import { DictionaryModule } from "./module/dictionary/dictionary.module";
 
 @Module({
   imports: [
