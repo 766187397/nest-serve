@@ -96,8 +96,11 @@ export class UploadService extends BaseService {
         take,
       });
       const resultData = data.map((file) => {
+        const { deletedAt, platform, ...item } = file;
         return {
-          ...file,
+          ...item,
+          createdAt: this.dayjs(file.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+          updatedAt: this.dayjs(file.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
           completePath: global.url + file.url,
         };
       });
@@ -113,6 +116,7 @@ export class UploadService extends BaseService {
         },
         message: "查询成功",
         code: 200,
+        entities: Upload,
       });
     } catch (error) {
       return ApiResult.error<null>(error || "查询失败");
