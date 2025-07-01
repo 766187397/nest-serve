@@ -328,7 +328,7 @@ export class defaultData implements OnApplicationBootstrap {
         platform: "admin",
         type: "menu",
         name: "notice",
-        title: "角色管理",
+        title: "通知公告管理",
         path: "/system/notice",
         icon: "Message",
         externalLinks: false,
