@@ -328,18 +328,51 @@ export class defaultData implements OnApplicationBootstrap {
         platform: "admin",
         type: "menu",
         name: "notice",
-        title: "通知公告",
+        title: "角色管理",
         path: "/system/notice",
-        component: "system/notice/Index",
         icon: "Message",
         externalLinks: false,
-        redirect: "",
+        redirect: "/system/notice/admin",
         meta: "",
         parent: adminSystem,
         sort: 5,
       });
 
-      await this.routeRepository.save(noticeData);
+      const notice = await this.routeRepository.save(noticeData);
+
+      // 通知公告页面
+      const noticePageData = this.routeRepository.create([
+        {
+          platform: "admin",
+          type: "menu",
+          name: "noticeAdmin",
+          title: "admin通知公告",
+          path: "/system/notice/admin",
+          component: "system/notice/Admin",
+          icon: "",
+          externalLinks: false,
+          redirect: "",
+          meta: "",
+          parent: notice,
+          sort: 2,
+        },
+        {
+          platform: "web",
+          type: "menu",
+          name: "noticeWeb",
+          title: "admin通知公告",
+          path: "/system/notice/web",
+          component: "system/notice/Web",
+          icon: "",
+          externalLinks: false,
+          redirect: "",
+          meta: "",
+          parent: notice,
+          sort: 1,
+        },
+      ]);
+
+      await this.routeRepository.save(noticePageData);
 
       //#endregion
 
