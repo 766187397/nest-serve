@@ -287,42 +287,6 @@ export class defaultData implements OnApplicationBootstrap {
       ]);
       await this.routeRepository.save(adminRolePageData);
 
-      // 数据字典
-      const dictionaryData = this.routeRepository.create({
-        platform: "admin",
-        type: "menu",
-        name: "dictionary",
-        title: "数据字典",
-        path: "/system/dictionary",
-        component: "system/dictionary/Index",
-        icon: "Collection",
-        externalLinks: false,
-        redirect: "",
-        meta: "",
-        parent: adminSystem,
-        sort: 6,
-      });
-
-      await this.routeRepository.save(dictionaryData);
-
-      // 数据字典子页面
-      const dictionaryDataChild = this.routeRepository.create({
-        platform: "admin",
-        type: "button",
-        name: "dictionaryChild",
-        title: "数据字典项",
-        path: "/system/dictionary/child",
-        component: "system/dictionary/Child",
-        icon: "",
-        externalLinks: false,
-        redirect: "",
-        meta: "",
-        parent: adminSystem,
-        sort: 6,
-      });
-
-      await this.routeRepository.save(dictionaryDataChild);
-
       // 通知公告
       const noticeData = this.routeRepository.create({
         platform: "admin",
@@ -373,6 +337,43 @@ export class defaultData implements OnApplicationBootstrap {
       ]);
 
       await this.routeRepository.save(noticePageData);
+      
+
+      // 数据字典
+      const dictionaryData = this.routeRepository.create({
+        platform: "admin",
+        type: "menu",
+        name: "dictionary",
+        title: "数据字典",
+        path: "/system/dictionary",
+        component: "system/dictionary/Index",
+        icon: "Collection",
+        externalLinks: false,
+        redirect: "",
+        meta: "",
+        parent: adminSystem,
+        sort: 1,
+      });
+
+      await this.routeRepository.save(dictionaryData);
+
+      // 数据字典子页面
+      const dictionaryDataChild = this.routeRepository.create({
+        platform: "admin",
+        type: "button",
+        name: "dictionaryChild",
+        title: "数据字典项",
+        path: "/system/dictionary/child",
+        component: "system/dictionary/Child",
+        icon: "",
+        externalLinks: false,
+        redirect: "",
+        meta: "",
+        parent: adminSystem,
+        sort: 1,
+      });
+
+      await this.routeRepository.save(dictionaryDataChild);
 
       //#endregion
 
