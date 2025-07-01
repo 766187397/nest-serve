@@ -19,27 +19,31 @@ import { User } from "../users/entities/user.entity";
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
-  @Post("create")
+  @Post("create/:platform")
   @ApiOperation({ summary: "创建公告" })
-  create(@Body() createNoticeDto: CreateNoticeDto) {
-    return this.noticeService.create(createNoticeDto);
+  create(@Param("platform") platform: string, @Body() createNoticeDto: CreateNoticeDto) {
+    return this.noticeService.create(createNoticeDto, platform);
   }
 
-  @Get("page")
+  @Get("page/:platform")
   @ApiOperation({ summary: "查询公告列表(分页,后端编辑使用查询所有)" })
-  findByPage(@Query(new FilterEmptyPipe()) findNoticeDtoByPage: FindNoticeDtoByPage) {
-    return this.noticeService.findByPage(findNoticeDtoByPage);
+  findByPage(
+    @Param("platform") platform: string,
+    @Query(new FilterEmptyPipe()) findNoticeDtoByPage: FindNoticeDtoByPage
+  ) {
+    return this.noticeService.findByPage(findNoticeDtoByPage, platform);
   }
 
-  @Get("page/userOrRole")
+  @Get("page/userOrRole/:platform")
   @ApiOperation({ summary: "查询公告列表(分页,后台查询当前用户和角色权限对应的公告)" })
   findByPageByUserOrRole(
+    @Param("platform") platform: string,
     @Query(new FilterEmptyPipe()) findNoticeDtoByPage: FindNoticeDtoByPageByUserOrRole,
     @Req() req: Request
   ) {
     const userInfo = req.userInfo as User;
     const roleKeys = userInfo?.roles.map((item) => item.roleKey);
-    return this.noticeService.findByPageByUserAndRole(findNoticeDtoByPage, "admin", roleKeys, userInfo.id);
+    return this.noticeService.findByPageByUserAndRole(findNoticeDtoByPage, platform, roleKeys, userInfo.id);
   }
 
   @Get("info/:id")

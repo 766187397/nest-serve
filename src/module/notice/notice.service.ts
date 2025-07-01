@@ -19,11 +19,13 @@ export class NoticeService extends BaseService {
   /**
    * 创建通知
    * @param {CreateNoticeDto} createNoticeDto
+   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<Notice | null>>} 统一返回结果
    */
-  async create(createNoticeDto: CreateNoticeDto): Promise<ApiResult<Notice | null>> {
+  async create(createNoticeDto: CreateNoticeDto, platform: string = "admin"): Promise<ApiResult<Notice | null>> {
     try {
-      let notice = this.noticeRepository.create(createNoticeDto);
+      let createData = Object.assign(createNoticeDto, { platform });
+      let notice = this.noticeRepository.create(createData);
       let data = await this.noticeRepository.save(notice);
       return ApiResult.success<Notice>({ data });
     } catch (error) {
@@ -34,9 +36,13 @@ export class NoticeService extends BaseService {
   /**
    * 分页查询
    * @param {FindNoticeDtoByPage} findNoticeDtoByPage
+   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<PageApiResult<Notice[]> | null>>} 统一返回结果
    */
-  async findByPage(findNoticeDtoByPage: FindNoticeDtoByPage): Promise<ApiResult<PageApiResult<Notice[]> | null>> {
+  async findByPage(
+    findNoticeDtoByPage: FindNoticeDtoByPage,
+    platform: string = "admin"
+  ): Promise<ApiResult<PageApiResult<Notice[]> | null>> {
     try {
       let { take, skip } = this.buildCommonPaging(findNoticeDtoByPage?.page, findNoticeDtoByPage?.pageSize);
       let where = this.buildCommonQuery(findNoticeDtoByPage);
@@ -46,6 +52,7 @@ export class NoticeService extends BaseService {
           ...where,
           title: findNoticeDtoByPage?.title ? ILike(`%${findNoticeDtoByPage.title}%`) : undefined,
           type: findNoticeDtoByPage?.type ? ILike(`%${findNoticeDtoByPage.type}%`) : undefined,
+          platform,
         },
         order,
         take,
@@ -163,7 +170,9 @@ export class NoticeService extends BaseService {
    */
   async update(id: string, updateNoticeDto: UpdateNoticeDto): Promise<ApiResult<null>> {
     try {
-      const notice = await this.noticeRepository.findOne({ where: { id } });
+      const notice = await this.noticeRepository.findOne({
+        where: { id },
+      });
       if (!notice) {
         return ApiResult.error<null>("通知不存在");
       }
