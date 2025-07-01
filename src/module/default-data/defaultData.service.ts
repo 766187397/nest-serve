@@ -321,10 +321,10 @@ export class defaultData implements OnApplicationBootstrap {
           sort: 2,
         },
         {
-          platform: "web",
+          platform: "admin",
           type: "menu",
           name: "noticeWeb",
-          title: "admin通知公告",
+          title: "web通知公告",
           path: "/system/notice/web",
           component: "system/notice/Web",
           icon: "",
