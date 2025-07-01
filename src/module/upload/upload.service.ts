@@ -31,6 +31,7 @@ export class UploadService extends BaseService {
         url: "/" + file.path.replace(/\\/g, "/"),
         fileName: file.filename,
         size: file.size,
+        mimetype: file.mimetype,
       });
       const savedFile = await this.upload.save(fileData);
       return ApiResult.success<UploadFile>({

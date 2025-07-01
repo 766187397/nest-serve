@@ -11,4 +11,6 @@ export class Upload extends BaseEntity {
   url: string;
   @Column({ type: "varchar", name: "size", length: 255, comment: "文件大小" })
   size: string;
+  @Column({ type: "varchar", name: "mimetype", length: 255, comment: "文件类型" })
+  mimetype: string;
 }
