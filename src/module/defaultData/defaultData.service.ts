@@ -382,7 +382,7 @@ export class defaultData implements OnApplicationBootstrap {
         title: "文件上传",
         path: "/system/file",
         component: "system/file/Index",
-        icon: "",
+        icon: "UploadFilled",
         externalLinks: false,
         redirect: "",
         meta: "",
