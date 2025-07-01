@@ -337,7 +337,6 @@ export class defaultData implements OnApplicationBootstrap {
       ]);
 
       await this.routeRepository.save(noticePageData);
-      
 
       // 数据字典
       const dictionaryData = this.routeRepository.create({
@@ -352,7 +351,7 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "",
         meta: "",
         parent: adminSystem,
-        sort: 1,
+        sort: 3,
       });
 
       await this.routeRepository.save(dictionaryData);
@@ -370,11 +369,28 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "",
         meta: "",
         parent: adminSystem,
-        sort: 1,
+        sort: 3,
       });
 
       await this.routeRepository.save(dictionaryDataChild);
 
+      // 附件上传管理
+      const uploadData = this.routeRepository.create({
+        platform: "admin",
+        type: "menu",
+        name: "file",
+        title: "文件上传",
+        path: "/system/file",
+        component: "system/file/Index",
+        icon: "",
+        externalLinks: false,
+        redirect: "",
+        meta: "",
+        parent: adminSystem,
+        sort: 2,
+      });
+
+      await this.routeRepository.save(uploadData);
       //#endregion
 
       //#region web路由数据
