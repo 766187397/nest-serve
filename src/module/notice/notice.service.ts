@@ -4,7 +4,7 @@ import { CreateNoticeDto, FindNoticeDtoByPage, FindNoticeDtoByPageByUserOrRole, 
 import { ApiResult } from "@/common/utils/result";
 import { Notice } from "./entities/notice.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, Repository } from "typeorm";
+import { ILike, In, IsNull, Like, Repository } from "typeorm";
 import { PageApiResult } from "@/types/public";
 import { NoticeByPageByUserOrRole } from "@/types/notice";
 @Injectable()
@@ -86,59 +86,35 @@ export class NoticeService extends BaseService {
     platform: string,
     roleKeys: string[] | undefined,
     userId: string
-  ): Promise<ApiResult<PageApiResult<NoticeByPageByUserOrRole[]> | null>> {
+  ): Promise<any> {
     try {
       let { take, skip } = this.buildCommonPaging(
         findNoticeDtoByPageByUserOrRole?.page,
         findNoticeDtoByPageByUserOrRole?.pageSize
       );
-      const queryBuilder = this.noticeRepository.createQueryBuilder("notice");
-      // 添加platform精确匹配条件
-      queryBuilder.where("notice.platform  = :platform", { platform });
-      const type = findNoticeDtoByPageByUserOrRole?.type;
-      queryBuilder.andWhere("notice.type = :type", { type });
-      roleKeys?.forEach((role, index) => {
-        const paramName = `role${index}`;
-        const condition = index === 0 ? "where" : "orWhere";
-        queryBuilder[condition](`notice.roleKeys  LIKE :${paramName}`, {
-          [paramName]: `%${role}%`,
-        });
+      const [data, total] = await this.noticeRepository.findAndCount({
+        where: [
+          {
+            platform,
+            type: findNoticeDtoByPageByUserOrRole.type,
+            userIds: "",
+            roleKeys: "",
+          },
+          {
+            platform,
+            type: findNoticeDtoByPageByUserOrRole.type,
+            userIds: Like(`%${userId}%`),
+            roleKeys: roleKeys ? In(roleKeys) : undefined,
+          },
+        ],
+        skip, // 跳过的条数
+        take, // 每页条数
       });
-
-      // 用户ID匹配
-      queryBuilder.orWhere(`notice.userIds  LIKE :userId`, {
-        userId: `%${userId}%`,
-      });
-
-      // 追加查询roleKeys和userIds同时为空
-      queryBuilder.orWhere(
-        `(notice.roleKeys IS NULL OR notice.roleKeys  = '' AND notice.userIds IS NULL OR notice.userIds  = '')`
-      );
-
-      // 添加分页
-      let [data, total] = await queryBuilder.skip(skip).take(take).getManyAndCount();
       // 计算总页数
       const totalPages = Math.ceil(total / take);
-
-      let filterData: NoticeByPageByUserOrRole[] = data.map((item) => {
-        return {
-          id: item.id,
-          content: item.content,
-          // platform: item.platform,
-          // roleKeys: item.roleKeys,
-          // specifyTime: item.specifyTime,
-          title: item.title,
-          type: item.type,
-          // userIds: item.userIds,
-          createdAt: this.dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss"),
-          updatedAt: this.dayjs(item.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
-          // deletedAt: item.deletedAt,
-        };
-      });
-
-      return ApiResult.success<PageApiResult<NoticeByPageByUserOrRole[]>>({
+      return ApiResult.success<PageApiResult<Notice[]>>({
         data: {
-          data: filterData,
+          data,
           total,
           totalPages,
           page: findNoticeDtoByPageByUserOrRole?.page || 1,
