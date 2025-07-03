@@ -95,6 +95,8 @@ export class NoticeService extends BaseService {
       const queryBuilder = this.noticeRepository.createQueryBuilder("notice");
       // 添加platform精确匹配条件
       queryBuilder.where("notice.platform  = :platform", { platform });
+      const type = findNoticeDtoByPageByUserOrRole?.type;
+      queryBuilder.andWhere("notice.type = :type", { type });
       roleKeys?.forEach((role, index) => {
         const paramName = `role${index}`;
         const condition = index === 0 ? "where" : "orWhere";

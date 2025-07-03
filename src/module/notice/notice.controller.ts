@@ -35,7 +35,7 @@ export class NoticeController {
   }
 
   @Get("page/userOrRole/:platform")
-  @ApiOperation({ summary: "查询公告列表(分页,后台查询当前用户和角色权限对应的公告)" })
+  @ApiOperation({ summary: "查询公告列表(分页,查询当前用户和角色权限对应的公告)" })
   findByPageByUserOrRole(
     @Param("platform") platform: string,
     @Query(new FilterEmptyPipe()) findNoticeDtoByPage: FindNoticeDtoByPageByUserOrRole,

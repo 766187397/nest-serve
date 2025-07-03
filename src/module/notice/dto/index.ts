@@ -119,12 +119,8 @@ export class FindNoticeDtoByPageByUserOrRole {
   @IsString({ message: "pageSize必须是字符串" })
   pageSize?: string;
 
-  @ApiProperty({
-    name: "platform",
-    type: String,
-    description: "指定的平台标识（如admin/web/app/mini）",
-  })
+  @ApiProperty({ name: "type", type: String, required: false, description: "类型" })
   @IsOptional()
-  @IsString({ message: "平台标识必须是字符串" })
-  platform?: string;
+  @IsString({ message: "类型必须是字符串" })
+  type?: string;
 }
