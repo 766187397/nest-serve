@@ -63,7 +63,7 @@ export class UsersController {
     return this.usersService.logIn(loginDto, "admin");
   }
 
-  @Post("/logIn/setCookie")
+  @Post("logIn/setCookie")
   @ApiOperation({ summary: "用户登录(设置Cookie)" })
   async logInSetCookie(@Body() loginDto: LogInDto, @Res() res: Response) {
     let { __isApiResult, ...data } = await this.usersService.logIn(loginDto, "admin");
