@@ -20,6 +20,7 @@ import * as DailyRotateFile from "winston-daily-rotate-file";
 import { DebugConfig, ErrorConfig, InfoConfig, WarnConfig } from "./config/logger";
 import { NoticeModule } from "./module/notice/notice.module";
 import { DictionaryModule } from "./module/dictionary/dictionary.module";
+import { ChataiModule } from './module/chatai/chatai.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { DictionaryModule } from "./module/dictionary/dictionary.module";
     LoggerModule,
     NoticeModule,
     DictionaryModule,
+    ChataiModule,
   ],
   controllers: [],
   providers: [
