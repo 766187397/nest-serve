@@ -1,10 +1,10 @@
-import { BaseEntity } from "@/common/entities/base";
+import { UUIDBaseEntity } from "@/common/entities/base";
 import { Column, Entity, Index } from "typeorm";
 
 @Entity("notice", { comment: "通知表" })
 // 复合索引 优化同时查询id和deletedAt的情况
 @Index("IDX_notice_id_deletedAt", ["id", "deletedAt"])
-export class Notice extends BaseEntity {
+export class Notice extends UUIDBaseEntity {
   @Column({ type: "varchar", length: 30, comment: "通知类型", default: "" })
   type: string;
 

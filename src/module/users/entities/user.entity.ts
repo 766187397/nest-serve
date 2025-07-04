@@ -1,4 +1,4 @@
-import { BaseEntity } from "@/common/entities/base";
+import { UUIDBaseEntity } from "@/common/entities/base";
 import { Column, Entity, Index, JoinTable, ManyToMany } from "typeorm";
 import { Exclude } from "class-transformer";
 import { Role } from "@/module/roles/entities/role.entity";
@@ -6,7 +6,7 @@ import { Role } from "@/module/roles/entities/role.entity";
 @Entity("users", { comment: "用户信息表" })
 // 复合索引 优化同时查询id和deletedAt的情况
 @Index("IDX_users_id_deletedAt", ["id", "deletedAt"])
-export class User extends BaseEntity {
+export class User extends UUIDBaseEntity {
   @Column({ type: "varchar", name: "account", length: 30, nullable: false, comment: "用户账号" })
   account: string;
 

@@ -11,13 +11,8 @@ import { Exclude, Transform } from "class-transformer";
 import * as dayjs from "dayjs";
 import { v4 as uuidv4 } from "uuid";
 
+/** 基础实体 */
 export abstract class BaseEntity {
-  // @PrimaryGeneratedColumn({ comment: "ID" })
-  // id: string;
-
-  @PrimaryColumn({ type: "text", length: 36, comment: "uuid" })
-  id: string;
-
   @Column({ default: 1, comment: "排序" })
   sort: number;
 
@@ -40,6 +35,12 @@ export abstract class BaseEntity {
   @Exclude({ toPlainOnly: true })
   // @Transform(({ value }) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"))
   deletedAt: Date;
+}
+
+/** UUID基础实体 */
+export abstract class UUIDBaseEntity extends BaseEntity {
+  @PrimaryColumn({ type: "text", length: 36, comment: "uuid" })
+  id: string;
 
   @BeforeInsert()
   generateId() {
@@ -47,4 +48,10 @@ export abstract class BaseEntity {
       this.id = uuidv4();
     }
   }
+}
+
+/** 自增id基础实体 */
+export abstract class AutoIDBaseEntity extends BaseEntity {
+  @PrimaryGeneratedColumn({ comment: "ID" })
+  id: string;
 }
