@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { ChatRequestDto } from "./dto/index";
+import { ChatRequestDto, CreateImageDto } from "./dto/index";
 import axios from "axios";
 import { ApiResult } from "@/common/utils/result";
 
@@ -42,10 +42,10 @@ export class ChataiService {
 
   /**
    * 生成图片
-   * @param {ChatRequestDto} message
+   * @param {CreateImageDto} message
    * @returns {Promise<ApiResult<any>>} 响应结果
    */
-  async createImages(message: ChatRequestDto): Promise<ApiResult<any>> {
+  async createImages(message: CreateImageDto): Promise<ApiResult<any>> {
     const options = {
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export class ChataiService {
       },
       data: {
         model: "Kwai-Kolors/Kolors",
-        messages: message.messages,
+        ...message,
       },
     };
 
