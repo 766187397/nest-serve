@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
 import { ChataiService } from "./chatai.service";
-import { ChatRequestDto } from "./dto/index";
+import { ChatRequestDto, CreateImageDto } from "./dto/index";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("AI")
@@ -24,7 +24,7 @@ export class ChataiController {
 
   @Post("create/images")
   @ApiOperation({ summary: "AI 生图" })
-  createImages(@Body() message: ChatRequestDto) {
-    return this.chataiService.chat(message);
+  createImages(@Body() data: CreateImageDto) {
+    return this.chataiService.createImages(data);
   }
 }
