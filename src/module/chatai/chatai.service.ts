@@ -15,7 +15,6 @@ export class ChataiService {
    * @returns {Promise<ApiResult<any>>} 响应结果
    */
   async chat(message: ChatRequestDto): Promise<ApiResult<any>> {
-    console.log("message", message);
     const options = {
       method: "POST",
       headers: {
