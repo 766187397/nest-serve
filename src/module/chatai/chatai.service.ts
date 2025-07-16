@@ -2,9 +2,20 @@ import { Injectable } from "@nestjs/common";
 import { ChatRequestDto, CreateImageDto } from "./dto/index";
 import axios from "axios";
 import { ApiResult } from "@/common/utils/result";
+import { BaseService } from "@/common/service/base";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Chatai } from "./entities/chatai.entity";
+import { Repository } from "typeorm";
 
 @Injectable()
-export class ChataiService {
+export class ChataiService extends BaseService {
+  constructor(
+    @InjectRepository(Chatai)
+    private chataiRepository: Repository<Chatai>
+  ) {
+    super();
+  }
+
   // 根地址
   private apiUrl = "https://api.siliconflow.cn/v1";
   // 令牌
@@ -12,9 +23,10 @@ export class ChataiService {
   /**
    * 对话接口
    * @param {ChatRequestDto} message 消息
+   * @param {string} platform 平台
    * @returns {Promise<ApiResult<any>>} 响应结果
    */
-  async chat(message: ChatRequestDto): Promise<ApiResult<any>> {
+  async chat(message: ChatRequestDto, platform: string = "admin"): Promise<ApiResult<any>> {
     const options = {
       method: "POST",
       headers: {
@@ -24,16 +36,31 @@ export class ChataiService {
       data: {
         model: "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B",
         messages: message.messages,
+        max_tokens: 8192,
       },
     };
 
     try {
-      const response = await axios.post(this.apiUrl + "/chat/completions", options.data, {
+      const { data } = await axios.post(this.apiUrl + "/chat/completions", options.data, {
         headers: options.headers,
       });
-      return ApiResult.success({
-        data: response.data,
-      });
+      let userData = message.messages.at(-1);
+      // 对话记录
+      let content: any[] = [];
+      let record = this.chataiRepository.create({ platform });
+      if (message.id) {
+        let res = await this.chataiRepository.findOne({ where: { id: message.id } });
+        if (res) {
+          record = res;
+        }
+      }
+      content = record.content ? (JSON.parse(record.content) as any[]) : [];
+      content.push(userData);
+      content.push(data.choices.at(-1).message);
+      record.content = JSON.stringify(content);
+      await this.chataiRepository.save(record);
+
+      return ApiResult.success({ data });
     } catch (error) {
       return ApiResult.error(error);
     }
@@ -57,12 +84,24 @@ export class ChataiService {
     };
 
     try {
-      const response = await axios.post(this.apiUrl + "/images/generations", options.data, {
+      const { data } = await axios.post(this.apiUrl + "/images/generations", options.data, {
         headers: options.headers,
       });
-      return ApiResult.success({
-        data: response.data,
-      });
+      return ApiResult.success({ data });
+    } catch (error) {
+      return ApiResult.error(error);
+    }
+  }
+
+  /**
+   * 获取对话记录
+   * @param {string} id 记录id
+   * @returns {Promise<ApiResult<Chatai | null>>} 响应结果
+   */
+  async findOne(id: string): Promise<ApiResult<Chatai | null>> {
+    try {
+      let data = await this.chataiRepository.findOne({ where: { id } });
+      return ApiResult.success({ data });
     } catch (error) {
       return ApiResult.error(error);
     }

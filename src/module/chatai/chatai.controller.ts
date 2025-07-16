@@ -3,7 +3,7 @@ import { ChataiService } from "./chatai.service";
 import { ChatRequestDto, CreateImageDto } from "./dto/index";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
-@ApiTags("AI")
+@ApiTags("AI 套壳接口")
 // @ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })
@@ -16,10 +16,16 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 export class ChataiController {
   constructor(private readonly chataiService: ChataiService) {}
 
-  @Post("chat")
+  @Get("info/:id")
+  @ApiOperation({ summary: "获取对话记录信息" })
+  findOne(@Param("id") id: string) {
+    return this.chataiService.findOne(id);
+  }
+
+  @Post("chat/:platform")
   @ApiOperation({ summary: "AI 对话" })
-  chat(@Body() message: ChatRequestDto) {
-    return this.chataiService.chat(message);
+  chat(@Param("platform") platform: string, @Body() message: ChatRequestDto) {
+    return this.chataiService.chat(message, platform);
   }
 
   @Post("create/images")

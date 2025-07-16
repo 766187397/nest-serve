@@ -39,7 +39,7 @@ export abstract class BaseEntity {
 
 /** UUID基础实体 */
 export abstract class UUIDBaseEntity extends BaseEntity {
-  @PrimaryColumn({ type: "text", length: 36, comment: "uuid" })
+  @PrimaryColumn({ type: "varchar", length: 36, comment: "uuid" })
   id: string;
 
   @BeforeInsert()

@@ -21,10 +21,22 @@ class MessageDto {
 }
 
 export class ChatRequestDto {
+  @ApiProperty({
+    description: "对话内容",
+    example: [{ role: "user", content: "你好" }],
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => MessageDto)
   messages: MessageDto[];
+
+  @ApiProperty({
+    description: "对话记录id，除了首次对话不传，其他对话必须传",
+    example: "",
+  })
+  @IsOptional()
+  @IsString({ message: "对话记录id不能为空" })
+  id?: string;
 }
 
 /** 生成图片DTO */
