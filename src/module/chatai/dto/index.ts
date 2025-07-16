@@ -22,6 +22,14 @@ class MessageDto {
 
 export class ChatRequestDto {
   @ApiProperty({
+    description: "类型",
+    example: "chat",
+  })
+  @IsNotEmpty()
+  @IsString({ message: "类型不能为空" })
+  type: string;
+
+  @ApiProperty({
     description: "对话内容",
     example: [{ role: "user", content: "你好" }],
   })

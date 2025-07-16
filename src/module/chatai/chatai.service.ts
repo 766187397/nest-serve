@@ -47,7 +47,7 @@ export class ChataiService extends BaseService {
       let userData = message.messages.at(-1);
       // 对话记录
       let content: any[] = [];
-      let record = this.chataiRepository.create({ platform });
+      let record = this.chataiRepository.create({ platform, type: message.type });
       if (message.id) {
         let res = await this.chataiRepository.findOne({ where: { id: message.id } });
         if (res) {
