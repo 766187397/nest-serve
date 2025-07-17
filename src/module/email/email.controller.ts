@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
 import { EmailService } from "./email.service";
-import { CreateEmailDto, UpdateEmailDto } from "./dto";
+import { CreateEmailDto, SendEmail, UpdateEmailDto } from "./dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 
@@ -51,5 +51,11 @@ export class EmailController {
   @ApiOperation({ summary: "删除邮箱模板" })
   remove(@Param("id") id: string) {
     return this.emailService.remove(id);
+  }
+
+  @Post("send/email")
+  @ApiOperation({ summary: "发送邮箱" })
+  sendEmail(@Body() sendEmail: SendEmail) {
+    return this.emailService.sendEmail(sendEmail);
   }
 }
