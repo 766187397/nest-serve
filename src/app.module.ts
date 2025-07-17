@@ -21,6 +21,7 @@ import { DebugConfig, ErrorConfig, InfoConfig, WarnConfig } from "./config/logge
 import { NoticeModule } from "./module/notice/notice.module";
 import { DictionaryModule } from "./module/dictionary/dictionary.module";
 import { ChataiModule } from './module/chatai/chatai.module';
+import { EmailModule } from './module/email/email.module';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { ChataiModule } from './module/chatai/chatai.module';
     NoticeModule,
     DictionaryModule,
     ChataiModule,
+    EmailModule,
   ],
   controllers: [],
   providers: [
