@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
 import { EmailService } from "./email.service";
-import { CreateEmailDto, SendEmail, UpdateEmailDto } from "./dto";
+import { CreateEmailDto, FindEmailDto, FindEmailtoByPage, SendEmail, UpdateEmailDto } from "./dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 
@@ -25,32 +25,32 @@ export class EmailController {
 
   @Get("page/:platform")
   @ApiOperation({ summary: "查询邮箱列表(分页)" })
-  findByPage(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findEmailtoByPage: any) {
+  findByPage(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findEmailtoByPage: FindEmailtoByPage) {
     return this.emailService.findByPage(findEmailtoByPage, platform);
   }
 
   @Get("all/:platform")
   @ApiOperation({ summary: "查询邮箱列表(不分页)" })
-  findAll(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findEmailDto: any) {
+  findAll(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findEmailDto: FindEmailDto) {
     return this.emailService.findAll(findEmailDto, platform);
   }
 
   @Get("info/:id")
   @ApiOperation({ summary: "查询邮箱详情" })
   findOne(@Param("id") id: string) {
-    return this.emailService.findOne(id);
+    return this.emailService.findOne(+id);
   }
 
   @Patch("update/:id")
   @ApiOperation({ summary: "更新邮箱模板" })
   update(@Param("id") id: string, @Body() updateEmailDto: UpdateEmailDto) {
-    return this.emailService.update(id, updateEmailDto);
+    return this.emailService.update(+id, updateEmailDto);
   }
 
   @Delete("delete/:id")
   @ApiOperation({ summary: "删除邮箱模板" })
   remove(@Param("id") id: string) {
-    return this.emailService.remove(id);
+    return this.emailService.remove(+id);
   }
 
   @Post("send/email")

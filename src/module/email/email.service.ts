@@ -1,12 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { CreateEmailDto, SendEmail, UpdateEmailDto } from "./dto";
+import { CreateEmailDto, FindEmailDto, FindEmailtoByPage, SendEmail, UpdateEmailDto } from "./dto";
 import { BaseService } from "@/common/service/base";
 import * as nodemailer from "nodemailer";
 import * as nodeCache from "node-cache";
 import { EmailConfig } from "@/config/email";
 import { EmailCahce } from "@/types/email";
 import { ApiResult } from "@/common/utils/result";
-import { resolve } from "path";
+import { Email } from "./entities/email.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { ILike, Repository } from "typeorm";
+import { PageApiResult } from "@/types/public";
 
 // 创建一个NodeCache实例，设置过期时间为60秒
 const cache = new nodeCache({ stdTTL: 60 });
@@ -24,34 +27,151 @@ const QQPostbox = nodemailer.createTransport({
 
 @Injectable()
 export class EmailService extends BaseService {
-  create(createEmailDto: CreateEmailDto, platform: string = "admin") {
-    return "This action adds a new email";
+  constructor(
+    @InjectRepository(Email)
+    private emailRepository: Repository<Email>
+  ) {
+    super();
   }
 
-  findByPage(findUserDtoByPage: any, platform: string = "admin") {
-    return `This action returns all email`;
+  /**
+   * 创建邮箱模板
+   * @param {CreateEmailDto} createEmailDto
+   * @param {string} platform 平台标识字符串(admin/web/app/mini)
+   * @returns {Promise<ApiResult<Email | null>>} 统一返回结果
+   */
+  async create(createEmailDto: CreateEmailDto, platform: string = "admin"): Promise<ApiResult<Email | null>> {
+    try {
+      let email = this.emailRepository.create({ ...createEmailDto, platform });
+      let data = await this.emailRepository.save(email);
+      return ApiResult.success<Email>({ data });
+    } catch (error) {
+      return ApiResult.error<null>(error);
+    }
   }
 
-  findAll(findEmailDto: any, platform: string = "admin") {
-    return `This action returns all email`;
+  /**
+   * 分页查询邮箱模板
+   * @param {FindEmailtoByPage} findEmailtoByPage
+   * @param {string} platform 平台标识字符串(admin/web/app/mini)
+   * @returns {Promise<ApiResult<PageApiResult<Email[]> | null>>} 统一返回结果
+   */
+  async findByPage(
+    findEmailtoByPage: FindEmailtoByPage,
+    platform: string = "admin"
+  ): Promise<ApiResult<PageApiResult<Email[]> | null>> {
+    try {
+      let { take, skip } = this.buildCommonPaging(findEmailtoByPage?.page, findEmailtoByPage?.pageSize);
+      let where = this.buildCommonQuery(findEmailtoByPage);
+      let order = this.buildCommonSort(findEmailtoByPage?.sort);
+      // 查询符合条件的用户
+      const [data, total] = await this.emailRepository.findAndCount({
+        where: {
+          ...where,
+          platform: platform,
+          title: findEmailtoByPage?.title ? ILike(`%${findEmailtoByPage.title}%`) : undefined,
+        },
+        order: {
+          ...order,
+        },
+        skip, // 跳过的条数
+        take, // 每页条数
+      });
+
+      // 计算总页数
+      const totalPages = Math.ceil(total / take);
+      return ApiResult.success<PageApiResult<Email[]>>({
+        data: {
+          data,
+          total,
+          totalPages,
+          page: findEmailtoByPage?.page || 1,
+          pageSize: findEmailtoByPage?.pageSize || 10,
+        },
+      });
+    } catch (error) {
+      return ApiResult.error(error);
+    }
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} email`;
+  /**
+   * 查询所有邮箱模板
+   * @param {FindEmailDto} findEmailDto
+   * @param platform 平台标识字符串(admin/web/app/mini)
+   * @returns {Promise<ApiResult<Email[] | null>>} 统一返回结果
+   */
+  async findAll(findEmailDto: FindEmailDto, platform: string = "admin"): Promise<ApiResult<Email[] | null>> {
+    try {
+      let where = this.buildCommonQuery(findEmailDto);
+      let order = this.buildCommonSort(findEmailDto?.sort);
+      let data = await this.emailRepository.find({
+        where: {
+          ...where,
+          platform,
+          title: findEmailDto?.title ? ILike(`%${findEmailDto.title}%`) : undefined,
+        },
+        order: {
+          ...order,
+        },
+      }); // 查询所有用户并返回;
+      return ApiResult.success<Email[]>({ data });
+    } catch (error) {
+      return ApiResult.error(error);
+    }
   }
 
-  update(id: string, updateEmailDto: UpdateEmailDto) {
-    return `This action updates a #${id} email`;
+  /**
+   * 查询邮箱详情
+   * @param {number} id
+   * @returns {Promise<ApiResult<Email | null>>} 统一返回结果
+   */
+  async findOne(id: number): Promise<ApiResult<Email | null>> {
+    try {
+      let email = await this.emailRepository.findOneBy({ id });
+      return ApiResult.success<Email>({ data: email });
+    } catch (error) {
+      return ApiResult.error<null>(error);
+    }
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} email`;
+  /**
+   * 更新邮箱模板
+   * @param {number} id
+   * @param {UpdateEmailDto} updateEmailDto
+   * @returns {Promise<ApiResult<null>>} 统一返回结果
+   */
+  async update(id: number, updateEmailDto: UpdateEmailDto): Promise<ApiResult<null>> {
+    try {
+      let email = await this.emailRepository.findOneBy({ id });
+      if (!email) {
+        return ApiResult.error({ code: 404, message: "邮箱不存在" });
+      }
+      Object.assign(email, updateEmailDto);
+      await this.emailRepository.save(email);
+      return ApiResult.success();
+    } catch (error) {
+      return ApiResult.error(error);
+    }
+  }
+
+  /**
+   * 删除邮箱
+   * @param {number} id id
+   * @returns { Promise<ApiResult<null>>} 统一返回结果
+   */
+  async remove(id: number): Promise<ApiResult<null>> {
+    try {
+      let data = await this.emailRepository.softDelete(id);
+      return ApiResult.success();
+    } catch (error) {
+      return ApiResult.error(error);
+    }
   }
 
   /**
    * 发送邮件
    * @param {SendEmail} sendEmail
-   * @returns
+   * @returns {ApiResult<any> | Promise<ApiResult<any>>} 统一返回结果
    */
   sendEmail(sendEmail: SendEmail): ApiResult<any> | Promise<ApiResult<any>> {
     try {

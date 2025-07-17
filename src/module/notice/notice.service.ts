@@ -24,8 +24,8 @@ export class NoticeService extends BaseService {
    */
   async create(createNoticeDto: CreateNoticeDto, platform: string = "admin"): Promise<ApiResult<Notice | null>> {
     try {
-      let createData = Object.assign(createNoticeDto, { platform });
-      let notice = this.noticeRepository.create(createData);
+      Object.assign(createNoticeDto, { platform });
+      let notice = this.noticeRepository.create(createNoticeDto);
       let data = await this.noticeRepository.save(notice);
       return ApiResult.success<Notice>({ data });
     } catch (error) {

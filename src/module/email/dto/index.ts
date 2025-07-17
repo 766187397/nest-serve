@@ -1,6 +1,6 @@
-import { CreateBaseDto } from "@/common/dto/base";
-import { PartialType } from "@nestjs/mapped-types";
-import { ApiProperty } from "@nestjs/swagger";
+import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
+// import { PartialType } from "@nestjs/mapped-types";
+import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 class EmailOptionalDto extends CreateBaseDto {
@@ -19,16 +19,27 @@ class EmailOptionalDto extends CreateBaseDto {
 export class CreateEmailDto extends EmailOptionalDto {}
 
 /** 更新邮箱模板 */
-export class UpdateEmailDto extends PartialType(EmailOptionalDto) {
-  @ApiProperty({ description: "邮件标题", example: "测试邮件" })
-  @IsOptional()
-  @IsString({ message: "标题字符串" })
-  title?: string;
+export class UpdateEmailDto extends PartialType(EmailOptionalDto) {}
 
-  @ApiProperty({ description: "邮件内容", example: "这是测试邮件" })
+/** 不分页请求模板 */
+export class FindEmailDto extends FindByParameter {
+  @ApiProperty({ description: "邮箱标题" })
   @IsOptional()
-  @IsString({ message: "内容字符串" })
-  content?: string;
+  @IsString({ message: "标题必须是字符串" })
+  title?: string;
+}
+
+/** 分页请求模板 */
+export class FindEmailtoByPage extends FindEmailDto {
+  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
+  @IsOptional()
+  @IsString({ message: "page必须是字符串" })
+  page?: string;
+
+  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
+  @IsOptional()
+  @IsString({ message: "pageSize必须是字符串" })
+  pageSize?: string;
 }
 
 /** 发送邮件 */

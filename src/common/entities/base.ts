@@ -53,5 +53,5 @@ export abstract class UUIDBaseEntity extends BaseEntity {
 /** 自增id基础实体 */
 export abstract class AutoIDBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ comment: "ID" })
-  id: string;
+  id: number;
 }
