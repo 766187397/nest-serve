@@ -1,7 +1,7 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
 // import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 class EmailOptionalDto extends CreateBaseDto {
   @ApiProperty({ description: "邮件标题", example: "测试邮件" })
@@ -43,7 +43,12 @@ export class FindEmailtoByPage extends FindEmailDto {
 }
 
 /** 发送邮件 */
-export class SendEmail extends EmailOptionalDto {
+export class SendEmail {
+  @ApiProperty({ description: "模板ID" })
+  @IsNumber({}, { message: "模板ID必须是数字" })
+  @IsNotEmpty({ message: "邮箱是必填项" }) // 必填校验
+  id: number;
+
   @ApiProperty({ description: "收件人邮箱", example: "766187397@qq.com" })
   @IsString({ message: "邮箱字符串" })
   @IsNotEmpty({ message: "邮箱是必填项" }) // 必填校验

@@ -173,8 +173,13 @@ export class EmailService extends BaseService {
    * @param {SendEmail} sendEmail
    * @returns {ApiResult<any> | Promise<ApiResult<any>>} 统一返回结果
    */
-  sendEmail(sendEmail: SendEmail): ApiResult<any> | Promise<ApiResult<any>> {
+  async sendEmail(sendEmail: SendEmail): Promise<ApiResult<any>> {
     try {
+      const emailTemplate = await this.emailRepository.findOneBy({ id: sendEmail.id });
+      if (!emailTemplate) {
+        return ApiResult.error({ code: 404, message: "邮箱模板不存在" });
+      }
+
       // 检查该收件人是否在缓存中
       const info: EmailCahce = cache.get(sendEmail.email) as EmailCahce;
       if (info && info.state) {
@@ -189,9 +194,9 @@ export class EmailService extends BaseService {
       let mailOptions = {
         from: EmailConfig.QQ.auth.user,
         to: sendEmail.email,
-        subject: sendEmail.title,
+        subject: emailTemplate.title,
         // text: "",
-        html: sendEmail.content,
+        html: emailTemplate.content,
       };
       return new Promise((resolve, reject) => {
         // 发送邮件
