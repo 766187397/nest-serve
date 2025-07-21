@@ -193,7 +193,7 @@ export class EmailService extends BaseService {
         });
       }
 
-      const { html, code, time } = this.handleTemplate(emailTemplate.content, userInfo);
+      const { html, code } = this.handleTemplate(emailTemplate.content, userInfo);
 
       // 设置邮件信息
       const mailOptions = {
@@ -215,6 +215,7 @@ export class EmailService extends BaseService {
           cache.set(sendEmail.email, {
             state: true,
             time: time.format("YYYY-MM-DD HH:mm:ss"),
+            code: code,
           });
           resolve(ApiResult.success({ data: info }));
         });
@@ -230,13 +231,17 @@ export class EmailService extends BaseService {
    * @param userInfo 用户信息
    * @return  返回处理后的内容
    */
-  handleTemplate(text: string, userInfo: User): { html: string; code: string; time: number } {
+  handleTemplate(text: string, userInfo: User): { html: string; code: string } {
     let code = generateRandomString(6);
     let reg = new RegExp("\\{(\\w+)\\}", "g");
     return {
-      html: text.replace(reg, (match, key) => userInfo[key] || code || ""),
+      html: text.replace(reg, (match, key) => {
+        if (key === "code") {
+          return code; // 如果是code变量，直接返回生成的验证码
+        }
+        return userInfo[key] || "";
+      }),
       code,
-      time: 1,
     };
   }
 }
