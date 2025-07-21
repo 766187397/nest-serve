@@ -252,7 +252,7 @@ export class UsersService extends BaseService {
       });
 
       if (!data) {
-        return ApiResult.error<null>("用户不存在");
+        return ApiResult.error<null>("账号不存在");
       }
       const status = await bcryptService.validateStr(logInDto.password, data.password);
       if (!status) {
@@ -350,7 +350,7 @@ export class UsersService extends BaseService {
         relations: ["roles"],
       });
       if (!data) {
-        return ApiResult.error<null>("用户不存在");
+        return ApiResult.error<null>("邮箱不存在");
       }
       // 验证码校验逻辑
       // 检查该收件人是否在缓存中
