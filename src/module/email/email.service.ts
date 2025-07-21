@@ -240,10 +240,13 @@ export class EmailService extends BaseService {
   handleTemplate(text: string, userInfo: User): { html: string; code: string } {
     let code = generateRandomString(6);
     let reg = new RegExp("\\{(\\w+)\\}", "g");
+    let createdAt = this.dayjs().format("YYYY-MM-DD HH:mm:ss");
     return {
       html: text.replace(reg, (match, key) => {
         if (key === "code") {
           return code; // 如果是code变量，直接返回生成的验证码
+        } else if (key === "createdAt") {
+          return createdAt; // 如果是createdAt变量，直接返回当前时间
         }
         return userInfo[key] || "";
       }),
