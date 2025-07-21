@@ -2,4 +2,5 @@
 export interface EmailCahce {
   state: Boolean;
   time: string;
+  code: string;
 }

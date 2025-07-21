@@ -1,5 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import { CreateUserDto, FindUserDto, FindUserDtoByPage, LogInDto, UpdateUserDto } from "./dto/index";
+import {
+  CreateUserDto,
+  FindUserDto,
+  FindUserDtoByPage,
+  LogInDto,
+  UpdateUserDto,
+  VerificationCodeLoginDto,
+} from "./dto/index";
 import { ApiResult } from "@/common/utils/result";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
@@ -11,6 +18,8 @@ import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
 import { PageApiResult } from "@/types/public";
 import { RefreshToken, UserLogin } from "@/types/user";
 import { Role } from "@/module/roles/entities/role.entity";
+import { EmailCahce } from "@/types/email";
+import { cache } from "@/config/nodeCache";
 
 @Injectable()
 export class UsersService extends BaseService {
@@ -322,6 +331,65 @@ export class UsersService extends BaseService {
         return ApiResult.error<null>({ data: null, message: "用户身份信息过期，请重新登录！", code: 401 });
       }
       return ApiResult.error<null>(error || "刷新token失败，请重新登录！");
+    }
+  }
+
+  /**
+   * 邮箱登录
+   * @param {VerificationCodeLoginDto} verificationCodeLogin
+   * @param {string} platform 平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<UserLogin | null>>} 统一返回结果
+   */
+  async VerificationCodeLogin(
+    verificationCodeLogin: VerificationCodeLoginDto,
+    platform: string = "admin"
+  ): Promise<ApiResult<UserLogin | null>> {
+    try {
+      let data = await this.userRepository.findOne({
+        where: { email: verificationCodeLogin.email, platform },
+        relations: ["roles"],
+      });
+      if (!data) {
+        return ApiResult.error<null>("用户不存在");
+      }
+      // 验证码校验逻辑
+      // 检查该收件人是否在缓存中
+      const cacheData: EmailCahce = cache.get(verificationCodeLogin.email) as EmailCahce;
+      if (cacheData?.code !== verificationCodeLogin.code) {
+        return ApiResult.error<null>("验证码错误或已过期");
+      }
+      // 如果验证码正确，删除缓存中的验证码
+      cache.del(verificationCodeLogin.email);
+
+      // 这个状态需要自定义
+      if (data.status === 2) {
+        return ApiResult.error<null>("当前账号已被禁用，请联系管理员！");
+      }
+      let { password, deletedAt, platform: userPlatform, ...info } = data;
+
+      let options = getPlatformJwtConfig(platform) as JwtConfig;
+      let userInfo = {
+        userInfo: {
+          ...info,
+          createdAt: this.dayjs(info.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+          updatedAt: this.dayjs(info.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
+        },
+        token_type: "Bearer ",
+        access_token: this.jwtService.sign(info, {
+          secret: options.secret,
+          expiresIn: options.jwt_expires_in,
+        }),
+        refresh_token: this.jwtService.sign(
+          { id: info.id },
+          {
+            secret: options.secret,
+            expiresIn: options.jwt_refresh_expires_in,
+          }
+        ),
+      };
+      return ApiResult.success<UserLogin>({ data: userInfo });
+    } catch (error) {
+      return ApiResult.error<null>(error || "用户登录失败，请稍后再试");
     }
   }
 }

@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { CreateEmailDto, FindEmailDto, FindEmailtoByPage, SendEmail, UpdateEmailDto } from "./dto";
 import { BaseService } from "@/common/service/base";
 import * as nodemailer from "nodemailer";
-import * as nodeCache from "node-cache";
 import { EmailConfig } from "@/config/email";
 import { EmailCahce } from "@/types/email";
 import { ApiResult } from "@/common/utils/result";
@@ -12,9 +11,7 @@ import { ILike, Repository } from "typeorm";
 import { PageApiResult } from "@/types/public";
 import { User } from "@/module/users/entities/user.entity";
 import { generateRandomString } from "@/common/utils/tool";
-
-// 创建一个NodeCache实例，设置过期时间为60秒
-const cache = new nodeCache({ stdTTL: 60 });
+import { cache, cacheTime } from "@/config/nodeCache";
 
 // 创建一个SMTP客户端配置对象
 const QQPostbox = nodemailer.createTransport({
@@ -183,6 +180,15 @@ export class EmailService extends BaseService {
         return ApiResult.error({ code: 404, message: "邮箱模板不存在" });
       }
 
+      // 清理所有缓存
+      // cache.flushAll();
+      // 查看现在的缓存项
+      // console.log('cache.keys() :>> ', cache.keys());
+      // 删除特定的缓存项
+      // cache.del('key1');
+      // 删除已经过期的
+      // cache.check()
+      // 判断是否存在cache.has()
       // 检查该收件人是否在缓存中
       const info: EmailCahce = cache.get(sendEmail.email) as EmailCahce;
       if (info && info.state) {
@@ -211,7 +217,7 @@ export class EmailService extends BaseService {
           }
 
           // 将收件人的邮箱地址添加到缓存中
-          let time = this.dayjs().add(1, "m");
+          let time = this.dayjs().add(cacheTime, "m");
           cache.set(sendEmail.email, {
             state: true,
             time: time.format("YYYY-MM-DD HH:mm:ss"),

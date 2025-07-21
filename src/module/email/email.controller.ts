@@ -56,7 +56,7 @@ export class EmailController {
   }
 
   @Post("send/email")
-  @ApiOperation({ summary: "发送邮箱（自定义变量格式：验证码为{code}。）" })
+  @ApiOperation({ summary: "发送邮箱（自定义变量格式：验证码为{code}）" })
   sendEmail(@Body() sendEmail: SendEmail, @Req() req: Request) {
     let userInfo = req.userInfo as User;
     return this.emailService.sendEmail(sendEmail, userInfo);

@@ -1,6 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res, Req } from "@nestjs/common";
 import { UsersService } from "./users.service";
-import { CreateUserDto, UpdateUserDto, FindUserDto, FindUserDtoByPage, LogInDto } from "./dto/index";
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  FindUserDto,
+  FindUserDtoByPage,
+  LogInDto,
+  VerificationCodeLoginDto,
+} from "./dto/index";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request, Response } from "express";
@@ -77,6 +84,12 @@ export class UsersController {
     } else {
       res.status(data.code).json(data);
     }
+  }
+
+  @Post("logIn/verificationCode")
+  @ApiOperation({ summary: "邮箱验证码登录" })
+  async verificationCodeLogin(@Body() verificationCodeLogin: VerificationCodeLoginDto) {
+    return this.usersService.VerificationCodeLogin(verificationCodeLogin, "admin");
   }
 
   @Get("refresh/token")

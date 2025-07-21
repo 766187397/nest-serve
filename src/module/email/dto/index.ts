@@ -9,7 +9,7 @@ class EmailOptionalDto extends CreateBaseDto {
   @IsNotEmpty({ message: "标题是必填项" })
   title: string;
 
-  @ApiProperty({ description: "邮件内容", example: "这是测试邮件" })
+  @ApiProperty({ description: "邮件内容；自定义变量有{code|用户信息}", example: "这是测试邮件" })
   @IsString({ message: "内容字符串" })
   @IsNotEmpty({ message: "内容是必填项" })
   content: string;

@@ -114,10 +114,7 @@ export class FindUserDtoByPage extends FindUserDto {
   pageSize?: string;
 }
 
-/**
- * 登录
- */
-
+/** 登录 */
 export class LogInDto {
   @ApiProperty({ description: "账号", example: "admin" })
   @IsString({ message: "账号字符串" })
@@ -128,4 +125,17 @@ export class LogInDto {
   @IsString({ message: "密码字符串" })
   @IsNotEmpty({ message: "密码是必填项" })
   password: string;
+}
+
+/** 验证码 */
+export class VerificationCodeLoginDto {
+  @ApiProperty({ description: "验证码", example: "123456" })
+  @IsString({ message: "验证码字符串" })
+  @IsNotEmpty({ message: "验证码是必填项" })
+  code: string;
+
+  @ApiProperty({ description: "邮箱", example: "766187397@qq.com" })
+  @IsEmail({}, { message: "邮箱格式错误" })
+  @IsNotEmpty({ message: "邮箱是必填项" })
+  email: string;
 }
