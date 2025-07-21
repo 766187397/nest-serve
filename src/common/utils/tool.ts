@@ -40,3 +40,15 @@ export function calculatePagination(
   const skip = (page - 1) * pageSize;
   return { take, skip };
 }
+
+/**
+ * 随机字符串生成函数
+ * @param {number} length 生成的字符串长度
+ * @returns {string} 随机字符串
+ */
+export function generateRandomString(length: number): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array, (byte) => chars[byte % chars.length]).join("");
+}

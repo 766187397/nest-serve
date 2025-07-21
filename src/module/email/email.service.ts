@@ -10,6 +10,8 @@ import { Email } from "./entities/email.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ILike, Repository } from "typeorm";
 import { PageApiResult } from "@/types/public";
+import { User } from "@/module/users/entities/user.entity";
+import { generateRandomString } from "@/common/utils/tool";
 
 // 创建一个NodeCache实例，设置过期时间为60秒
 const cache = new nodeCache({ stdTTL: 60 });
@@ -171,9 +173,10 @@ export class EmailService extends BaseService {
   /**
    * 发送邮件
    * @param {SendEmail} sendEmail
+   * @param {User} userInfo 请求用户信息
    * @returns {ApiResult<any> | Promise<ApiResult<any>>} 统一返回结果
    */
-  async sendEmail(sendEmail: SendEmail): Promise<ApiResult<any>> {
+  async sendEmail(sendEmail: SendEmail, userInfo: User): Promise<ApiResult<any>> {
     try {
       const emailTemplate = await this.emailRepository.findOneBy({ id: sendEmail.id });
       if (!emailTemplate) {
@@ -190,13 +193,15 @@ export class EmailService extends BaseService {
         });
       }
 
+      const { html, code, time } = this.handleTemplate(emailTemplate.content, userInfo);
+
       // 设置邮件信息
-      let mailOptions = {
+      const mailOptions = {
         from: EmailConfig.QQ.auth.user,
         to: sendEmail.email,
         subject: emailTemplate.title,
         // text: "",
-        html: emailTemplate.content,
+        html,
       };
       return new Promise((resolve, reject) => {
         // 发送邮件
@@ -217,5 +222,21 @@ export class EmailService extends BaseService {
     } catch (error) {
       return ApiResult.error({ code: 500, message: "发送失败", data: `${error}` });
     }
+  }
+
+  /**
+   * 处理模板自定义变量
+   * @param text 内容
+   * @param userInfo 用户信息
+   * @return  返回处理后的内容
+   */
+  handleTemplate(text: string, userInfo: User): { html: string; code: string; time: number } {
+    let code = generateRandomString(6);
+    let reg = new RegExp("\\{(\\w+)\\}", "g");
+    return {
+      html: text.replace(reg, (match, key) => userInfo[key] || code || ""),
+      code,
+      time: 1,
+    };
   }
 }

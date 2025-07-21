@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from "@nestjs/common";
 import { EmailService } from "./email.service";
 import { CreateEmailDto, FindEmailDto, FindEmailtoByPage, SendEmail, UpdateEmailDto } from "./dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
+import { Request } from "express";
+import { User } from "@/module/users/entities/user.entity";
 
 @ApiTags("admin - 邮箱管理")
 // @ApiBearerAuth("Authorization")
@@ -54,8 +56,9 @@ export class EmailController {
   }
 
   @Post("send/email")
-  @ApiOperation({ summary: "发送邮箱" })
-  sendEmail(@Body() sendEmail: SendEmail) {
-    return this.emailService.sendEmail(sendEmail);
+  @ApiOperation({ summary: "发送邮箱（自定义变量格式：验证码为{code}。）" })
+  sendEmail(@Body() sendEmail: SendEmail, @Req() req: Request) {
+    let userInfo = req.userInfo as User;
+    return this.emailService.sendEmail(sendEmail, userInfo);
   }
 }
