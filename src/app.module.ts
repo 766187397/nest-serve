@@ -23,11 +23,6 @@ import { DictionaryModule } from "./module/dictionary/dictionary.module";
 import { ChataiModule } from "./module/chatai/chatai.module";
 import { EmailModule } from "./module/email/email.module";
 import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
-import { glob } from "glob";
-
-const allEntities = glob.sync(join(__dirname, "module", "**", "*.entity{.ts,.js}"));
-const filteredEntities = allEntities.filter((path) => !path.includes(join("module", "logger")));
-
 @Module({
   imports: [
     // 配置 ConfigModule 作为全局模块，并根据 NODE_ENV 加载相应的 .env 文件
@@ -47,7 +42,10 @@ const filteredEntities = allEntities.filter((path) => !path.includes(join("modul
             database: config.DB_DATABASE,
             synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
             logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
-            entities: filteredEntities, // 匹配非logger所有 .entity.ts 或 .entity.js 文件
+            // entities: filteredEntities, // 匹配非logger所有 .entity.ts 或 .entity.js 文件
+
+            pattern: join(__dirname, "module", "**", "*.entity.{ts,js}"),
+            exclude: [join(__dirname, "module", "logger", "**", "*.entity.{ts,js}")],
             migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
           };
         } else {
@@ -61,7 +59,9 @@ const filteredEntities = allEntities.filter((path) => !path.includes(join("modul
             database: config.DB_DATABASE,
             synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
             logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
-            entities: filteredEntities, // 匹配非logger所有 .entity.ts 或 .entity.js 文件
+            // entities: filteredEntities, // 匹配非logger所有 .entity.ts 或 .entity.js 文件
+            pattern: join(__dirname, "module", "**", "*.entity.{ts,js}"),
+            exclude: [join(__dirname, "module", "logger", "**", "*.entity.{ts,js}")],
             migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
           };
         }
