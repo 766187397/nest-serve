@@ -7,11 +7,31 @@ import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import { join } from "path";
 import { Logger } from "winston";
 import { promises as fsPromises } from "fs";
+import { BaseService } from "@/common/service/base";
+import { Log } from "./entities/logger.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { LogOptionalDto } from "./dto/index";
 
 @Injectable()
-export class LoggerService {
+export class LoggerService extends BaseService {
   logRootDir = BaseFileUrl; // 日志根目录路径
-  constructor(@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {}
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @InjectRepository(Log, "logger")
+    private logRepository: Repository<Log>
+  ) {
+    super();
+  }
+
+  /**
+   * 创建日志
+   * @param {LogOptionalDto} logOptionalDto
+   */
+  async create(logOptionalDto: LogOptionalDto) {
+    let data = this.logRepository.create(logOptionalDto);
+    await this.logRepository.save(data);
+  }
 
   info(message: string, options?: any) {
     this.logger.info(message, options);
