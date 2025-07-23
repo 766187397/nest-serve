@@ -4,6 +4,11 @@ import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 class EmailOptionalDto extends CreateBaseDto {
+  @ApiProperty({ description: "邮件标签", example: "loginCode" })
+  @IsString({ message: "标题字符串" })
+  @IsNotEmpty({ message: "标题是必填项" })
+  label: string;
+
   @ApiProperty({ description: "邮件标题", example: "测试邮件" })
   @IsString({ message: "标题字符串" })
   @IsNotEmpty({ message: "标题是必填项" })
@@ -44,13 +49,13 @@ export class FindEmailtoByPage extends FindEmailDto {
 
 /** 发送邮件 */
 export class SendEmail {
-  @ApiProperty({ description: "模板ID" })
-  @IsNumber({}, { message: "模板ID必须是数字" })
-  @IsNotEmpty({ message: "邮箱是必填项" }) // 必填校验
-  id: number;
+  @ApiProperty({ description: "模板标签" })
+  @IsString({ message: "lavel必须是字符串" })
+  @IsNotEmpty({ message: "lavel必须是必填项" }) // 必填校验
+  label: string;
 
   @ApiProperty({ description: "收件人邮箱", example: "766187397@qq.com" })
   @IsString({ message: "邮箱字符串" })
-  @IsNotEmpty({ message: "邮箱是必填项" }) // 必填校验
+  @IsNotEmpty({ message: "email是必填项" }) // 必填校验
   email: string;
 }

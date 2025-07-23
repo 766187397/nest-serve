@@ -7,6 +7,7 @@ import { Role } from "@/module/roles/entities/role.entity";
 import { Route } from "@/module/routes/entities/route.entity";
 import { Dictionary } from "@/module/dictionary/entities/dictionary.entity";
 import { DictionaryItem } from "@/module/dictionary/entities/dictionaryItem.entity";
+import { Email } from "@/module/email/entities/email.entity";
 
 @Injectable()
 export class defaultData implements OnApplicationBootstrap {
@@ -27,20 +28,24 @@ export class defaultData implements OnApplicationBootstrap {
     @InjectRepository(Dictionary)
     private readonly dictionaryRepository: Repository<Dictionary>,
 
-    /** 字典项*/
+    /** 字典项 */
     @InjectRepository(DictionaryItem)
-    private readonly dictionaryItemRepository: Repository<DictionaryItem>
+    private readonly dictionaryItemRepository: Repository<DictionaryItem>,
+
+    /** 邮箱 */
+    @InjectRepository(Email)
+    private readonly emailRepository: Repository<Email>
   ) {}
 
   async onApplicationBootstrap() {
     await this.seedRoutes();
     await this.seedRoles();
     await this.seedUsers();
-
     await this.seedDictionary();
+    await this.seedEmails();
   }
 
-  // 插入默认用户数据
+  /** 用户数据信息 */
   private async seedUsers() {
     const count = await this.userRepository.count();
     if (count === 0) {
@@ -54,7 +59,7 @@ export class defaultData implements OnApplicationBootstrap {
           nickName: "管理员",
           password,
           phone: "18888888888",
-          email: "admin@example.com",
+          email: "766187397@qq.com",
           sex: "0",
           platform: "admin",
           roles: admin ? [admin] : [],
@@ -508,6 +513,29 @@ export class defaultData implements OnApplicationBootstrap {
 
       const dictionariesItem = dictionariesItemData.map((item) => this.dictionaryItemRepository.create(item));
       await this.dictionaryItemRepository.save(dictionariesItem); // 插入数据
+    }
+  }
+
+  /** 邮箱模板 */
+  private async seedEmails() {
+    const count = await this.emailRepository.count();
+    if (count === 0) {
+      const emailData = [
+        // {
+        //   platform: "admin",
+        //   title: "您好 {nickName}，这是您的验证码！",
+        //   content: "您好 {nickName}，您正在尝试登录，验证码：{code}。",
+        // },
+        {
+          label: "logonCode",
+          platform: "admin",
+          title: "尊敬的用户您好，这是您的验证码！",
+          content: "尊敬的用户您好，您正在尝试登录，验证码：{code}。",
+        },
+      ];
+
+      const email = emailData.map((item) => this.emailRepository.create(item));
+      await this.emailRepository.save(email);
     }
   }
 }

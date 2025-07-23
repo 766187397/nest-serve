@@ -41,6 +41,11 @@ export class EmailService extends BaseService {
    */
   async create(createEmailDto: CreateEmailDto, platform: string = "admin"): Promise<ApiResult<Email | null>> {
     try {
+      let emailInfo = await this.emailRepository.findOne({ where: { label: createEmailDto.label } });
+      if (emailInfo) {
+        return ApiResult.error({ code: 400, message: "邮箱模板已存在" });
+      }
+
       let email = this.emailRepository.create({ ...createEmailDto, platform });
       let data = await this.emailRepository.save(email);
       return ApiResult.success<Email>({ data });
@@ -173,9 +178,9 @@ export class EmailService extends BaseService {
    * @param {User} userInfo 请求用户信息
    * @returns {ApiResult<any> | Promise<ApiResult<any>>} 统一返回结果
    */
-  async sendEmail(sendEmail: SendEmail, userInfo: User): Promise<ApiResult<any>> {
+  async sendEmail(sendEmail: SendEmail, userInfo?: User): Promise<ApiResult<any>> {
     try {
-      const emailTemplate = await this.emailRepository.findOneBy({ id: sendEmail.id });
+      const emailTemplate = await this.emailRepository.findOneBy({ label: sendEmail.label });
       if (!emailTemplate) {
         return ApiResult.error({ code: 404, message: "邮箱模板不存在" });
       }
@@ -199,13 +204,15 @@ export class EmailService extends BaseService {
         });
       }
 
-      const { html, code } = this.handleTemplate(emailTemplate.content, userInfo);
+      const { text: title } = this.handleTemplate(emailTemplate.title, userInfo);
+
+      const { text: html, code } = this.handleTemplate(emailTemplate.content, userInfo);
 
       // 设置邮件信息
       const mailOptions = {
         from: EmailConfig.QQ.auth.user,
         to: sendEmail.email,
-        subject: emailTemplate.title,
+        subject: title,
         // text: "",
         html,
       };
@@ -237,18 +244,18 @@ export class EmailService extends BaseService {
    * @param userInfo 用户信息
    * @return  返回处理后的内容
    */
-  handleTemplate(text: string, userInfo: User): { html: string; code: string } {
+  handleTemplate(text: string, userInfo: User | undefined): { text: string; code: string } {
     let code = generateRandomString(6);
     let reg = new RegExp("\\{(\\w+)\\}", "g");
     let createdAt = this.dayjs().format("YYYY-MM-DD HH:mm:ss");
     return {
-      html: text.replace(reg, (match, key) => {
+      text: text.replace(reg, (match, key) => {
         if (key === "code") {
           return code; // 如果是code变量，直接返回生成的验证码
         } else if (key === "createdAt") {
           return createdAt; // 如果是createdAt变量，直接返回当前时间
         }
-        return userInfo[key] || "";
+        return userInfo ? userInfo[key] : "";
       }),
       code,
     };
