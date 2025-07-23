@@ -23,8 +23,10 @@ import { DictionaryModule } from "./module/dictionary/dictionary.module";
 import { ChataiModule } from "./module/chatai/chatai.module";
 import { EmailModule } from "./module/email/email.module";
 import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
+import { glob } from "glob";
 
-console.log("module", join(__dirname, "module", "**", "*.entity{.ts,.js}"));
+const allEntities = glob.sync(join(__dirname, "module", "**", "*.entity{.ts,.js}"));
+const filteredEntities = allEntities.filter((path) => !path.includes(join("module", "logger")));
 
 @Module({
   imports: [
@@ -45,10 +47,7 @@ console.log("module", join(__dirname, "module", "**", "*.entity{.ts,.js}"));
             database: config.DB_DATABASE,
             synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
             logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
-            entities: [
-              join(__dirname, "module", "**", "*.entity{.ts,.js}"),
-              "!" + join(__dirname, "module", "logger", "**", "*.entity{.ts,.js}"), // 显式排除 logger 模块
-            ], // 匹配非logger所有 .entity.ts 或 .entity.js 文件
+            entities: filteredEntities, // 匹配非logger所有 .entity.ts 或 .entity.js 文件
             migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
           };
         } else {
@@ -62,7 +61,7 @@ console.log("module", join(__dirname, "module", "**", "*.entity{.ts,.js}"));
             database: config.DB_DATABASE,
             synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
             logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
-            entities: [join(__dirname, "module", "logger", "**", "*.entity{.ts,.js}")], // 日志模块的实体
+            entities: filteredEntities, // 匹配非logger所有 .entity.ts 或 .entity.js 文件
             migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
           };
         }
@@ -81,10 +80,7 @@ console.log("module", join(__dirname, "module", "**", "*.entity{.ts,.js}"));
             database: config.DB_DATABASE,
             synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
             logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
-            entities: [
-              join(__dirname, "module", "**", "*.entity{.ts,.js}"),
-              "!" + join(__dirname, "module", "logger", "**", "*.entity{.ts,.js}"), // 显式排除 logger 模块
-            ], // 匹配非logger所有 .entity.ts 或 .entity.js 文件
+            entities: [join(__dirname, "modules", "logger", "**", "*.entity{.ts,.js}")], // 日志模块的实体
             migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
           };
         } else {
