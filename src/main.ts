@@ -97,6 +97,8 @@ async function run(app: INestApplication<any>, port?: number | string) {
       } else if (err.errno === -4091 && process.env.PORT_AUTO === "true") {
         port = Number(port) + 1;
         run(app, port);
+      } else {
+        console.log("err：", err);
       }
     });
 }
