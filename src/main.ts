@@ -76,11 +76,10 @@ bootstrap();
 /**
  * 运行 app 判断是否被占用，根据环境变量判断是否自动加1
  * @param app NestFactory.create nestjs创建的实例
- * @param port 端口号
  */
-async function run(app: INestApplication<any>, port?: number | string) {
-  port = port || process.env.PORT || 3000;
-  host = process.env.HOST || "localhost";
+async function run(app: INestApplication<any>) {
+  // port = port || process.env.PORT || 3000;
+  // host = process.env.HOST || "localhost";
   url = `http://${host}:${port}`;
   global.url = url;
   await app
@@ -96,7 +95,7 @@ async function run(app: INestApplication<any>, port?: number | string) {
         console.log("请检查端口号是否被占用");
       } else if (err.errno === -4091 && process.env.PORT_AUTO === "true") {
         port = Number(port) + 1;
-        run(app, port);
+        run(app);
       } else {
         console.log("err：", err);
       }
