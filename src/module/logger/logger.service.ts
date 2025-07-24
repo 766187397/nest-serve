@@ -1,23 +1,15 @@
 import { ApiResult } from "@/common/utils/result";
-import { BaseFileUrl } from "@/config/logger";
 import { Inject, Injectable } from "@nestjs/common";
-import { createReadStream } from "fs";
-import { readFile } from "fs/promises";
-import { WINSTON_MODULE_PROVIDER } from "nest-winston";
-import { join } from "path";
-import { Logger } from "winston";
-import { promises as fsPromises } from "fs";
 import { BaseService } from "@/common/service/base";
 import { Log } from "./entities/logger.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { LogOptionalDto } from "./dto/index";
+import { FindLogDtoByPage, LogOptionalDto } from "./dto/index";
+import { PageApiResult } from "@/types/public";
 
 @Injectable()
 export class LoggerService extends BaseService {
-  logRootDir = BaseFileUrl; // 日志根目录路径
   constructor(
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     @InjectRepository(Log, "logger")
     private logRepository: Repository<Log>
   ) {
@@ -33,72 +25,46 @@ export class LoggerService extends BaseService {
     await this.logRepository.save(data);
   }
 
-  info(message: string, options?: any) {
-    this.logger.info(message, options);
-  }
-  error(message: string, options?: any) {
-    this.logger.error(message, options);
-  }
-  warn(message: string, options?: any) {
-    this.logger.warn(message, options);
-  }
-  debug(message: string, options?: any) {
-    this.logger.debug(message, options);
-  }
-
   /**
-   * 查询日志文件夹列表
-   * @returns {Promise<ApiResult<string[] | null>>} 统一返回结果
+   * 分页查询日志
+   * @param {FindLogDtoByPage} findLogDtoByPage
+   * @param {string} platform
+   * @returns {Promise<ApiResult<PageApiResult<Log[]>>>} 统一返回结果
    */
-  async findAll(): Promise<ApiResult<string[] | null>> {
+  async findByPage(
+    findLogDtoByPage: FindLogDtoByPage,
+    platform: string = "admin"
+  ): Promise<ApiResult<PageApiResult<Log[]> | null>> {
     try {
-      const allItems = await fsPromises.readdir(this.logRootDir, { withFileTypes: true });
-      // 过滤出符合 YYYY-MM-DD 格式的文件夹
-      const dateFolders = allItems
-        .filter((dirent) => dirent.isDirectory())
-        .map((dirent) => dirent.name)
-        .filter((name) => /^\d{4}-\d{2}-\d{2}$/.test(name))
-        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime()); // 按日期倒序
+      let { take, skip } = this.buildCommonPaging(findLogDtoByPage?.page, findLogDtoByPage?.pageSize);
+      let where = this.buildCommonQuery(findLogDtoByPage);
+      let order = this.buildCommonSort(findLogDtoByPage?.sort);
+      // 查询符合条件的用户
+      const [data, total] = await this.logRepository.findAndCount({
+        where: {
+          ...where,
+          platform: platform,
+        },
+        order: {
+          ...order,
+        },
+        skip, // 跳过的条数
+        take, // 每页条数
+      });
 
-      return ApiResult.success<string[]>({ data: dateFolders });
+      // 计算总页数
+      const totalPages = Math.ceil(total / take);
+      return ApiResult.success<PageApiResult<Log[]>>({
+        data: {
+          data,
+          total,
+          totalPages,
+          page: findLogDtoByPage?.page || 1,
+          pageSize: findLogDtoByPage?.pageSize || 10,
+        },
+      });
     } catch (error) {
-      return ApiResult.error<null>(error || "获取日志列表失败，请稍后再试");
-    }
-  }
-  /**
-   * 查询日志文件夹列表
-   * @returns {Promise<ApiResult<string[] | null>>} 统一返回结果
-   */
-  async getFilesByDate(date: string): Promise<ApiResult<string[] | null>> {
-    try {
-      const logDir = join(process.cwd(), this.logRootDir, date);
-      const data = await fsPromises.readdir(logDir);
-      return ApiResult.success<string[]>({ data });
-    } catch (error) {
-      return ApiResult.error<null>(error || "获取日志列表失败，请稍后再试");
-    }
-  }
-
-  async downloadFile(date: string, fileName: string) {
-    const filePath = join(process.cwd(), this.logRootDir, date, fileName);
-    return createReadStream(filePath);
-  }
-
-  /**
-   * 查询文件内容
-   * @param {string} date 日期
-   * @param {string} fileName 文件名称
-   * @returns {Promise<ApiResult<string | null>>} 统一返回格式
-   */
-  async readLoggerFile(date: string, fileName: string): Promise<ApiResult<string | null>> {
-    try {
-      const filePath = join(process.cwd(), this.logRootDir, date, fileName);
-      // 异步读取
-      let file = await readFile(filePath, "utf-8");
-      file = JSON.parse(`[${file.trim().replace(/\r?\n/g, ",")}]`);
-      return ApiResult.success<string>({ data: file });
-    } catch (error) {
-      return ApiResult.error<null>(error || "获取日志文件失败，请稍后再试");
+      return ApiResult.error<null>(error || "查询日志失败，请稍后重试");
     }
   }
 }

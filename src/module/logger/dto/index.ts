@@ -1,7 +1,8 @@
-import { CreateBaseDto } from "@/common/dto/base";
+import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsOptional, IsString } from "class-validator";
 
+/** 创建日志参数 */
 export class LogOptionalDto extends CreateBaseDto {
   @ApiProperty({ description: "用户账号" })
   @IsOptional()
@@ -62,4 +63,17 @@ export class LogOptionalDto extends CreateBaseDto {
   @IsOptional()
   @IsString({ message: "IP必须是字符串" })
   IP?: string;
+}
+
+/** 分页查询 */
+export class FindLogDtoByPage extends FindByParameter {
+  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
+  @IsOptional()
+  @IsString({ message: "page必须是字符串" })
+  page?: string;
+
+  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
+  @IsOptional()
+  @IsString({ message: "pageSize必须是字符串" })
+  pageSize?: string;
 }

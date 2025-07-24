@@ -80,26 +80,26 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       data: null,
     });
 
-    // 记录错误日志
-    this.loggerService.error(`[${new Date().toISOString()}] Error:`, {
-      statusCode: status,
-      timestamp: new Date().toISOString(),
-      message,
-      stack: exception instanceof Error ? exception.stack : null,
-      data: {
-        account,
-        nickName,
-        url,
-        method,
-        referer,
-        apiPlatform,
-        platform,
-        browser,
-        statusCode,
-        IP,
-        resData: data,
-      },
-    });
+    // // 记录错误日志
+    // this.loggerService.create({
+    //   statusCode: status?.toString(),
+    //   timestamp: new Date().toISOString(),
+    //   message,
+    //   stack: exception instanceof Error ? exception.stack : null,
+    //   data: {
+    //     account,
+    //     nickName,
+    //     url,
+    //     method,
+    //     referer,
+    //     apiPlatform,
+    //     platform,
+    //     browser,
+    //     statusCode,
+    //     IP,
+    //     resData: data,
+    //   },
+    // });
 
     response.status(status).json(data);
   }

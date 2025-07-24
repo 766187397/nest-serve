@@ -4,8 +4,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { join } from "path";
 import { Knife4jModule } from "./module/knife4j/knife4j.module";
-import { ApiResultInterceptor } from "@/common/interceptor/api-result.interceptor";
-import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
+import { APP_GUARD } from "@nestjs/core";
 import { AuthModule } from "./module/auth/auth.module";
 import { DefaultDataModule } from "./module/defaultData/defaultData.module";
 import { UploadModule } from "./module/upload/upload.module";
@@ -13,11 +12,7 @@ import { RolesModule } from "./module/roles/roles.module";
 import { RolesGuard } from "./module/roles/roles.guard";
 import { AuthGuard } from "./module/auth/auth.guard";
 import { RoutesModule } from "./module/routes/routes.module";
-import { WinstonModule } from "nest-winston";
 import { LoggerModule } from "./module/logger/logger.module";
-import * as winston from "winston";
-import * as DailyRotateFile from "winston-daily-rotate-file";
-import { DebugConfig, ErrorConfig, InfoConfig, WarnConfig } from "./config/logger";
 import { NoticeModule } from "./module/notice/notice.module";
 import { DictionaryModule } from "./module/dictionary/dictionary.module";
 import { ChataiModule } from "./module/chatai/chatai.module";
@@ -96,18 +91,6 @@ import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
         }
       },
       inject: [ConfigService],
-    }),
-    WinstonModule.forRoot({
-      format: winston.format.combine(
-        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        winston.format.json()
-      ),
-      transports: [
-        InfoConfig,
-        ErrorConfig,
-        // DebugConfig,
-        WarnConfig,
-      ],
     }),
     UsersModule,
     Knife4jModule,

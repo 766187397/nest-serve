@@ -22,15 +22,15 @@ export class LoggerInterceptor implements NestInterceptor {
     if (whiteListStartsWith.some((prefix) => url.startsWith(prefix)) || whiteListExact.includes(url)) {
       return next.handle();
     }
-    const apiPlatform: string = url.split("/")[3] || "";
+    const platform: string = url.split("/")[3] || "";
     const { account = "", nickName = "" } = request.userInfo || {};
     const method = request.method || "";
-    let { referer = "", "sec-ch-ua-platform": platform = "", "sec-ch-ua": browser = "" } = request.headers;
+    let { referer = "", "sec-ch-ua-platform": apiPlatform = "", "sec-ch-ua": browser = "" } = request.headers;
     try {
       browser = (browser as string).replace(/"/g, "");
-      platform = (platform as string).replace(/"/g, "");
+      apiPlatform = (apiPlatform as string).replace(/"/g, "");
     } catch (error) {
-      platform = "";
+      apiPlatform = "";
       browser = "";
     }
     request.startTime = Date.now();
@@ -69,20 +69,6 @@ export class LoggerInterceptor implements NestInterceptor {
           }
 
           this.loggerService.create(data);
-
-          if (statusCode >= 100 && statusCode < 200) {
-            this.loggerService.info("信息响应", data);
-          } else if (statusCode >= 200 && statusCode < 300) {
-            this.loggerService.info("成功响应", data);
-          } else if (statusCode >= 300 && statusCode < 400) {
-            this.loggerService.info("重定向响应", data);
-          } else if (statusCode >= 400 && statusCode < 500) {
-            this.loggerService.warn("客户端错误响应", data);
-          } else if (statusCode >= 500 && statusCode < 600) {
-            this.loggerService.error("服务器错误响应", data);
-          } else {
-            this.loggerService.info("自定义响应", data);
-          }
         } catch (error) {
           console.error("日志插入失败:", error);
         }
