@@ -35,7 +35,7 @@ import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
       // name: "data",
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const dbType = configService.get<string>("DB_TYPE") as "mysql" | "sqlite";
+        const dbType = DBConfig.dbConfig.DB_TYPE as "mysql" | "sqlite";
         if (dbType === "sqlite") {
           const config = DBConfig.dbConfig as SqliteConfig;
           return {
@@ -68,7 +68,7 @@ import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
       name: "logger",
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const dbType = configService.get<string>("DB_TYPE") as "mysql" | "sqlite";
+        const dbType = DBConfig.dbConfig.DB_TYPE as "mysql" | "sqlite";
         if (dbType === "sqlite") {
           const config = DBConfig.dbLogger as SqliteConfig;
           return {

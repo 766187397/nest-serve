@@ -1,6 +1,9 @@
 export interface JwtConfig {
+  /** token密钥 */
   secret: string;
+  /** token过期时间 */
   jwt_expires_in: string;
+  /** 刷新token过期时间  */
   jwt_refresh_expires_in: string;
 }
 
@@ -12,24 +15,24 @@ export interface JwtConfig {
 export function getPlatformJwtConfig(platform: string = "admin"): JwtConfig | undefined {
   const configs = {
     admin: {
-      secret: process.env.JWT_SECRET_ADMIN,
-      jwt_expires_in: process.env.JWT_EXPIRES_IN_ADMIN,
-      jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN_ADMIN,
+      secret: "vAT6Syz5kWD64I63",
+      jwt_expires_in: "3600000",
+      jwt_refresh_expires_in: "86400000",
     },
     web: {
-      secret: process.env.JWT_SECRET_WEB,
-      jwt_expires_in: process.env.JWT_EXPIRES_IN_WEB,
-      jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN_WEB,
+      secret: "vAT6Syz5kWD64I63",
+      jwt_expires_in: "3600000",
+      jwt_refresh_expires_in: "86400000",
     },
     app: {
-      secret: process.env.JWT_SECRET_APP,
-      jwt_expires_in: process.env.JWT_EXPIRES_IN_APP,
-      jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN_APP,
+      secret: "vAT6Syz5kWD64I63",
+      jwt_expires_in: "3600000",
+      jwt_refresh_expires_in: "86400000",
     },
     mini: {
-      secret: process.env.JWT_SECRET_MINI,
-      jwt_expires_in: process.env.JWT_EXPIRES_IN_MINI,
-      jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN_MINI,
+      secret: "vAT6Syz5kWD64I63",
+      jwt_expires_in: "3600000",
+      jwt_refresh_expires_in: "86400000",
     },
   };
   return configs[platform];
