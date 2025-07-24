@@ -45,7 +45,8 @@ export class LoggerInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(async (data) => {
         // `data` 是控制器返回给前端的响应体
-        let resData = data;
+        console.log("data", data);
+        let resData = JSON.stringify(data);
         const statusCode = response.statusCode || "";
         const responseTime = Date.now() - request["startTime"] || 0; // 计算响应时间(毫秒)
         try {

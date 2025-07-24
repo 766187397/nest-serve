@@ -30,8 +30,7 @@ export class LoggerWhiteList {
     "/webjars", // knife4j 静态资源
     "/swagger", // swagger 接口文档地址
     "/api/v1/large/files", // 大文件上传
-    "/api/v1/admin/logger/downloadFile", // 日志文件下载
-    "/api/v1/admin/logger/read", // 日志文件读取
+    "/api/v1/admin/logger/page", // 日志分页查询
   ];
   // 全匹配
   static whiteListExact: string[] = [
