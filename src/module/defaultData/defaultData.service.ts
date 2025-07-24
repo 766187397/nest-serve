@@ -161,6 +161,7 @@ export class defaultData implements OnApplicationBootstrap {
         sort: 7,
       });
       const adminRoute = await this.routeRepository.save(adminRouteData);
+      
       // 路由页面
       const adminRoutePageData = this.routeRepository.create([
         {
