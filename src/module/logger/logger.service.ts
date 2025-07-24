@@ -6,6 +6,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { FindLogDtoByPage, LogOptionalDto } from "./dto/index";
 import { PageApiResult } from "@/types/public";
+import { Request } from "express";
 
 @Injectable()
 export class LoggerService extends BaseService {
@@ -20,9 +21,54 @@ export class LoggerService extends BaseService {
    * 创建日志
    * @param {LogOptionalDto} logOptionalDto
    */
-  async create(logOptionalDto: LogOptionalDto) {
-    let data = this.logRepository.create(logOptionalDto);
-    await this.logRepository.save(data);
+  async create(request: Request, data: string = "", statusCode: string = "200") {
+    const url: string = request.url || "";
+    const platform: string = url.split("/")[3] || "";
+    const { account = "", nickName = "" } = request.userInfo || {};
+    const method = request.method || "";
+    let { referer = "", "sec-ch-ua-platform": apiPlatform = "", "sec-ch-ua": browser = "" } = request.headers;
+    try {
+      browser = (browser as string).replace(/"/g, "");
+      apiPlatform = (apiPlatform as string).replace(/"/g, "");
+    } catch (error) {
+      apiPlatform = "";
+      browser = "";
+    }
+
+    // 获取客户端的 IP 地址
+    const IP =
+      (request.headers["x-forwarded-for"] as string)?.split(",")[0] ||
+      request.connection.remoteAddress ||
+      request.ip ||
+      "";
+
+    let resData = JSON.stringify(data);
+    const responseTime = Date.now() - request["startTime"] || 0; // 计算响应时间(毫秒)
+    try {
+      const data = {
+        account,
+        nickName,
+        url,
+        method,
+        referer,
+        apiPlatform,
+        platform,
+        browser,
+        responseTime,
+        resData,
+        statusCode,
+        IP,
+      };
+
+      if (!data.resData) {
+        data.resData = "";
+      }
+
+      const logger = this.logRepository.create(data);
+      await this.logRepository.save(logger);
+    } catch (error) {
+      console.error("日志插入失败:", error);
+    }
   }
 
   /**
