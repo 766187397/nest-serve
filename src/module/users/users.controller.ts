@@ -81,6 +81,9 @@ export class UsersController {
         maxAge: Number(options.jwt_refresh_expires_in),
       });
       res.status(data.code).json(data);
+      // 返回 data 让数据经过 interceptor 处理
+      // 这样可以确保日志记录等功能正常工作
+      return data;
     } else {
       res.status(data.code).json(data);
     }
@@ -113,6 +116,9 @@ export class UsersController {
       res.cookie("token", (data?.data as UserLogin).access_token, { maxAge: Number(options.jwt_expires_in) });
     }
     res.status(data.code).json(data);
+    // 返回 data 让数据经过 interceptor 处理
+    // 这样可以确保日志记录等功能正常工作
+    return data;
   }
 
   @Get("logout")

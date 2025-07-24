@@ -71,5 +71,8 @@ export class RoutesController {
     const rolesIds = userInfo.roles.map((item) => item.id);
     let { __isApiResult, ...data } = await this.routesService.getRoutesByRoleId(rolesIds, userInfo.platform, type);
     res.status(data.code).json(data);
+    // 返回 data 让数据经过 interceptor 处理
+    // 这样可以确保日志记录等功能正常工作
+    return data;
   }
 }
