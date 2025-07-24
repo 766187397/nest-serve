@@ -1,9 +1,9 @@
 export interface JwtConfig {
-  /** token密钥 */
+  /** token密钥 长度16 不同平台需要配置不同的密钥 */
   secret: string;
-  /** token过期时间 */
+  /** token过期时间 可以根据不同的平台配置不同的过期时间 */
   jwt_expires_in: string;
-  /** 刷新token过期时间  */
+  /** 刷新token过期时间 可以根据不同的平台配置不同的过期时间 */
   jwt_refresh_expires_in: string;
 }
 
