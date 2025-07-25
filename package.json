@@ -12,6 +12,7 @@
     "serve:dev": "cross-env NODE_ENV=dev nest start --watch",
     "serve:sqlitedb": "cross-env NODE_ENV=sqlitedb nest start --watch",
     "start": "node dist/main",
+    "start:sqlitedb": "cross-env NODE_ENV=sqlitedb node dist/main",
     "start:debug": "nest start --debug --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
   },
