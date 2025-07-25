@@ -6,8 +6,8 @@ dotenv.config({ path: envFilePath });
 
 // 项目地址端口
 let port = process.env.PORT || 3000;
-let host = process.env.HOST || "localhost";
-let url = `http://${host}:${port}`;
+let baseUrl = process.env.BASE_URL || "localhost";
+let url = `${baseUrl}`;
 global.url = url;
 
 import { NestFactory, Reflector } from "@nestjs/core";
@@ -78,9 +78,7 @@ bootstrap();
  * @param app NestFactory.create nestjs创建的实例
  */
 async function run(app: INestApplication<any>) {
-  // port = port || process.env.PORT || 3000;
-  // host = process.env.HOST || "localhost";
-  url = `http://${host}:${port}`;
+  url = `${baseUrl}`;
   global.url = url;
   await app
     .listen(port)
