@@ -11,6 +11,7 @@
     "serve": "nest start --watch",
     "serve:dev": "cross-env NODE_ENV=dev nest start --watch",
     "serve:sqlitedb": "cross-env NODE_ENV=sqlitedb nest start --watch",
+    "serve:sqlitedb.koyeb": "cross-env NODE_ENV=sqlitedb.koyeb nest start --watch",
     "start": "node dist/main",
     "start:sqlitedb": "cross-env NODE_ENV=sqlitedb node dist/main",
     "start:debug": "nest start --debug --watch",

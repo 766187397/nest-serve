@@ -80,7 +80,7 @@ let dbConfig: MysqlConfig | SqliteConfig;
 /** 日志配置 */
 let dbLogger: MysqlConfig | SqliteConfig;
 
-if (env === "sqlitedb") {
+if (env?.search("sqlitedb") !== -1) {
   dbConfig = sqliteConfig;
   dbLogger = sqliteLogger;
 } else {
