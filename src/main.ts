@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 // 根据环境加载对应的 .env 文件
-const envFilePath = `.env.${process.env.NODE_ENV || "dev"}`;
+const envFilePath = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env";
 global.envFilePath = envFilePath;
 dotenv.config({ path: envFilePath });
 
