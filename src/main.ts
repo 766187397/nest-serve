@@ -7,6 +7,7 @@ dotenv.config({ path: envFilePath });
 // 项目地址端口
 let port = process.env.PORT || 3000;
 let baseUrl = process.env.BASE_URL || "localhost";
+let IP = process.env.IP || "127.0.0.1";
 let url = `${baseUrl}`;
 global.url = url;
 
@@ -81,7 +82,7 @@ async function run(app: INestApplication<any>) {
   url = `${baseUrl}`;
   global.url = url;
   await app
-    .listen(port)
+    .listen(port, IP)
     .then((res) => {
       console.log(`当前环境为：${envFilePath}`);
       console.log(`当前端口为：${port}`);
