@@ -84,6 +84,7 @@ async function run(app: INestApplication<any>) {
     .listen(port)
     .then((res) => {
       console.log(`当前环境为：${envFilePath}`);
+      console.log(`当前端口为：${port}`);
       console.log(`server to ${url}`);
       console.log(`swagger to ${url}/swagger`);
       console.log(`knife4j to ${url}/doc.html`);
