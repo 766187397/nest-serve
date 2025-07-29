@@ -1,7 +1,7 @@
 import { join } from "path";
 
 // 获取环境变量
-const env = process.env.NODE_ENV;
+const DB_TYPE = process.env.DB_TYPE;
 
 /** 数据库配置类型 */
 export interface MysqlConfig {
@@ -80,7 +80,7 @@ let dbConfig: MysqlConfig | SqliteConfig;
 /** 日志配置 */
 let dbLogger: MysqlConfig | SqliteConfig;
 
-if (env && env?.search("sqlitedb") !== -1) {
+if (DB_TYPE === "sqlite") {
   dbConfig = sqliteConfig;
   dbLogger = sqliteLogger;
 } else {
