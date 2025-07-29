@@ -4,9 +4,8 @@ import { CreateNoticeDto, FindNoticeDtoByPage, FindNoticeDtoByPageByUserOrRole, 
 import { ApiResult } from "@/common/utils/result";
 import { Notice } from "./entities/notice.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, In, IsNull, Like, Repository } from "typeorm";
+import { ILike, In, Like, Repository } from "typeorm";
 import { PageApiResult } from "@/types/public";
-import { NoticeByPageByUserOrRole } from "@/types/notice";
 @Injectable()
 export class NoticeService extends BaseService {
   constructor(
@@ -79,14 +78,14 @@ export class NoticeService extends BaseService {
    * @param {FindNoticeDtoByPageByUserOrRole} findNoticeDtoByPageByUserOrRole 分页
    * @param {string} platform 平台
    * @param {string[]} roleKeys 角色权限数组
-   * @returns {Promise<ApiResult<PageApiResult<NoticeByPageByUserOrRole[]> | null>>} 统一返回结果
+   * @returns {Promise<ApiResult<PageApiResult<Notice[]> | null>>} 统一返回结果
    */
   async findByPageByUserAndRole(
     findNoticeDtoByPageByUserOrRole: FindNoticeDtoByPageByUserOrRole,
     platform: string,
     roleKeys: string[] | undefined,
     userId: string
-  ): Promise<any> {
+  ): Promise<ApiResult<PageApiResult<Notice[]> | null>> {
     try {
       let { take, skip } = this.buildCommonPaging(
         findNoticeDtoByPageByUserOrRole?.page,
