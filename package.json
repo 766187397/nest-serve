@@ -11,11 +11,8 @@
     "serve": "nest start --watch",
     "serve:dev": "cross-env NODE_ENV=dev nest start --watch",
     "serve:sqlitedb": "cross-env NODE_ENV=sqlitedb nest start --watch",
-    "serve:sqlitedb.koyeb": "cross-env NODE_ENV=sqlitedb.koyeb nest start --watch",
     "start": "node dist/main",
     "start:sqlitedb": "cross-env NODE_ENV=sqlitedb node dist/main",
-    "start:sqlitedb.koyeb": "cross-env NODE_ENV=sqlitedb.koyeb node dist/main",
-    "start:sqlitedb.ClawCloud": "cross-env NODE_ENV=sqlitedb.ClawCloud node dist/main",
     "start:debug": "nest start --debug --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
   },
