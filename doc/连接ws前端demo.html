@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<body></body>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+  // 连接指定命名空间 "/chat"
+  const socket = io("http://localhost:3000/notice", {
+    transports: ["websocket"], // 强制使用 WebSocket 协议
+  });
+
+  socket.on("connect", () => {
+    console.log(" 已连接到命名空间 /notice");
+  });
+
+  // 发送消息到该命名空间
+  socket.emit("message", { text: "Hello Namespace!" });
+
+  // 接收命名空间专属消息
+  socket.on("notification", (data) => {
+    console.log(" 收到通知:", data);
+  });
+</script>
