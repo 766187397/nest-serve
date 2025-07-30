@@ -2,11 +2,14 @@
 <body></body>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
+  const token =
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb3J0IjoxLCJzdGF0dXMiOjEsImNyZWF0ZWRBdCI6IjIwMjUtMDctMzBUMDY6MDc6NDIuMDAwWiIsInVwZGF0ZWRBdCI6IjIwMjUtMDctMzBUMDY6MDc6NDIuMDAwWiIsImlkIjoiYjNmYTJkNDctYzQxNi00YWY1LThmMDYtZmU2YmJkYjZkNTc5IiwiYWNjb3VudCI6ImFkbWluIiwibmlja05hbWUiOiLnrqHnkIblkZgiLCJlbWFpbCI6Ijc2NjE4NzM5N0BxcS5jb20iLCJwaG9uZSI6IjE4ODg4ODg4ODg4Iiwic2V4IjoiMCIsImF2YXRhciI6IiIsInJvbGVzIjpbeyJzb3J0IjoxLCJzdGF0dXMiOjEsInBsYXRmb3JtIjoiYWRtaW4iLCJjcmVhdGVkQXQiOiIyMDI1LTA3LTMwVDA2OjA3OjQyLjAwMFoiLCJ1cGRhdGVkQXQiOiIyMDI1LTA3LTMwVDA2OjA3OjQyLjAwMFoiLCJkZWxldGVkQXQiOm51bGwsImlkIjoiNjQ3MDNkODgtNWI0My00YWE2LTkzZTAtNGNkNTM0Y2IyZmFiIiwibmFtZSI6Iui2hee6p-euoeeQhuWRmCIsInJvbGVLZXkiOiJhZG1pbiIsImRlc2NyaXB0aW9uIjoi5oul5pyJ5omA5pyJ5p2D6ZmQIn1dLCJpYXQiOjE3NTM4NjUwOTYsImV4cCI6MTc1Mzg2ODY5Nn0.ztNp_nVZnDslCVnFLIIsB08N0obfDFKDRY6yTvyksRE";
+
   // 连接指定命名空间
   const socket = io("http://localhost:3000/api/v1/admin/notice/ws", {
     transports: ["websocket"], // 强制使用 WebSocket 协议
     query: {
-      token: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb3J0IjoxLCJzdGF0dXMiOjEsImNyZWF0ZWRBdCI6IjIwMjUtMDctMzBUMDY6MDc6NDIuMDAwWiIsInVwZGF0ZWRBdCI6IjIwMjUtMDctMzBUMDY6MDc6NDIuMDAwWiIsImlkIjoiYjNmYTJkNDctYzQxNi00YWY1LThmMDYtZmU2YmJkYjZkNTc5IiwiYWNjb3VudCI6ImFkbWluIiwibmlja05hbWUiOiLnrqHnkIblkZgiLCJlbWFpbCI6Ijc2NjE4NzM5N0BxcS5jb20iLCJwaG9uZSI6IjE4ODg4ODg4ODg4Iiwic2V4IjoiMCIsImF2YXRhciI6IiIsInJvbGVzIjpbeyJzb3J0IjoxLCJzdGF0dXMiOjEsInBsYXRmb3JtIjoiYWRtaW4iLCJjcmVhdGVkQXQiOiIyMDI1LTA3LTMwVDA2OjA3OjQyLjAwMFoiLCJ1cGRhdGVkQXQiOiIyMDI1LTA3LTMwVDA2OjA3OjQyLjAwMFoiLCJkZWxldGVkQXQiOm51bGwsImlkIjoiNjQ3MDNkODgtNWI0My00YWE2LTkzZTAtNGNkNTM0Y2IyZmFiIiwibmFtZSI6Iui2hee6p-euoeeQhuWRmCIsInJvbGVLZXkiOiJhZG1pbiIsImRlc2NyaXB0aW9uIjoi5oul5pyJ5omA5pyJ5p2D6ZmQIn1dLCJpYXQiOjE3NTM4NjUwOTYsImV4cCI6MTc1Mzg2ODY5Nn0.ztNp_nVZnDslCVnFLIIsB08N0obfDFKDRY6yTvyksRE",
+      token,
     },
   });
 
@@ -20,5 +23,10 @@
   // 接收命名空间专属消息
   socket.on("list", (data) => {
     console.log(" 收到通知:", data);
+  });
+
+  // 接收命名空间专属消息
+  socket.on("update", (data) => {
+    socket.emit("message", { token });
   });
 </script>

@@ -5,6 +5,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagg
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request } from "express";
 import { User } from "../users/entities/user.entity";
+import { NoticeWS } from "./notice.ws";
 
 @ApiTags("公告")
 // @ApiBearerAuth("Authorization")
@@ -17,12 +18,20 @@ import { User } from "../users/entities/user.entity";
 @ApiResponse({ status: 500, description: "服务器异常，请联系管理员" })
 @Controller("/api/v1/admin/notice")
 export class NoticeController {
-  constructor(private readonly noticeService: NoticeService) {}
+  constructor(
+    private readonly noticeService: NoticeService,
+    private readonly noticeWS: NoticeWS
+  ) {}
 
   @Post("create/:platform")
   @ApiOperation({ summary: "创建公告" })
-  create(@Param("platform") platform: string, @Body() createNoticeDto: CreateNoticeDto) {
-    return this.noticeService.create(createNoticeDto, platform);
+  async create(@Param("platform") platform: string, @Body() createNoticeDto: CreateNoticeDto) {
+    let { __isApiResult, ...data } = await this.noticeService.create(createNoticeDto, platform);
+    if (data.code === 200) {
+      // 广播新公告给所有连接的客户端
+      this.noticeWS.broadcastAlert(`新公告: ${createNoticeDto.title}`);
+    }
+    return data;
   }
 
   @Get("page/:platform")

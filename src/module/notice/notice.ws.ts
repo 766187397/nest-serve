@@ -32,18 +32,22 @@ export class NoticeWS implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 处理前端发送的 "message" 事件
   @SubscribeMessage("message")
-  handleMessage(client: Socket, payload: any): void {
+  async handleMessage(client: Socket, payload: any) {
     console.log("payload", payload);
+    const token = payload.token;
+
+    let { __isApiResult, ...data } = await this.noticeService.handleWsFindUserOrRole(token, "admin");
     // 广播消息给所有客户端（包括发送者）
-    this.server.emit("message", payload);
+    // this.server.emit("message", payload);
 
     // 仅回复发送者（可选）
-    // client.emit('ack',  { status: 'Message received' });
+    client.emit("list", data);
   }
 
   // 1. 推送给所有客户端
   broadcastAlert(message: string) {
-    this.server.emit("alert", { message });
+    console.log("推送给所有客户端", message);
+    this.server.emit("update", { message });
   }
 
   // 2. 推送给特定房间
