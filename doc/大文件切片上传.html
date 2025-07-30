@@ -85,7 +85,7 @@
 
         // 创建 tus 上传实例
         currentUpload = new tus.Upload(file, {
-          endpoint: `${BASE_URL}/api/v1/large/tempFile`,
+          endpoint: `${BASE_URL}/api/v1/large/files/`, // 最后的"/"是必须的
           metadata: {
             filename: file.name,
             filetype: file.type,
@@ -158,7 +158,7 @@
             const fileId = segments[segments.length - 1];
 
             // 调用后端 DELETE 接口取消上传（删除服务器上的文件）
-            fetch(`${BASE_URL}//api/v1/large/tempFile/${fileId}`, {
+            fetch(`${BASE_URL}/api/v1/large/tempFile/${fileId}`, {
               method: "DELETE",
             })
               .then((response) => {

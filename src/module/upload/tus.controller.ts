@@ -81,10 +81,10 @@ export class TusController implements OnModuleInit {
 }
 
 @ApiTags("大文件切片上传")
-@Controller("api/large")
+@Controller("api/v1/large/tempFile")
 export class CustomizeTusController {
-  // 取消上传接口：客户端可以发送 DELETE 请求到 /api/large/files/{upload-id}
-  @Delete("tempFile/:id")
+  // 取消上传接口：客户端可以发送 DELETE 请求到 /api/large/tempFile/{upload-id}
+  @Delete(":id")
   @ApiParam({ name: "id", description: "上传文件的唯一标识符" })
   @ApiOperation({ summary: "大文件切片取消的方法" })
   cancelUpload(@Param("id") id: string) {

@@ -6,7 +6,8 @@ export class JWTWhiteList {
     "/api-docs", // knife4j 分组接口文档
     "/webjars", // knife4j 静态资源
     "/swagger", // swagger 接口文档地址
-    "/api/v1/large/files",
+    "/api/v1/large/files", // 大文件上传
+    "/api/v1/large/tempFile", // 大文件上传取消
   ];
   // 全匹配
   static whiteListExact: string[] = [
