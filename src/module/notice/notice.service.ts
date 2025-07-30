@@ -8,6 +8,7 @@ import { ILike, In, IsNull, LessThan, Like, Repository } from "typeorm";
 import { PageApiResult } from "@/types/public";
 import { JwtService } from "@nestjs/jwt";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
+import { NoticeByPageByUserOrRole } from "@/types/notice";
 @Injectable()
 export class NoticeService extends BaseService {
   constructor(
@@ -99,14 +100,14 @@ export class NoticeService extends BaseService {
           {
             platform,
             type: findNoticeDtoByPageByUserOrRole.type,
-            userIds: "",
+            userIds: IsNull(),
             roleKeys: "",
             specifyTime: IsNull(), // 指定时间为空
           },
           {
             platform,
             type: findNoticeDtoByPageByUserOrRole.type,
-            userIds: "",
+            userIds: IsNull(),
             roleKeys: "",
             specifyTime: LessThan(new Date()), // 指定时间小于当前时间
           },
@@ -127,6 +128,7 @@ export class NoticeService extends BaseService {
         ],
         skip, // 跳过的条数
         take, // 每页条数
+        select: ["id", "content", "title", "type", "createdAt", "updatedAt"],
       });
       // 计算总页数
       const totalPages = Math.ceil(total / take);
@@ -198,9 +200,12 @@ export class NoticeService extends BaseService {
    * 通过用户或角色查询通知
    * @param {string} token token
    * @param {string} platform 平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<Notice[] | null>>} 统一返回结果
+   * @returns {Promise<ApiResult<NoticeByPageByUserOrRole[] | null>>} 统一返回结果
    */
-  async handleWsFindUserOrRole(token: string, platform: string = "admin"): Promise<ApiResult<Notice[] | null>> {
+  async handleWsFindUserOrRole(
+    token: string,
+    platform: string = "admin"
+  ): Promise<ApiResult<NoticeByPageByUserOrRole[] | null>> {
     try {
       token = token?.split(" ")[1]; // 获取 Bearer Token
       let options = getPlatformJwtConfig(platform) as JwtConfig;
@@ -214,13 +219,13 @@ export class NoticeService extends BaseService {
         where: [
           {
             platform,
-            userIds: "",
+            userIds: IsNull(),
             roleKeys: "",
             specifyTime: IsNull(), // 指定时间为空
           },
           {
             platform,
-            userIds: "",
+            userIds: IsNull(),
             roleKeys: "",
             specifyTime: LessThan(new Date()), // 获取当前时间之前的所有数据
           },
@@ -239,11 +244,18 @@ export class NoticeService extends BaseService {
         ],
         skip, // 跳过的条数
         take, // 每页条数
+        select: ["id", "content", "title", "type", "createdAt", "updatedAt"],
       });
       // 计算总页数
-      const totalPages = Math.ceil(total / take);
-      return ApiResult.success<Notice[]>({
-        data,
+      // const totalPages = Math.ceil(total / take);
+      return ApiResult.success<NoticeByPageByUserOrRole[]>({
+        data: data.map((item) => {
+          return {
+            ...item,
+            createdAt: this.dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss"),
+            updatedAt: this.dayjs(item.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
+          };
+        }),
       });
     } catch (error) {
       return ApiResult.error<null>(error);
