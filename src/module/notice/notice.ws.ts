@@ -6,17 +6,23 @@ import {
   SubscribeMessage,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
+import { NoticeService } from "./notice.service";
 
 @WebSocketGateway({
   cors: true, // 允许跨域
-  namespace: "/notice", // 命名空间（可选）
+  namespace: "/api/v1/admin/notice/ws", // 命名空间（可选）
 })
 export class NoticeWS implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private readonly noticeService: NoticeService) {}
   @WebSocketServer() server: Server; // 访问 Socket.io  服务端实例
 
   // 客户端连接时触发
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
     console.log(`客户端连接时触发: ${client.id}`);
+    // console.log("query", client.handshake.query);
+    const token = client.handshake.query.token as string;
+    let { __isApiResult, ...data } = await this.noticeService.handleWsFindUserOrRole(token, "admin");
+    client.emit("list", data);
   }
 
   // 客户端断开时触发

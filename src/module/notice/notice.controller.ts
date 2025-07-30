@@ -63,4 +63,8 @@ export class NoticeController {
   remove(@Param("id") id: string) {
     return this.noticeService.remove(id);
   }
+
+  @Get("ws")
+  @ApiOperation({ summary: "WebSocket服务", description: "展示用于WebSocket服务（前端使用socket.io这个包）" })
+  ws() {}
 }

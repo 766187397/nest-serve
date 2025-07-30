@@ -4,13 +4,16 @@ import { CreateNoticeDto, FindNoticeDtoByPage, FindNoticeDtoByPageByUserOrRole, 
 import { ApiResult } from "@/common/utils/result";
 import { Notice } from "./entities/notice.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, In, Like, Repository } from "typeorm";
+import { ILike, In, IsNull, LessThan, Like, Repository } from "typeorm";
 import { PageApiResult } from "@/types/public";
+import { JwtService } from "@nestjs/jwt";
+import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
 @Injectable()
 export class NoticeService extends BaseService {
   constructor(
     @InjectRepository(Notice)
-    private readonly noticeRepository: Repository<Notice>
+    private readonly noticeRepository: Repository<Notice>,
+    private readonly jwtService: JwtService
   ) {
     super();
   }
@@ -98,12 +101,28 @@ export class NoticeService extends BaseService {
             type: findNoticeDtoByPageByUserOrRole.type,
             userIds: "",
             roleKeys: "",
+            specifyTime: IsNull(), // 指定时间为空
+          },
+          {
+            platform,
+            type: findNoticeDtoByPageByUserOrRole.type,
+            userIds: "",
+            roleKeys: "",
+            specifyTime: LessThan(new Date()), // 指定时间小于当前时间
           },
           {
             platform,
             type: findNoticeDtoByPageByUserOrRole.type,
             userIds: Like(`%${userId}%`),
             roleKeys: roleKeys ? In(roleKeys) : undefined,
+            specifyTime: IsNull(), // 指定时间为空
+          },
+          {
+            platform,
+            type: findNoticeDtoByPageByUserOrRole.type,
+            userIds: Like(`%${userId}%`),
+            roleKeys: roleKeys ? In(roleKeys) : undefined,
+            specifyTime: LessThan(new Date()), // 指定时间小于当前时间
           },
         ],
         skip, // 跳过的条数
@@ -170,6 +189,62 @@ export class NoticeService extends BaseService {
     try {
       await this.noticeRepository.softDelete(id);
       return ApiResult.success<null>({});
+    } catch (error) {
+      return ApiResult.error<null>(error);
+    }
+  }
+
+  /**
+   * 通过用户或角色查询通知
+   * @param {string} token token
+   * @param {string} platform 平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<Notice[] | null>>} 统一返回结果
+   */
+  async handleWsFindUserOrRole(token: string, platform: string = "admin"): Promise<ApiResult<Notice[] | null>> {
+    try {
+      token = token?.split(" ")[1]; // 获取 Bearer Token
+      let options = getPlatformJwtConfig(platform) as JwtConfig;
+      let userInfo = this.jwtService.verify(token, {
+        secret: options.secret,
+      });
+      const roleKeys = userInfo?.roles?.map((item: any) => item.key) || [];
+
+      let { take, skip } = this.buildCommonPaging(1, 10);
+      const [data, total] = await this.noticeRepository.findAndCount({
+        where: [
+          {
+            platform,
+            userIds: "",
+            roleKeys: "",
+            specifyTime: IsNull(), // 指定时间为空
+          },
+          {
+            platform,
+            userIds: "",
+            roleKeys: "",
+            specifyTime: LessThan(new Date()), // 获取当前时间之前的所有数据
+          },
+          {
+            platform,
+            userIds: Like(`%${userInfo.id}%`),
+            roleKeys: roleKeys ? In(roleKeys) : undefined,
+            specifyTime: IsNull(), // 指定时间为空
+          },
+          {
+            platform,
+            userIds: Like(`%${userInfo.id}%`),
+            roleKeys: roleKeys ? In(roleKeys) : undefined,
+            specifyTime: LessThan(new Date()), // 获取当前时间之前的所有数据
+          },
+        ],
+        skip, // 跳过的条数
+        take, // 每页条数
+      });
+      // 计算总页数
+      const totalPages = Math.ceil(total / take);
+      return ApiResult.success<Notice[]>({
+        data,
+      });
     } catch (error) {
       return ApiResult.error<null>(error);
     }
