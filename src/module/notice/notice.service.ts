@@ -95,28 +95,32 @@ export class NoticeService extends BaseService {
         findNoticeDtoByPageByUserOrRole?.pageSize
       );
       let order = this.buildCommonSort();
+      let where = {
+        platform,
+        status: 2,
+      };
       const [data, total] = await this.noticeRepository.findAndCount({
         where: [
           {
-            platform,
+            ...where,
             userIds: IsNull(),
             roleKeys: "",
             specifyTime: IsNull(), // 指定时间为空
           },
           {
-            platform,
+            ...where,
             userIds: IsNull(),
             roleKeys: "",
             specifyTime: LessThan(new Date()), // 指定时间小于当前时间
           },
           {
-            platform,
+            ...where,
             userIds: Like(`%${userId}%`),
             roleKeys: roleKeys ? In(roleKeys) : undefined,
             specifyTime: IsNull(), // 指定时间为空
           },
           {
-            platform,
+            ...where,
             userIds: Like(`%${userId}%`),
             roleKeys: roleKeys ? In(roleKeys) : undefined,
             specifyTime: LessThan(new Date()), // 指定时间小于当前时间
@@ -127,7 +131,7 @@ export class NoticeService extends BaseService {
         },
         skip, // 跳过的条数
         take, // 每页条数
-        select: ["id", "content", "title", "createdAt", "updatedAt", "READUserIds"],
+        select: ["id", "content", "title", "status", "createdAt", "updatedAt", "READUserIds"],
       });
       // 计算总页数
       const totalPages = Math.ceil(total / take);
@@ -138,7 +142,7 @@ export class NoticeService extends BaseService {
               ...item,
               createdAt: this.dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss"),
               updatedAt: this.dayjs(item.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
-              status: item.READUserIds?.includes(userId) || false, // 添加状态字段
+              readStatus: item.READUserIds?.includes(userId) || false, // 添加状态字段
             };
           }),
           total,
@@ -222,35 +226,36 @@ export class NoticeService extends BaseService {
 
       let { take, skip } = this.buildCommonPaging(1, 3);
       let order = this.buildCommonSort();
+      const where = {
+        platform,
+        READUserIds: Not(Like(`%${userInfo.id}%`)), // 未读通知
+        status: 2,
+      };
       const [data, total] = await this.noticeRepository.findAndCount({
         where: [
           {
-            platform,
+            ...where,
             userIds: IsNull(),
             roleKeys: "",
             specifyTime: IsNull(), // 指定时间为空
-            READUserIds: Not(Like(`%${userInfo.id}%`)), // 未读通知
           },
           {
-            platform,
+            ...where,
             userIds: IsNull(),
             roleKeys: "",
             specifyTime: LessThan(new Date()), // 获取当前时间之前的所有数据
-            READUserIds: Not(Like(`%${userInfo.id}%`)), // 未读通知
           },
           {
-            platform,
+            ...where,
             userIds: Like(`%${userInfo.id}%`),
             roleKeys: roleKeys ? In(roleKeys) : undefined,
             specifyTime: IsNull(), // 指定时间为空
-            READUserIds: Not(Like(`%${userInfo.id}%`)), // 未读通知
           },
           {
-            platform,
+            ...where,
             userIds: Like(`%${userInfo.id}%`),
             roleKeys: roleKeys ? In(roleKeys) : undefined,
             specifyTime: LessThan(new Date()), // 获取当前时间之前的所有数据
-            READUserIds: Not(Like(`%${userInfo.id}%`)), // 未读通知
           },
         ],
         order: {
@@ -258,7 +263,7 @@ export class NoticeService extends BaseService {
         },
         skip, // 跳过的条数
         take, // 每页条数
-        select: ["id", "content", "title", "createdAt", "updatedAt"],
+        select: ["id", "content", "title", "status", "createdAt", "updatedAt"],
       });
       // 计算总页数
       // const totalPages = Math.ceil(total / take);

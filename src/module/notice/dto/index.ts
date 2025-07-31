@@ -1,8 +1,13 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 class NoticeOptionalDto extends CreateBaseDto {
+  @ApiProperty({ description: "状态；1 - 暂存，2 - 发布", required: false, example: 1 })
+  @IsOptional()
+  @IsNumber({}, { message: "status必须为数字" })
+  declare status?: number;
+
   @ApiProperty({ name: "roleKeys", type: String, required: false, description: "角色权限" })
   @IsOptional()
   @IsString({ message: "角色权限必须是字符串" })
