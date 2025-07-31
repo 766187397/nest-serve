@@ -81,8 +81,8 @@ export class NoticeController {
 
   @Get("ws")
   @ApiOperation({
-    summary: "查询前三条未读公告",
-    description: "展示用于WebSocket服务（前端使用socket.io-client这个包）",
+    summary: "WebSocket 未读公告",
+    description: "通过ws获取前三条未读的通知公告，展示用于WebSocket服务（前端使用socket.io-client这个包）",
   })
   ws() {}
 }
