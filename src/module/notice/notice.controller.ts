@@ -74,6 +74,6 @@ export class NoticeController {
   }
 
   @Get("ws")
-  @ApiOperation({ summary: "WebSocket服务", description: "展示用于WebSocket服务（前端使用socket.io这个包）" })
+  @ApiOperation({ summary: "WebSocket服务", description: "展示用于WebSocket服务（前端使用socket.io-client这个包）" })
   ws() {}
 }
