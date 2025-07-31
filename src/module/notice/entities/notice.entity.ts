@@ -5,9 +5,6 @@ import { Column, Entity, Index } from "typeorm";
 // 复合索引 优化同时查询id和deletedAt的情况
 @Index("IDX_notice_id_deletedAt", ["id", "deletedAt"])
 export class Notice extends UUIDBaseEntity {
-  @Column({ type: "varchar", length: 30, comment: "通知类型", default: "" })
-  type: string;
-
   @Column({ type: "varchar", comment: "指定角色权限", default: "" })
   roleKeys?: string;
 
@@ -22,4 +19,7 @@ export class Notice extends UUIDBaseEntity {
 
   @Column({ type: "date", comment: "指定时间", nullable: true })
   specifyTime?: Date;
+
+  @Column({ type: "text", comment: "标记已读用户id", nullable: true })
+  READUserIds?: string;
 }

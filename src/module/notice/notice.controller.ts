@@ -73,7 +73,16 @@ export class NoticeController {
     return this.noticeService.remove(id);
   }
 
+  @Post("read/:id")
+  @ApiOperation({ summary: "标记公告为已读" })
+  async read(@Param("id") id: string, @Req() req: Request) {
+    return this.noticeService.handleMarkByUserId(req.userInfo?.id as string, id);
+  }
+
   @Get("ws")
-  @ApiOperation({ summary: "WebSocket服务", description: "展示用于WebSocket服务（前端使用socket.io-client这个包）" })
+  @ApiOperation({
+    summary: "查询前三条未读公告",
+    description: "展示用于WebSocket服务（前端使用socket.io-client这个包）",
+  })
   ws() {}
 }

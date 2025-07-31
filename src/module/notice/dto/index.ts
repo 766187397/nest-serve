@@ -26,22 +26,6 @@ class NoticeOptionalDto extends CreateBaseDto {
 
 /** 创建通知 */
 export class CreateNoticeDto extends NoticeOptionalDto {
-  // @ApiProperty({
-  //   name: "platform",
-  //   type: String,
-  //   required: true,
-  //   description: "指定的平台标识（如admin/web/app/mini）",
-  //   example: "admin",
-  // })
-  // @IsNotEmpty({ message: "平台标识不能为空" })
-  // @IsString({ message: "平台标识必须是字符串" })
-  // platform: string;
-
-  @ApiProperty({ name: "type", type: String, required: true, description: "类型", example: "notice" })
-  @IsNotEmpty({ message: "类型不能为空" })
-  @IsString({ message: "类型必须是字符串" })
-  type: string;
-
   @ApiProperty({ name: "title", type: String, required: true, description: "标题", example: "通知" })
   @IsNotEmpty({ message: "标题不能为空" })
   @IsString({ message: "标题必须是字符串" })
@@ -50,21 +34,6 @@ export class CreateNoticeDto extends NoticeOptionalDto {
 
 /** 修改通知 */
 export class UpdateNoticeDto extends NoticeOptionalDto {
-  // @ApiProperty({
-  //   name: "platform",
-  //   type: String,
-  //   required: true,
-  //   description: "指定的平台标识（如admin/web/app/mini）",
-  // })
-  // @IsOptional()
-  // @IsString({ message: "平台标识必须是字符串" })
-  // platform?: string;
-
-  @ApiProperty({ name: "type", type: String, description: "类型" })
-  @IsOptional()
-  @IsString({ message: "类型必须是字符串" })
-  type?: string;
-
   @ApiProperty({ name: "title", type: String, description: "标题" })
   @IsOptional()
   @IsString({ message: "标题必须是字符串" })
@@ -73,11 +42,6 @@ export class UpdateNoticeDto extends NoticeOptionalDto {
 
 /** 查询通知 */
 export class FindNoticeDto extends FindByParameter {
-  @ApiProperty({ name: "type", type: String, required: false, description: "类型" })
-  @IsOptional()
-  @IsString({ message: "类型必须是字符串" })
-  type?: string;
-
   @ApiProperty({ name: "title", type: String, required: false, description: "标题" })
   @IsOptional()
   @IsString({ message: "标题必须是字符串" })
@@ -118,9 +82,4 @@ export class FindNoticeDtoByPageByUserOrRole {
   @IsOptional()
   @IsString({ message: "pageSize必须是字符串" })
   pageSize?: string;
-
-  @ApiProperty({ name: "type", type: String, required: false, description: "类型" })
-  @IsOptional()
-  @IsString({ message: "类型必须是字符串" })
-  type?: string;
 }
