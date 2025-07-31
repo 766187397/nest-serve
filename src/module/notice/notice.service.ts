@@ -94,6 +94,7 @@ export class NoticeService extends BaseService {
         findNoticeDtoByPageByUserOrRole?.page,
         findNoticeDtoByPageByUserOrRole?.pageSize
       );
+      let order = this.buildCommonSort();
       const [data, total] = await this.noticeRepository.findAndCount({
         where: [
           {
@@ -121,6 +122,9 @@ export class NoticeService extends BaseService {
             specifyTime: LessThan(new Date()), // 指定时间小于当前时间
           },
         ],
+        order: {
+          ...order,
+        },
         skip, // 跳过的条数
         take, // 每页条数
         select: ["id", "content", "title", "createdAt", "updatedAt", "READUserIds"],
@@ -217,6 +221,7 @@ export class NoticeService extends BaseService {
       const roleKeys = userInfo?.roles?.map((item: any) => item.key) || [];
 
       let { take, skip } = this.buildCommonPaging(1, 3);
+      let order = this.buildCommonSort();
       const [data, total] = await this.noticeRepository.findAndCount({
         where: [
           {
@@ -248,6 +253,9 @@ export class NoticeService extends BaseService {
             READUserIds: Not(Like(`%${userInfo.id}%`)), // 未读通知
           },
         ],
+        order: {
+          ...order,
+        },
         skip, // 跳过的条数
         take, // 每页条数
         select: ["id", "content", "title", "createdAt", "updatedAt"],
