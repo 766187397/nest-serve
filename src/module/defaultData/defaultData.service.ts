@@ -161,7 +161,7 @@ export class defaultData implements OnApplicationBootstrap {
         sort: 7,
       });
       const adminRoute = await this.routeRepository.save(adminRouteData);
-      
+
       // 路由页面
       const adminRoutePageData = this.routeRepository.create([
         {
@@ -212,7 +212,7 @@ export class defaultData implements OnApplicationBootstrap {
       const user = await this.routeRepository.save(userData);
 
       // 用户页面
-      const adminUserPageData = this.routeRepository.create([
+      const UserPageData = this.routeRepository.create([
         {
           platform: "admin",
           type: "menu",
@@ -242,10 +242,10 @@ export class defaultData implements OnApplicationBootstrap {
           sort: 8,
         },
       ]);
-      await this.routeRepository.save(adminUserPageData);
+      await this.routeRepository.save(UserPageData);
 
       // 角色管理
-      const adminRoleData = this.routeRepository.create({
+      const RoleData = this.routeRepository.create({
         platform: "admin",
         type: "menu",
         name: "role",
@@ -258,10 +258,10 @@ export class defaultData implements OnApplicationBootstrap {
         parent: adminSystem,
         sort: 8,
       });
-      const role = await this.routeRepository.save(adminRoleData);
+      const role = await this.routeRepository.save(RoleData);
 
       // 角色页面
-      const adminRolePageData = this.routeRepository.create([
+      const RolePageData = this.routeRepository.create([
         {
           platform: "admin",
           type: "menu",
@@ -291,10 +291,10 @@ export class defaultData implements OnApplicationBootstrap {
           sort: 8,
         },
       ]);
-      await this.routeRepository.save(adminRolePageData);
+      await this.routeRepository.save(RolePageData);
 
       // 通知公告
-      const noticeData = this.routeRepository.create({
+      const adminNoticeData = this.routeRepository.create({
         platform: "admin",
         type: "menu",
         name: "notice",
@@ -305,13 +305,13 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "/system/notice/admin",
         meta: "",
         parent: adminSystem,
-        sort: 5,
+        sort: 6,
       });
 
-      const notice = await this.routeRepository.save(noticeData);
+      const adminNotice = await this.routeRepository.save(adminNoticeData);
 
       // 通知公告页面
-      const noticePageData = this.routeRepository.create([
+      const adminNoticePageData = this.routeRepository.create([
         {
           platform: "admin",
           type: "menu",
@@ -323,7 +323,7 @@ export class defaultData implements OnApplicationBootstrap {
           externalLinks: false,
           redirect: "",
           meta: "",
-          parent: notice,
+          parent: adminNotice,
           sort: 2,
         },
         {
@@ -337,12 +337,12 @@ export class defaultData implements OnApplicationBootstrap {
           externalLinks: false,
           redirect: "",
           meta: "",
-          parent: notice,
+          parent: adminNotice,
           sort: 1,
         },
       ]);
 
-      await this.routeRepository.save(noticePageData);
+      await this.routeRepository.save(adminNoticePageData);
 
       // 数据字典
       const dictionaryData = this.routeRepository.create({
@@ -357,7 +357,7 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "",
         meta: "",
         parent: adminSystem,
-        sort: 3,
+        sort: 5,
       });
 
       await this.routeRepository.save(dictionaryData);
@@ -380,12 +380,12 @@ export class defaultData implements OnApplicationBootstrap {
 
       await this.routeRepository.save(dictionaryDataChild);
 
-      // 附件上传管理
+      // 附件管理
       const uploadData = this.routeRepository.create({
         platform: "admin",
         type: "menu",
         name: "file",
-        title: "文件上传",
+        title: "附件管理",
         path: "/system/file",
         component: "system/file/Index",
         icon: "UploadFilled",
@@ -393,10 +393,59 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "",
         meta: "",
         parent: adminSystem,
-        sort: 2,
+        sort: 4,
       });
 
       await this.routeRepository.save(uploadData);
+
+      // 日志管理
+      const logData = this.routeRepository.create({
+        platform: "admin",
+        type: "menu",
+        name: "log",
+        title: "日志管理",
+        path: "/system/log",
+        icon: "Tickets",
+        externalLinks: false,
+        redirect: "/system/log/admin",
+        meta: "",
+        parent: adminSystem,
+        sort: 3,
+      });
+      const log = await this.routeRepository.save(logData);
+
+      // 日志页面
+      const logPageData = this.routeRepository.create([
+        {
+          platform: "admin",
+          type: "menu",
+          name: "logAdmin",
+          title: "admin日志",
+          path: "/system/log/admin",
+          component: "system/log/Admin",
+          icon: "",
+          externalLinks: false,
+          redirect: "",
+          meta: "",
+          parent: log,
+          sort: 9,
+        },
+        {
+          platform: "admin",
+          type: "menu",
+          name: "logWeb",
+          title: "web日志",
+          path: "/system/log/web",
+          component: "system/log/Web",
+          icon: "",
+          externalLinks: false,
+          redirect: "",
+          meta: "",
+          parent: log,
+          sort: 8,
+        },
+      ]);
+      await this.routeRepository.save(logPageData);
       //#endregion
 
       //#region web路由数据
