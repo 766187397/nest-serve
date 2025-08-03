@@ -41,7 +41,7 @@ export class EmailService extends BaseService {
    */
   async create(createEmailDto: CreateEmailDto, platform: string = "admin"): Promise<ApiResult<Email | null>> {
     try {
-      let emailInfo = await this.emailRepository.findOne({ where: { label: createEmailDto.label } });
+      let emailInfo = await this.emailRepository.findOne({ where: { type: createEmailDto.type } });
       if (emailInfo) {
         return ApiResult.error({ code: 400, message: "邮箱模板已存在" });
       }
@@ -180,7 +180,7 @@ export class EmailService extends BaseService {
    */
   async sendEmail(sendEmail: SendEmail, userInfo?: User): Promise<ApiResult<any>> {
     try {
-      const emailTemplate = await this.emailRepository.findOneBy({ label: sendEmail.label });
+      const emailTemplate = await this.emailRepository.findOneBy({ type: sendEmail.type });
       if (!emailTemplate) {
         return ApiResult.error({ code: 404, message: "邮箱模板不存在" });
       }

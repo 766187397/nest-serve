@@ -6,7 +6,7 @@ import { Column, Entity, Index } from "typeorm";
 @Index("IDX_email_id_deletedAt", ["id", "deletedAt"])
 export class Email extends AutoIDBaseEntity {
   @Column({ type: "varchar", nullable: false, comment: "邮箱模板标签" })
-  label: string;
+  type: string;
 
   @Column({ type: "varchar", nullable: false, comment: "邮箱标题" })
   title: string;

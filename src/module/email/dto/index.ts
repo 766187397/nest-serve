@@ -5,12 +5,12 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 class EmailOptionalDto extends CreateBaseDto {
   @ApiProperty({ description: "邮件标签", example: "loginCode" })
-  @IsString({ message: "标题字符串" })
-  @IsNotEmpty({ message: "标题是必填项" })
-  label: string;
+  @IsString({ message: "类型必须是字符串" })
+  @IsNotEmpty({ message: "类型是必填项" })
+  type: string;
 
   @ApiProperty({ description: "邮件标题", example: "测试邮件" })
-  @IsString({ message: "标题字符串" })
+  @IsString({ message: "标题必须是字符串" })
   @IsNotEmpty({ message: "标题是必填项" })
   title: string;
 
@@ -52,7 +52,7 @@ export class SendEmail {
   @ApiProperty({ description: "模板标签" })
   @IsString({ message: "lavel必须是字符串" })
   @IsNotEmpty({ message: "lavel必须是必填项" }) // 必填校验
-  label: string;
+  type: string;
 
   @ApiProperty({ description: "收件人邮箱", example: "766187397@qq.com" })
   @IsString({ message: "邮箱字符串" })
