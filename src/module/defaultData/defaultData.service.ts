@@ -375,7 +375,7 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "",
         meta: "",
         parent: adminSystem,
-        sort: 3,
+        sort: 5,
       });
 
       await this.routeRepository.save(dictionaryDataChild);
@@ -410,7 +410,7 @@ export class defaultData implements OnApplicationBootstrap {
         redirect: "/system/log/admin",
         meta: "",
         parent: adminSystem,
-        sort: 3,
+        sort: 1,
       });
       const log = await this.routeRepository.save(logData);
 
@@ -446,6 +446,55 @@ export class defaultData implements OnApplicationBootstrap {
         },
       ]);
       await this.routeRepository.save(logPageData);
+
+      // 邮箱模板管理
+      const emailData = this.routeRepository.create({
+        platform: "admin",
+        type: "menu",
+        name: "email",
+        title: "邮箱模板管理",
+        path: "/system/email",
+        icon: "Tickets",
+        externalLinks: false,
+        redirect: "/system/email/admin",
+        meta: "",
+        parent: adminSystem,
+        sort: 3,
+      });
+      const email = await this.routeRepository.save(emailData);
+
+      // 邮箱模板页面
+      const emailPageData = this.routeRepository.create([
+        {
+          platform: "admin",
+          type: "menu",
+          name: "emailAdmin",
+          title: "admin邮箱模板",
+          path: "/system/email/admin",
+          component: "system/email/Admin",
+          icon: "",
+          externalLinks: false,
+          redirect: "",
+          meta: "",
+          parent: email,
+          sort: 9,
+        },
+        {
+          platform: "admin",
+          type: "menu",
+          name: "emailWeb",
+          title: "web邮箱模板",
+          path: "/system/email/web",
+          component: "system/email/Web",
+          icon: "",
+          externalLinks: false,
+          redirect: "",
+          meta: "",
+          parent: email,
+          sort: 8,
+        },
+      ]);
+      await this.routeRepository.save(emailPageData);
       //#endregion
 
       //#region web路由数据
