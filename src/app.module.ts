@@ -9,7 +9,7 @@ import { AuthModule } from "./module/auth/auth.module";
 import { DefaultDataModule } from "./module/defaultData/defaultData.module";
 import { UploadModule } from "./module/upload/upload.module";
 import { RolesModule } from "./module/roles/roles.module";
-import { RolesGuard } from "./module/roles/roles.guard";
+import { RolesGuard } from "./common/guards/roles.guard";
 import { AuthGuard } from "./module/auth/auth.guard";
 import { RoutesModule } from "./module/routes/routes.module";
 import { LoggerModule } from "./module/logger/logger.module";

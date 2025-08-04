@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, StreamableFile, Header, Query } from "@nestjs/common";
+import { Controller, Get, Param, Query } from "@nestjs/common";
 import { LoggerService } from "./logger.service";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Response } from "express";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { FindLogDtoByPage } from "./dto";
+import { Roles } from "@/common/decorator/roles.decorator";
 
 @ApiTags("admin - 日志")
 // @ApiBearerAuth("Authorization")
@@ -17,6 +17,7 @@ import { FindLogDtoByPage } from "./dto";
 @Controller("api/v1/admin/logger")
 export class LoggerController {
   constructor(private readonly loggerService: LoggerService) {}
+  @Roles("admin", "dev")
   @Get("page/:platform")
   @ApiOperation({ summary: "查询日志列表(分页)" })
   findByPage(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findLogDtoByPage: FindLogDtoByPage) {

@@ -3,7 +3,6 @@ import { RolesService } from "./roles.service";
 import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from "./dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
-import { Roles } from "./roles.decorator";
 
 @ApiTags("admin - 角色管理")
 // @ApiBearerAuth("Authorization")
@@ -50,7 +49,6 @@ export class RolesController {
 
   @Delete(":id")
   @ApiOperation({ summary: "删除角色" })
-  @Roles("admin")
   remove(@Param("id") id: string) {
     return this.rolesService.remove(id);
   }

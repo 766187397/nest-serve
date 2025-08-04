@@ -56,7 +56,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
     // http异常
     else if (exception instanceof HttpException) {
-      console.log("http异常");
+      console.log("http异常", exception.getResponse());
       status = exception.getStatus();
       message =
         typeof exception.getResponse() === "string"
@@ -70,7 +70,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
     // 处理其他Error类型
     else if (exception instanceof Error) {
-      console.log("处理其他Error类型");
+      console.log("处理其他Error类型", exception);
       message = exception.stack || "Internal server error";
     }
 
@@ -79,27 +79,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       message,
       data: null,
     });
-
-    // // 记录错误日志
-    // this.loggerService.create({
-    //   statusCode: status?.toString(),
-    //   timestamp: new Date().toISOString(),
-    //   message,
-    //   stack: exception instanceof Error ? exception.stack : null,
-    //   data: {
-    //     account,
-    //     nickName,
-    //     url,
-    //     method,
-    //     referer,
-    //     apiPlatform,
-    //     platform,
-    //     browser,
-    //     statusCode,
-    //     IP,
-    //     resData: data,
-    //   },
-    // });
 
     response.status(status).json(data);
   }
