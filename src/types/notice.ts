@@ -13,7 +13,7 @@ export interface NoticeByPageByUserOrRole extends NoticeWsFindUserOrRole {
 
 /** 分页返回数据 */
 export interface NoticePageApiResult<T> {
-  /** 已读状态 */
+  /** 未读状态 */
   unread: boolean;
   /** 数据 */
   data: T;
