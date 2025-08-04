@@ -8,7 +8,7 @@ import { ILike, In, IsNull, LessThan, Like, Not, Repository } from "typeorm";
 import { PageApiResult } from "@/types/public";
 import { JwtService } from "@nestjs/jwt";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
-import { NoticeByPageByUserOrRole, NoticeWsFindUserOrRole } from "@/types/notice";
+import { NoticeByPageByUserOrRole, NoticePageApiResult, NoticeWsFindUserOrRole } from "@/types/notice";
 @Injectable()
 export class NoticeService extends BaseService {
   constructor(
@@ -81,14 +81,14 @@ export class NoticeService extends BaseService {
    * @param {FindNoticeDtoByPageByUserOrRole} findNoticeDtoByPageByUserOrRole 分页
    * @param {string} platform 平台
    * @param {string[]} roleKeys 角色权限数组
-   * @returns {Promise<ApiResult<PageApiResult<NoticeByPageByUserOrRole[]> | null>>} 统一返回结果
+   * @returns {Promise<NoticePageApiResult<PageApiResult<NoticeByPageByUserOrRole[]> | null>>} 统一返回结果
    */
   async findByPageByUserAndRole(
     findNoticeDtoByPageByUserOrRole: FindNoticeDtoByPageByUserOrRole,
     platform: string,
     roleKeys: string[] | undefined,
     userId: string
-  ): Promise<ApiResult<PageApiResult<NoticeByPageByUserOrRole[]> | null>> {
+  ): Promise<ApiResult<NoticePageApiResult<NoticeByPageByUserOrRole[]> | null>> {
     try {
       let { take, skip } = this.buildCommonPaging(
         findNoticeDtoByPageByUserOrRole?.page,
@@ -135,7 +135,41 @@ export class NoticeService extends BaseService {
       });
       // 计算总页数
       const totalPages = Math.ceil(total / take);
-      return ApiResult.success<PageApiResult<NoticeByPageByUserOrRole[]>>({
+
+      const stateWhere = {
+        ...where,
+        READUserIds: Not(Like(`%${userId}%`)),
+      };
+      const state = await this.noticeRepository.find({
+        where: [
+          {
+            ...stateWhere,
+            userIds: IsNull(),
+            roleKeys: "",
+            specifyTime: IsNull(), // 指定时间为空
+          },
+          {
+            ...stateWhere,
+            userIds: IsNull(),
+            roleKeys: "",
+            specifyTime: LessThan(new Date()), // 指定时间小于当前时间
+          },
+          {
+            ...stateWhere,
+            userIds: Like(`%${userId}%`),
+            roleKeys: roleKeys ? In(roleKeys) : undefined,
+            specifyTime: IsNull(), // 指定时间为空
+          },
+          {
+            ...stateWhere,
+            userIds: Like(`%${userId}%`),
+            roleKeys: roleKeys ? In(roleKeys) : undefined,
+            specifyTime: LessThan(new Date()), // 指定时间小于当前时间
+          },
+        ],
+      });
+      console.log("state", state);
+      return ApiResult.success<NoticePageApiResult<NoticeByPageByUserOrRole[]>>({
         data: {
           data: data.map((item) => {
             return {
@@ -145,6 +179,7 @@ export class NoticeService extends BaseService {
               readStatus: item.READUserIds?.includes(userId) || false, // 添加状态字段
             };
           }),
+          unread: state.length === data.length,
           total,
           totalPages,
           page: findNoticeDtoByPageByUserOrRole?.page || 1,
