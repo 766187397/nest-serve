@@ -1,6 +1,8 @@
 # nest-serve
 
 > 使用nest开发的后端服务，可以对接不同的平台
+>
+> 预览地址：https://www.766187397.dpdns.org
 
 
 
@@ -110,9 +112,13 @@ knife4j to http://localhost:3000/doc.html
 
 
 
-## Docker hub
+## Docker部署
 
-已经发布到Docker hub了，搜索：766187397/nest-serve
+> 使用了GitHub自动化上传到了Docker hub
+
+```
+docker pull 766187397/nest-serve:latest
+```
 
 
 
@@ -171,21 +177,6 @@ nest-serve
 └── tsconfig.json
 ```
 
-
-
-
-
-## 根实体定义
-
-> common/entities/base
->
-> 项目的实体都继承与这个跟实体
-
-**重点字段**
-
-- id：唯一标识
-  - 使用的uuid，方便使用多数据库，也防止修改id防止泄露其他的用户信息
-- platform：平台标识：admin/web/app/mini
 
 
 
