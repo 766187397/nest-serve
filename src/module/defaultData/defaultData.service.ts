@@ -626,7 +626,7 @@ export class defaultData implements OnApplicationBootstrap {
         //   content: "您好 {nickName}，您正在尝试登录，验证码：{code}。",
         // },
         {
-          label: "logonCode",
+          type: "logonCode",
           platform: "admin",
           title: "尊敬的用户您好，这是您的验证码！",
           content: "尊敬的用户您好，您正在尝试登录，验证码：{code}。",
