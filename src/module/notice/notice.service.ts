@@ -168,7 +168,6 @@ export class NoticeService extends BaseService {
           },
         ],
       });
-      console.log("state", state);
       return ApiResult.success<NoticePageApiResult<NoticeByPageByUserOrRole[]>>({
         data: {
           data: data.map((item) => {
@@ -179,7 +178,7 @@ export class NoticeService extends BaseService {
               readStatus: item.READUserIds?.includes(userId) || false, // 添加状态字段
             };
           }),
-          unread: state.length === data.length,
+          unread: state.length > 0,
           total,
           totalPages,
           page: findNoticeDtoByPageByUserOrRole?.page || 1,

@@ -27,9 +27,9 @@ export class NoticeController {
   @ApiOperation({ summary: "创建公告" })
   async create(@Param("platform") platform: string, @Body() createNoticeDto: CreateNoticeDto) {
     let { __isApiResult, ...data } = await this.noticeService.create(createNoticeDto, platform);
-    if (data.code === 200) {
+    if (data.code === 200 && data.data?.status === 2) {
       // 广播新公告给所有连接的客户端
-      this.noticeWS.broadcastAlert(`新公告: ${createNoticeDto.title}`);
+      this.noticeWS.broadcastAlert(`有新公告`);
     }
     return data;
   }
@@ -63,8 +63,13 @@ export class NoticeController {
 
   @Patch("update/:id")
   @ApiOperation({ summary: "更新公告" })
-  update(@Param("id") id: string, @Body() updateNoticeDto: UpdateNoticeDto) {
-    return this.noticeService.update(id, updateNoticeDto);
+  async update(@Param("id") id: string, @Body() updateNoticeDto: UpdateNoticeDto) {
+    let { __isApiResult, ...data } = await this.noticeService.update(id, updateNoticeDto);
+    if (data.code === 200) {
+      // 广播新公告给所有连接的客户端
+      this.noticeWS.broadcastAlert(`有新公告`);
+    }
+    return data;
   }
 
   @Delete("delete/:id")
