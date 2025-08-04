@@ -8,6 +8,7 @@ import { Route } from "@/module/routes/entities/route.entity";
 import { Dictionary } from "@/module/dictionary/entities/dictionary.entity";
 import { DictionaryItem } from "@/module/dictionary/entities/dictionaryItem.entity";
 import { Email } from "@/module/email/entities/email.entity";
+import { Notice } from "@/module/notice/entities/notice.entity";
 
 @Injectable()
 export class defaultData implements OnApplicationBootstrap {
@@ -34,7 +35,11 @@ export class defaultData implements OnApplicationBootstrap {
 
     /** 邮箱 */
     @InjectRepository(Email)
-    private readonly emailRepository: Repository<Email>
+    private readonly emailRepository: Repository<Email>,
+
+    /** 通知公告 */
+    @InjectRepository(Notice)
+    private readonly noticeRepository: Repository<Notice>
   ) {}
 
   async onApplicationBootstrap() {
@@ -43,6 +48,7 @@ export class defaultData implements OnApplicationBootstrap {
     await this.seedUsers();
     await this.seedDictionary();
     await this.seedEmails();
+    await this.seedNotice();
   }
 
   /** 用户数据信息 */
@@ -620,11 +626,6 @@ export class defaultData implements OnApplicationBootstrap {
     const count = await this.emailRepository.count();
     if (count === 0) {
       const emailData = [
-        // {
-        //   platform: "admin",
-        //   title: "您好 {nickName}，这是您的验证码！",
-        //   content: "您好 {nickName}，您正在尝试登录，验证码：{code}。",
-        // },
         {
           type: "logonCode",
           platform: "admin",
@@ -633,8 +634,27 @@ export class defaultData implements OnApplicationBootstrap {
         },
       ];
 
-      const email = emailData.map((item) => this.emailRepository.create(item));
+      const email = this.emailRepository.create(emailData);
       await this.emailRepository.save(email);
+    }
+  }
+
+  /** 邮箱模板 */
+  private async seedNotice() {
+    const count = await this.noticeRepository.count();
+    console.log("count", count);
+    if (count === 0) {
+      const noticeData = [
+        {
+          platform: "admin",
+          title: "系统通知",
+          content: "不定期清空数据！！！",
+          status: 2,
+        },
+      ];
+
+      const notice = this.noticeRepository.create(noticeData);
+      await this.noticeRepository.save(notice);
     }
   }
 }
