@@ -1,0 +1,10 @@
+# 开源协议
+LICENSE
+# 自动任务
+.github/
+# 项目描述
+README.md
+# 示例文件
+doc/
+# 示例图片
+example/
