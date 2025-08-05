@@ -140,7 +140,6 @@ export class UsersController {
     @Res() res: Response
   ) {
     // return
-    console.log("res", res);
     const data = await this.usersService.exportUserList(findUserDto, platform);
     if ("buffer" in data) {
       res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(data.fileName)}"`);

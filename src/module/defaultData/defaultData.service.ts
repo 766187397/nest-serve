@@ -174,7 +174,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "RouteAdmin",
-          title: "admin路由",
+          title: "后台路由",
           path: "/system/route/admin",
           component: "system/route/Admin",
           icon: "",
@@ -188,7 +188,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "RouteWeb",
-          title: "web路由",
+          title: "前台路由",
           path: "/system/route/web",
           component: "system/route/Web",
           icon: "",
@@ -223,7 +223,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "userAdmin",
-          title: "admin用户",
+          title: "后台用户",
           path: "/system/user/admin",
           component: "system/user/Admin",
           icon: "",
@@ -237,7 +237,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "userWeb",
-          title: "web用户",
+          title: "前台用户",
           path: "/system/user/web",
           component: "system/user/Web",
           icon: "",
@@ -272,7 +272,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "roleAdmin",
-          title: "admin角色",
+          title: "后台角色",
           path: "/system/role/admin",
           component: "system/role/Admin",
           icon: "",
@@ -286,7 +286,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "roleWeb",
-          title: "web角色",
+          title: "前台角色",
           path: "/system/role/web",
           component: "system/role/Web",
           icon: "",
@@ -322,7 +322,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "noticeAdmin",
-          title: "admin通知公告",
+          title: "后台通知公告",
           path: "/system/notice/admin",
           component: "system/notice/Admin",
           icon: "",
@@ -336,7 +336,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "noticeWeb",
-          title: "web通知公告",
+          title: "前台通知公告",
           path: "/system/notice/web",
           component: "system/notice/Web",
           icon: "",
@@ -426,7 +426,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "logAdmin",
-          title: "admin日志",
+          title: "后台日志",
           path: "/system/log/admin",
           component: "system/log/Admin",
           icon: "",
@@ -440,7 +440,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "logWeb",
-          title: "web日志",
+          title: "前台日志",
           path: "/system/log/web",
           component: "system/log/Web",
           icon: "",
@@ -475,7 +475,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "emailAdmin",
-          title: "admin邮箱模板",
+          title: "后台邮箱模板",
           path: "/system/email/admin",
           component: "system/email/Admin",
           icon: "",
@@ -489,7 +489,7 @@ export class defaultData implements OnApplicationBootstrap {
           platform: "admin",
           type: "menu",
           name: "emailWeb",
-          title: "web邮箱模板",
+          title: "前台邮箱模板",
           path: "/system/email/web",
           component: "system/email/Web",
           icon: "",
@@ -639,10 +639,9 @@ export class defaultData implements OnApplicationBootstrap {
     }
   }
 
-  /** 邮箱模板 */
+  /** 通知公告 */
   private async seedNotice() {
     const count = await this.noticeRepository.count();
-    console.log("count", count);
     if (count === 0) {
       const noticeData = [
         {
