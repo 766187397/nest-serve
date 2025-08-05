@@ -183,7 +183,7 @@ nest-serve
 
 ## 截图
 
-![image-20250804184851090](example\image-20250804184851090.png)
+![image-20250804184851090](example/image-20250804184851090.png)
 
 
 
