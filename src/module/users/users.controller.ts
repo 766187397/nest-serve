@@ -136,11 +136,11 @@ export class UsersController {
   @Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
   async exportUsers(
     @Param("platform") platform: string,
-    @Query(new FilterEmptyPipe()) findUserDto: FindUserDto,
+    @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage,
     @Res() res: Response
   ) {
     // return
-    const data = await this.usersService.exportUserList(findUserDto, platform);
+    const data = await this.usersService.exportUserList(findUserDtoByPage, platform);
     if ("buffer" in data) {
       res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(data.fileName)}"`);
       // 4. 发送文件
