@@ -4,7 +4,7 @@ import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from "./
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 
-@ApiTags("admin - 角色管理")
+@ApiTags("角色管理")
 // @ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })

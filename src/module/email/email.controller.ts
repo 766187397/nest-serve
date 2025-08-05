@@ -6,7 +6,7 @@ import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request } from "express";
 import { User } from "@/module/users/entities/user.entity";
 
-@ApiTags("admin - 邮箱管理")
+@ApiTags("邮箱管理")
 // @ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })

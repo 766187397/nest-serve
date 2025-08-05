@@ -16,7 +16,7 @@ import { ApiResult } from "@/common/utils/result";
 import { UserLogin } from "@/types/user";
 import * as XLSX from "xlsx";
 
-@ApiTags("admin - 用户管理")
+@ApiTags("用户管理")
 // @ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })

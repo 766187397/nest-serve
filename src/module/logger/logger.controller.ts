@@ -5,7 +5,7 @@ import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { FindLogDtoByPage } from "./dto";
 import { Roles } from "@/common/decorator/roles.decorator";
 
-@ApiTags("admin - 日志")
+@ApiTags("日志")
 // @ApiBearerAuth("Authorization")
 @ApiResponse({ status: 200, description: "操作成功" })
 @ApiResponse({ status: 201, description: "操作成功，无返回内容" })

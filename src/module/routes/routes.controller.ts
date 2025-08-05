@@ -6,7 +6,7 @@ import { Request, Response } from "express";
 import { User } from "@/module/users/entities/user.entity";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 
-@ApiTags("admin - 路由管理")
+@ApiTags("路由管理")
 @ApiParam({
   name: "platform",
   required: true,
