@@ -1,14 +1,6 @@
 import { Between, FindOptionsOrderValue } from "typeorm";
 import * as dayjs from "dayjs";
 
-type SortKey<T> = keyof T;
-type SortOrder = "asc" | "desc";
-
-interface SortCondition<T> {
-  key: SortKey<T>;
-  order?: SortOrder;
-}
-
 export class BaseService {
   dayjs = dayjs;
   /**

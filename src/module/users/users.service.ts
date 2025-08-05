@@ -20,6 +20,7 @@ import { RefreshToken, UserLogin } from "@/types/user";
 import { Role } from "@/module/roles/entities/role.entity";
 import { EmailCahce } from "@/types/email";
 import { cache } from "@/config/nodeCache";
+import { exportWithKeyValueHeader, importWithKeyValueHeader } from "@/common/utils/xlsx";
 
 @Injectable()
 export class UsersService extends BaseService {
@@ -390,6 +391,55 @@ export class UsersService extends BaseService {
       return ApiResult.success<UserLogin>({ data: userInfo });
     } catch (error) {
       return ApiResult.error<null>(error || "用户登录失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 导出用户列表
+
+   * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
+   * @param {string} platform 平台(admin/web/app/mini)
+   * @returns {Promise<{buffer: Buffer; fileName: string} | ApiResult<null>>} 成功Excel文件和名称，失败统一返回结果
+   */
+  async exportUserList(
+    findUserDtoByPage?: FindUserDtoByPage,
+    platform: string = "admin"
+  ): Promise<{ buffer: Buffer; fileName: string } | ApiResult<null>> {
+    try {
+      let { take, skip } = this.buildCommonPaging(findUserDtoByPage?.page, findUserDtoByPage?.pageSize);
+      let where = this.buildCommonQuery(findUserDtoByPage);
+      let order = this.buildCommonSort(findUserDtoByPage?.sort);
+      // 查询符合条件的用户
+      const [data] = await this.userRepository.findAndCount({
+        where: {
+          ...where,
+          platform: platform,
+          account: findUserDtoByPage?.account ? ILike(`%${findUserDtoByPage.account}%`) : undefined,
+          nickName: findUserDtoByPage?.nickName ? ILike(`%${findUserDtoByPage.nickName}%`) : undefined,
+          email: findUserDtoByPage?.email ? ILike(`%${findUserDtoByPage.email}%`) : undefined,
+          phone: findUserDtoByPage?.phone ? ILike(`%${findUserDtoByPage.phone}%`) : undefined,
+        },
+        order: {
+          ...order,
+        },
+        skip, // 跳过的条数
+        take, // 每页条数
+      });
+      return exportWithKeyValueHeader(
+        data,
+        {
+          account: "账号",
+          nickName: "昵称",
+          email: "邮箱",
+          phone: "手机号",
+          sex: "性别",
+          status: "状态",
+          createdAt: "创建时间",
+        },
+        "用户数据"
+      );
+    } catch (error) {
+      return ApiResult.error<null>(error || "用户查询失败，请稍后再试");
     }
   }
 }

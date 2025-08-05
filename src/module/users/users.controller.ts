@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res, Req } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res, Req, Header } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import {
   CreateUserDto,
@@ -14,6 +14,7 @@ import { Request, Response } from "express";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
 import { ApiResult } from "@/common/utils/result";
 import { UserLogin } from "@/types/user";
+import * as XLSX from "xlsx";
 
 @ApiTags("admin - 用户管理")
 // @ApiBearerAuth("Authorization")
@@ -128,5 +129,26 @@ export class UsersController {
     res.cookie("refresh_token", "", { expires: new Date(0) });
     const { __isApiResult, ...data } = ApiResult.success({ data: null });
     res.status(200).json(data);
+  }
+
+  @Get("export/:platform")
+  @ApiOperation({ summary: "导出用户数据" })
+  @Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+  async exportUsers(
+    @Param("platform") platform: string,
+    @Query(new FilterEmptyPipe()) findUserDto: FindUserDto,
+    @Res() res: Response
+  ) {
+    // return
+    console.log("res", res);
+    const data = await this.usersService.exportUserList(findUserDto, platform);
+    if ("buffer" in data) {
+      res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(data.fileName)}"`);
+      // 4. 发送文件
+      res.status(200).send(data.buffer);
+      return;
+    }
+    const { __isApiResult, ...dataResult } = data as ApiResult<null>;
+    return dataResult;
   }
 }
