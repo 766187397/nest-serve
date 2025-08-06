@@ -1,8 +1,8 @@
 import { diskStorage } from "multer";
 
 export class FileUploadService {
-  /** 文件大小50MB */
-  static MB = 50;
+  /** 文件大小 */
+  static MB = 20;
   /** 文件大小限制 计算结果 */
   static size = 1024 * 1024 * this.MB;
   /** 文件夹名称 */
@@ -19,7 +19,7 @@ export class FileUploadService {
       },
     }),
     limits: {
-      fileSize: this.size, // 限制文件大小为50MB
+      fileSize: this.size, // 限制文件大小
     },
   };
 }

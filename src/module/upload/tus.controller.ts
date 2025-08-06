@@ -52,8 +52,8 @@ export class TusController implements OnModuleInit {
         path: newPath,
         filename: `${event.file.id}${extension}`,
         size: event.file.upload_length,
+        mimetype: metadata.filetype,
       };
-
       await this.uploadService.uploadFile(file);
     });
   }
