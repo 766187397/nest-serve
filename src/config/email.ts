@@ -1,12 +1,21 @@
+// 获取环境变量
+const env = process.env;
+let secure = true;
+if (env.EMAIL_SECURE == "true") {
+  secure = true;
+} else if (env.EMAIL_SECURE == "false") {
+  secure = false;
+}
+
 /** 邮箱配置 */
 export class EmailConfig {
   static QQ = {
-    host: "smtp.qq.com", // SMTP主机
-    port: 465, // SMTP端口
-    secure: true, // 使用SSL
+    host: env.EMAIL_HOST, // SMTP主机
+    port: env.EMAIL_PORT, // SMTP端口
+    secure: secure, // 使用SSL
     auth: {
-      user: "766187397@qq.com", // SMTP用户名
-      pass: "zolkzbawjigzbcha", // SMTP密码
+      user: env.EMAIL_USER, // SMTP用户名
+      pass: env.EMAIL_PASS, // SMTP密码
     },
   };
 }

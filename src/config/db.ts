@@ -1,7 +1,7 @@
 import { join } from "path";
 
 // 获取环境变量
-const DB_TYPE = process.env.DB_TYPE;
+const env = process.env;
 
 /** 数据库配置类型 */
 export interface MysqlConfig {
@@ -24,15 +24,15 @@ const mysqlConfig: MysqlConfig = {
   /** 数据库类型 */
   DB_TYPE: "mysql",
   /** 数据地址 */
-  DB_HOST: "127.0.0.1",
+  DB_HOST: env.DB_HOST || "127.0.0.1",
   /** 数据库端口 */
-  DB_PORT: 3306,
+  DB_PORT: Number(env.DB_PORT) || 3306,
   /** 数据库用户名 */
-  DB_USER: "root",
+  DB_USER: env.DB_USER || "root",
   /** 数据库密码 */
-  DB_PASSWORD: "123456",
+  DB_PASSWORD: env.DB_PASSWORD || "123456",
   /** 数据库名称 */
-  DB_DATABASE: "nest-serve",
+  DB_DATABASE: env.DB_DATABASE || "nest-serve",
 };
 
 /** mysql 日志 */
@@ -40,15 +40,15 @@ const mysqlLogger: MysqlConfig = {
   /** 数据库类型 */
   DB_TYPE: "mysql",
   /** 数据地址 */
-  DB_HOST: "127.0.0.1",
+  DB_HOST: env.DB_HOST || "127.0.0.1",
   /** 数据库端口 */
-  DB_PORT: 3306,
+  DB_PORT: Number(env.DB_PORT) || 3306,
   /** 数据库用户名 */
-  DB_USER: "root",
+  DB_USER: env.DB_USER || "root",
   /** 数据库密码 */
-  DB_PASSWORD: "123456",
+  DB_PASSWORD: env.DB_PASSWORD || "123456",
   /** 数据库名称 */
-  DB_DATABASE: "nest-serve-logger",
+  DB_DATABASE: env.DB_DATABASE || "nest-serve-logger",
 };
 
 /** Sqlite配置类型 */
@@ -64,7 +64,7 @@ const sqliteConfig: SqliteConfig = {
   // 数据库类型
   DB_TYPE: "sqlite",
   //  数据库地址
-  DB_DATABASE: join(process.cwd(), "sqlitedata/nest.db"),
+  DB_DATABASE: join(process.cwd(), env.DB_DATABASE || "sqlitedata/nest.db"),
 };
 
 /** sqlite 日志 */
@@ -72,7 +72,7 @@ const sqliteLogger: SqliteConfig = {
   // 数据库类型
   DB_TYPE: "sqlite",
   //  数据库地址
-  DB_DATABASE: join(process.cwd(), "sqlitedata/nest-logger.db"),
+  DB_DATABASE: join(process.cwd(), env.DB_DATABASE || "sqlitedata/nest-logger.db"),
 };
 
 /** 数据库配置 */
@@ -80,13 +80,11 @@ let dbConfig: MysqlConfig | SqliteConfig;
 /** 日志配置 */
 let dbLogger: MysqlConfig | SqliteConfig;
 
-if (DB_TYPE === "sqlite") {
-  dbConfig = sqliteConfig;
-  dbLogger = sqliteLogger;
-} else {
-  dbConfig = mysqlConfig;
-  dbLogger = mysqlLogger;
-}
+const DB_TYPE = env.DB_TYPE;
+const LOG_DB_TYPE = env.LOG_DB_TYPE;
+dbConfig = DB_TYPE === "sqlite" ? sqliteConfig : mysqlConfig;
+dbLogger = LOG_DB_TYPE === "sqlite" ? sqliteLogger : mysqlLogger;
+
 export default {
   dbConfig,
   dbLogger,

@@ -12,6 +12,7 @@ import { PageApiResult } from "@/types/public";
 import { User } from "@/module/users/entities/user.entity";
 import { generateRandomString } from "@/common/utils/tool";
 import { cache, cacheTime } from "@/config/nodeCache";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 // 创建一个SMTP客户端配置对象
 const QQPostbox = nodemailer.createTransport({
@@ -22,7 +23,7 @@ const QQPostbox = nodemailer.createTransport({
     user: EmailConfig.QQ.auth.user,
     pass: EmailConfig.QQ.auth.pass,
   },
-});
+} as SMTPTransport.Options);
 
 @Injectable()
 export class EmailService extends BaseService {
