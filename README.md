@@ -70,13 +70,13 @@ npm i
 
 
 
-### 运行版本
+### 环境变量
 
 > .env：开发版本（使用MySQL数据库）
 >
 > .env.sqlitedb：开发版本（使用sqlite数据库）
 
-[示例](/doc/环境变量配置.md)
+[环境变量配置示例](/doc/环境变量配置.md)
 
 ```bash
 npm run serve
@@ -119,6 +119,14 @@ knife4j to http://localhost:3000/doc.html
 ```
 docker pull 766187397/nest-serve:latest
 ```
+
+
+
+## 前端项目
+
+gitee：https://gitee.com/sk20020228/admin-vue3-ts
+
+GitHub：https://github.com/766187397/admin-vue3-ts
 
 
 
