@@ -72,15 +72,15 @@ npm i
 
 ### 运行版本
 
-> dev：开发版本（使用MySQL数据库）
+> .env：开发版本（使用MySQL数据库）
 >
-> prod：生产版本（使用MySQL数据库）
->
-> sqlitedb：开发版本（使用sqlite数据库）
+> .env.sqlitedb：开发版本（使用sqlite数据库）
+
+[示例](/doc/环境变量配置.md)
 
 ```bash
-npm run serve:dev
-npm run serve:prod
+npm run serve
+
 npm run serve:sqlitedb
 ```
 
