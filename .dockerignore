@@ -3,8 +3,14 @@ LICENSE
 # 自动任务
 .github/
 # 项目描述
-README.md
+*.md
 # 示例文件
 doc/
 # 示例图片
 example/
+# 依赖包
+node_modules
+# 构建生成目录
+dist
+# git
+.git

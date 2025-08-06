@@ -3,23 +3,28 @@ import { Inject, Injectable } from "@nestjs/common";
 import { BaseService } from "@/common/service/base";
 import { Log } from "./entities/logger.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { FindLogDtoByPage, LogOptionalDto } from "./dto/index";
+import { LessThan, Repository } from "typeorm";
+import { FindLogDtoByPage } from "./dto/index";
 import { PageApiResult } from "@/types/public";
 import { Request } from "express";
+import { Cron, CronExpression, SchedulerRegistry } from "@nestjs/schedule";
 
 @Injectable()
 export class LoggerService extends BaseService {
   constructor(
     @InjectRepository(Log, "logger")
-    private logRepository: Repository<Log>
+    private logRepository: Repository<Log>,
+    @Inject(SchedulerRegistry)
+    private schedulerRegistry: SchedulerRegistry
   ) {
     super();
   }
 
   /**
    * 创建日志
-   * @param {LogOptionalDto} logOptionalDto
+   * @param request 请求对象
+   * @param data 日志数据
+   * @param statusCode 状态码
    */
   async create(request: Request, data: string = "", statusCode: string = "200") {
     const url: string = request.url || "";
@@ -111,6 +116,21 @@ export class LoggerService extends BaseService {
       });
     } catch (error) {
       return ApiResult.error<null>(error || "查询日志失败，请稍后重试");
+    }
+  }
+
+  // 每天午夜执行
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  // 自定义 cron 表达式：每分钟的第30秒执行
+  // @Cron("30 * * * * *")
+  async deleteLogs() {
+    try {
+      console.log("定时任务删除日志");
+      await this.logRepository.delete({
+        createdAt: LessThan(this.dayjs().subtract(30, "day").toDate()),
+      });
+    } catch (error) {
+      console.log("日志删除失败，请稍后再试", error);
     }
   }
 }
