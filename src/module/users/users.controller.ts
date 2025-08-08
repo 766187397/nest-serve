@@ -143,6 +143,7 @@ export class UsersController {
     const data = await this.usersService.exportUserList(findUserDtoByPage, platform);
     if ("buffer" in data) {
       res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(data.fileName)}"`);
+      res.setHeader("Access-Control-Expose-Headers", `Content-Disposition`);
       // 4. 发送文件
       res.status(200).send(data.buffer);
       return;
