@@ -460,7 +460,7 @@ export class defaultData implements OnApplicationBootstrap {
         name: "email",
         title: "邮箱模板管理",
         path: "/system/email",
-        icon: "Tickets",
+        icon: "Message",
         externalLinks: false,
         redirect: "/system/email/admin",
         meta: "",
