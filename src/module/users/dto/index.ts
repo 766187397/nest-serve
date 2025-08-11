@@ -125,6 +125,16 @@ export class LogInDto {
   @IsString({ message: "密码字符串" })
   @IsNotEmpty({ message: "密码是必填项" })
   password: string;
+
+  @ApiProperty({ description: "验证码", example: "123456" })
+  @IsString({ message: "验证码字符串" })
+  @IsNotEmpty({ message: "验证码是必填项" })
+  code: string;
+
+  @ApiProperty({ description: "验证码Key", example: "123456" })
+  @IsString({ message: "验证码Key字符串" })
+  @IsNotEmpty({ message: "验证码Key是必填项" })
+  codeKey: string;
 }
 
 /** 验证码 */

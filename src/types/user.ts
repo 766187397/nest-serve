@@ -26,5 +26,5 @@ export interface RefreshToken {
 /** 人机校验 */
 export interface Captcha {
   url: string;
-  uuid: string;
+  codeKey: string;
 }

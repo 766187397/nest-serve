@@ -249,6 +249,13 @@ export class UsersService extends BaseService {
    */
   async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<UserLogin | null>> {
     try {
+      const code = svgCache.get(logInDto.codeKey) as { text: string };
+      if (!code || code.text != logInDto.code) {
+        return ApiResult.error<null>("验证码不存在或不正确");
+      } else {
+        svgCache.del(logInDto.codeKey);
+      }
+
       let data = await this.userRepository.findOne({
         where: { account: logInDto.account, platform },
         relations: ["roles"],
@@ -462,14 +469,14 @@ export class UsersService extends BaseService {
       const { text, data } = svgCaptcha.create(options);
       const base64 = Buffer.from(data).toString("base64");
       const url = `data:image/svg+xml;base64,${base64}`;
-      const uuid = uuidv4();
+      const codeKey = uuidv4();
       // 存入缓存
-      svgCache.set(uuid, { text });
+      svgCache.set(codeKey, { text });
 
       return ApiResult.success<Captcha>({
         data: {
           url,
-          uuid,
+          codeKey,
         },
       });
     } catch (error) {
