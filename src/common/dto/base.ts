@@ -60,3 +60,20 @@ export class FindByParameter {
   // @IsString({ message: "时间范围必须为字符串，并且需要使用逗号隔开" })
   time?: string | string[];
 }
+
+/** 验证码 */
+export class VerificationCodeDto {
+  @ApiProperty({
+    description: "验证码",
+    required: true,
+  })
+  @IsString({ message: "验证码必须为字符串" })
+  code: string;
+
+  @ApiProperty({
+    description: "验证码对应的键",
+    required: true,
+  })
+  @IsString({ message: "验证码对应的键必须为字符串" })
+  codeKey: string;
+}

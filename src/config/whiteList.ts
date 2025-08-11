@@ -19,6 +19,7 @@ export class JWTWhiteList {
     "/api/v1/admin/users/refresh/token", // 刷新token
     "/api/v1/upload/file", // 文件上传接口
     "/api/v1/admin/email/send/email", // 邮件发送接口
+    "/api/v1/admin/users/captcha", // 验证码接口
   ];
 }
 

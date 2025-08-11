@@ -249,11 +249,8 @@ export class UsersService extends BaseService {
    */
   async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<UserLogin | null>> {
     try {
-      const code = svgCache.get(logInDto.codeKey) as { text: string };
-      if (!code || code.text != logInDto.code) {
-        return ApiResult.error<null>("验证码不存在或不正确");
-      } else {
-        svgCache.del(logInDto.codeKey);
+      if (this.buildVerify({ code: logInDto.code, codeKey: logInDto.codeKey })) {
+        return ApiResult.error("验证码错误或者不存在！");
       }
 
       let data = await this.userRepository.findOne({

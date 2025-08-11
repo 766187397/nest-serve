@@ -1,4 +1,4 @@
-import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
+import { CreateBaseDto, FindByParameter, VerificationCodeDto } from "@/common/dto/base";
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
 import { IsArray, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
@@ -115,7 +115,7 @@ export class FindUserDtoByPage extends FindUserDto {
 }
 
 /** 登录 */
-export class LogInDto {
+export class LogInDto extends VerificationCodeDto {
   @ApiProperty({ description: "账号", example: "admin" })
   @IsString({ message: "账号字符串" })
   @IsNotEmpty({ message: "账号是必填项" }) // 必填校验
@@ -125,19 +125,9 @@ export class LogInDto {
   @IsString({ message: "密码字符串" })
   @IsNotEmpty({ message: "密码是必填项" })
   password: string;
-
-  @ApiProperty({ description: "验证码", example: "123456" })
-  @IsString({ message: "验证码字符串" })
-  @IsNotEmpty({ message: "验证码是必填项" })
-  code: string;
-
-  @ApiProperty({ description: "验证码Key", example: "123456" })
-  @IsString({ message: "验证码Key字符串" })
-  @IsNotEmpty({ message: "验证码Key是必填项" })
-  codeKey: string;
 }
 
-/** 验证码 */
+/** 邮箱验证码 */
 export class VerificationCodeLoginDto {
   @ApiProperty({ description: "验证码", example: "123456" })
   @IsString({ message: "验证码字符串" })

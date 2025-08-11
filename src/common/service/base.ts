@@ -1,5 +1,6 @@
 import { Between, FindOptionsOrderValue } from "typeorm";
 import * as dayjs from "dayjs";
+import { svgCache } from "@/config/nodeCache";
 
 export class BaseService {
   dayjs = dayjs;
@@ -70,5 +71,22 @@ export class BaseService {
     const take = pageSize;
     const skip = (page - 1) * pageSize;
     return { take, skip };
+  }
+
+  /**
+   * 校验验证码是否正确
+   * @param param
+   * @param {string} param.code 验证码
+   * @param {string} param.codeKey 验证码KEY
+   * @returns {boolean} true 为正确, false 为错误
+   */
+  buildVerify({ code, codeKey }: { codeKey: string; code: string }): boolean {
+    const codeCache = svgCache.get(codeKey) as { text: string };
+    if (!codeCache || codeCache.text != code) {
+      return false;
+    } else {
+      svgCache.del(codeKey);
+      return true;
+    }
   }
 }

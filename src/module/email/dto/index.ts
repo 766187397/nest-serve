@@ -1,4 +1,4 @@
-import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
+import { CreateBaseDto, FindByParameter, VerificationCodeDto } from "@/common/dto/base";
 // import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
@@ -48,7 +48,7 @@ export class FindEmailtoByPage extends FindEmailDto {
 }
 
 /** 发送邮件 */
-export class SendEmail {
+export class SendEmail extends VerificationCodeDto {
   @ApiProperty({ description: "模板标签" })
   @IsString({ message: "lavel必须是字符串" })
   @IsNotEmpty({ message: "lavel必须是必填项" }) // 必填校验
