@@ -16,11 +16,13 @@ import { JwtService, TokenExpiredError } from "@nestjs/jwt";
 import { bcryptService } from "@/common/utils/bcrypt-hash";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
 import { PageApiResult } from "@/types/public";
-import { RefreshToken, UserLogin } from "@/types/user";
+import { Captcha, RefreshToken, UserLogin } from "@/types/user";
 import { Role } from "@/module/roles/entities/role.entity";
 import { EmailCahce } from "@/types/email";
-import { cache } from "@/config/nodeCache";
+import { emailCache, svgCache } from "@/config/nodeCache";
 import { exportWithKeyValueHeader, importWithKeyValueHeader } from "@/common/utils/xlsx";
+import * as svgCaptcha from "svg-captcha";
+import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class UsersService extends BaseService {
@@ -355,12 +357,12 @@ export class UsersService extends BaseService {
       }
       // 验证码校验逻辑
       // 检查该收件人是否在缓存中
-      const cacheData: EmailCahce = cache.get(verificationCodeLogin.email) as EmailCahce;
+      const cacheData: EmailCahce = emailCache.get(verificationCodeLogin.email) as EmailCahce;
       if (cacheData?.code !== verificationCodeLogin.code) {
         return ApiResult.error<null>("验证码错误或已过期");
       }
       // 如果验证码正确，删除缓存中的验证码
-      cache.del(verificationCodeLogin.email);
+      emailCache.del(verificationCodeLogin.email);
 
       // 这个状态需要自定义
       if (data.status === 2) {
@@ -440,6 +442,38 @@ export class UsersService extends BaseService {
       );
     } catch (error) {
       return ApiResult.error<null>(error || "用户查询失败，请稍后再试");
+    }
+  }
+
+  /**
+   * 人机校验
+   * @param {string} background 验证码背景颜色
+   * @returns {Promise<ApiResult<Captcha | null>>} 统一返回结果
+   */
+  async captcha(background: string = "#fff"): Promise<ApiResult<Captcha | null>> {
+    try {
+      const options = {
+        size: 4,
+        ignoreChars: "10ol",
+        noise: 3,
+        background,
+      };
+
+      const { text, data } = svgCaptcha.create(options);
+      const base64 = Buffer.from(data).toString("base64");
+      const url = `data:image/svg+xml;base64,${base64}`;
+      const uuid = uuidv4();
+      // 存入缓存
+      svgCache.set(uuid, { text });
+
+      return ApiResult.success<Captcha>({
+        data: {
+          url,
+          uuid,
+        },
+      });
+    } catch (error) {
+      return ApiResult.error<null>(error || "生成验证码失败！");
     }
   }
 }

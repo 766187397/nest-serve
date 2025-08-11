@@ -151,4 +151,10 @@ export class UsersController {
     const { __isApiResult, ...dataResult } = data as ApiResult<null>;
     return dataResult;
   }
+
+  @Get("captcha")
+  @ApiOperation({ summary: "获取验证码" })
+  async captcha(@Query("background") background) {
+    return await this.usersService.captcha(background);
+  }
 }

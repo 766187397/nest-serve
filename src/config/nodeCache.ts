@@ -1,4 +1,7 @@
 import * as nodeCache from "node-cache";
-export const cacheTime = 2;
-// 创建一个NodeCache实例，设置过期时间为60秒
-export const cache = new nodeCache({ stdTTL: cacheTime * 60 });
+export const cacheTime = 5;
+/** 邮箱缓存实例 */
+export const emailCache = new nodeCache({ stdTTL: cacheTime * 60 });
+
+/** 图片人机校验缓存实例 */
+export const svgCache = new nodeCache({ stdTTL: 5 * 60 });

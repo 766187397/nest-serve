@@ -629,8 +629,8 @@ export class defaultData implements OnApplicationBootstrap {
         {
           type: "logonCode",
           platform: "admin",
-          title: "尊敬的用户您好，这是您的验证码！",
-          content: "尊敬的用户您好，您正在尝试登录，验证码：{code}。",
+          title: "验证码通知！",
+          content: "<!DOCTYPE html><html lang='zh-CN'><head><meta charset='UTF-8'/><title>验证码通知</title><meta name='viewport'content='width=device-width, initial-scale=1.0'/><style>body{margin:0;padding:0;background-color:#f4f4f4;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}table{border-collapse:collapse;width:100%}.wrapper{background-color:#f4f4f4;width:100%;padding:20px 0}.main{max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)}.header{background-color:#007bff;color:#ffffff;padding:30px 40px;text-align:center}.header h1{margin:0;font-size:24px}.content{padding:30px 40px;color:#333333;font-size:16px;line-height:1.6}.content h2{color:#007bff;margin-top:0}.code{cursor:pointer;background-color:#eee;padding:4px 8px}.footer{background-color:#f9f9f9;color:#888888;font-size:12px;padding:20px 40px;text-align:center}.footer a{color:#007bff;text-decoration:none}@media screen and(max-width:600px){.content,.header,.footer{padding:20px}.cta-button{width:100%;text-align:center}}</style></head><body><div class='wrapper'><table role='presentation'><tr><td><div class='main'><div class='header'><h1>🚀验证码通知！</h1></div><div class='content'><h2>亲爱的用户，您好！</h2><p>您似乎正在尝试登录！这是您的验证码：<span class='code'>{code}</span>，有效期5分钟，请勿将验证码泄漏于他人。</p></div><div class='footer'><p>此邮件由系统自动发送，请勿直接回复。<br/>如需帮助，请联系<a href='mailto:766187397@qq.com'>766187397@qq.com</a></p></div></div></td></tr></table></div></body></html>",
         },
       ];
 
