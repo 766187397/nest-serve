@@ -132,7 +132,7 @@ export class VerificationCodeLoginDto {
   @ApiProperty({ description: "验证码", example: "123456" })
   @IsString({ message: "验证码字符串" })
   @IsNotEmpty({ message: "验证码是必填项" })
-  code: string;
+  emailCode: string;
 
   @ApiProperty({ description: "邮箱", example: "766187397@qq.com" })
   @IsEmail({}, { message: "邮箱格式错误" })

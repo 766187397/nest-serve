@@ -50,12 +50,12 @@ export class FindEmailtoByPage extends FindEmailDto {
 /** 发送邮件 */
 export class SendEmail extends VerificationCodeDto {
   @ApiProperty({ description: "模板标签" })
-  @IsString({ message: "lavel必须是字符串" })
-  @IsNotEmpty({ message: "lavel必须是必填项" }) // 必填校验
+  @IsString({ message: "type必须是字符串" })
+  @IsNotEmpty({ message: "type必须是必填项" }) // 必填校验
   type: string;
 
   @ApiProperty({ description: "收件人邮箱", example: "766187397@qq.com" })
-  @IsString({ message: "邮箱字符串" })
+  @IsString({ message: "email字符串" })
   @IsNotEmpty({ message: "email是必填项" }) // 必填校验
   email: string;
 }

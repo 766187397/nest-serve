@@ -362,7 +362,7 @@ export class UsersService extends BaseService {
       // 验证码校验逻辑
       // 检查该收件人是否在缓存中
       const cacheData: EmailCahce = emailCache.get(verificationCodeLogin.email) as EmailCahce;
-      if (cacheData?.code !== verificationCodeLogin.code) {
+      if (cacheData?.code !== verificationCodeLogin.emailCode) {
         return ApiResult.error<null>("验证码错误或已过期");
       }
       // 如果验证码正确，删除缓存中的验证码
