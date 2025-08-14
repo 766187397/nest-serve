@@ -38,24 +38,24 @@ export class FindEmailDto extends FindByParameter {
 export class FindEmailtoByPage extends FindEmailDto {
   @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()
-  @IsString({ message: "page必须是字符串" })
+  @IsString({ message: "页码必须是字符串" })
   page?: string;
 
   @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
   @IsOptional()
-  @IsString({ message: "pageSize必须是字符串" })
+  @IsString({ message: "每页数量必须是字符串" })
   pageSize?: string;
 }
 
 /** 发送邮件 */
 export class SendEmail extends VerificationCodeDto {
   @ApiProperty({ description: "模板标签" })
-  @IsString({ message: "type必须是字符串" })
-  @IsNotEmpty({ message: "type必须是必填项" }) // 必填校验
+  @IsString({ message: "类型必须是字符串" })
+  @IsNotEmpty({ message: "类型必须是必填项" }) // 必填校验
   type: string;
 
   @ApiProperty({ description: "收件人邮箱", example: "766187397@qq.com" })
-  @IsString({ message: "email字符串" })
-  @IsNotEmpty({ message: "email是必填项" }) // 必填校验
+  @IsString({ message: "邮箱字符串" })
+  @IsNotEmpty({ message: "邮箱是必填项" }) // 必填校验
   email: string;
 }

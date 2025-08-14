@@ -15,7 +15,7 @@ class RoleOptionalDto extends CreateBaseDto {
 
   @ApiProperty({ description: "路由id", required: false, example: [1] })
   @IsOptional()
-  @IsArray({ message: "routeIds必须为数字数组" })
+  @IsArray({ message: "路由ids必须为数字数组" })
   routeIds?: number[];
 }
 
@@ -52,11 +52,11 @@ export class FindRoleDto extends FindByParameter {
 export class FindRoleDtoByPage extends FindRoleDto {
   @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()
-  @IsString({ message: "page必须是字符串" })
+  @IsString({ message: "页码必须是字符串" })
   page?: string;
 
   @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
   @IsOptional()
-  @IsString({ message: "pageSize必须是字符串" })
+  @IsString({ message: "每页数量必须是字符串" })
   pageSize?: string;
 }

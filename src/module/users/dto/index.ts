@@ -38,17 +38,17 @@ class UserOptionalDto extends CreateBaseDto {
  */
 export class CreateUserDto extends UserOptionalDto {
   @ApiProperty({ description: "账号", example: "admin" })
-  @IsString({ message: "账号字符串" })
+  @IsString({ message: "账号必须是字符串" })
   @IsNotEmpty({ message: "账号是必填项" }) // 必填校验
   account: string;
 
   @ApiProperty({ description: "昵称", example: "管理员" })
-  @IsString({ message: "昵称字符串" })
+  @IsString({ message: "昵称必须是字符串" })
   @IsNotEmpty({ message: "昵称是必填项" })
   nickName: string;
 
   @ApiProperty({ description: "密码", example: "123456" })
-  @IsString({ message: "密码字符串" })
+  @IsString({ message: "密码必须是字符串" })
   @IsNotEmpty({ message: "密码是必填项" })
   password: string;
 }
@@ -57,17 +57,17 @@ export class CreateUserDto extends UserOptionalDto {
 export class UpdateUserDto extends UserOptionalDto {
   @ApiProperty({ description: "账号", example: "admin" })
   @IsOptional()
-  @IsString({ message: "账号字符串" })
+  @IsString({ message: "账号必须是字符串" })
   account?: string | undefined;
 
   @ApiProperty({ description: "昵称", example: "管理员" })
   @IsOptional()
-  @IsString({ message: "昵称字符串" })
+  @IsString({ message: "昵称必须是字符串" })
   nickName?: string | undefined;
 
   @ApiProperty({ description: "密码", example: "123456" })
   @IsOptional()
-  @IsString({ message: "密码字符串" })
+  @IsString({ message: "密码必须是字符串" })
   password?: string | undefined;
 }
 
@@ -77,12 +77,12 @@ export class UpdateUserDto extends UserOptionalDto {
 export class FindUserDto extends FindByParameter {
   @ApiProperty({ type: "string", description: "账号", required: false, example: "admin" })
   @IsOptional()
-  @IsString()
+  @IsString({ message: "账号必须是字符串" })
   account?: string | undefined;
 
   @ApiProperty({ type: "string", description: "昵称", required: false, example: "管理员" })
   @IsOptional()
-  @IsString()
+  @IsString({ message: "昵称必须是字符串" })
   nickName?: string | undefined;
 
   // Transform 空值处理
@@ -105,12 +105,12 @@ export class FindUserDto extends FindByParameter {
 export class FindUserDtoByPage extends FindUserDto {
   @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()
-  @IsString({ message: "page必须是字符串" })
+  @IsString({ message: "页码必须是字符串" })
   page?: string;
 
   @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
   @IsOptional()
-  @IsString({ message: "pageSize必须是字符串" })
+  @IsString({ message: "每页数量必须是字符串" })
   pageSize?: string;
 }
 

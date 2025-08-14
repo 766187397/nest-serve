@@ -5,7 +5,7 @@ import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-
 class NoticeOptionalDto extends CreateBaseDto {
   @ApiProperty({ description: "状态；1 - 暂存，2 - 发布", required: false, example: 1 })
   @IsOptional()
-  @IsNumber({}, { message: "status必须为数字" })
+  @IsNumber({}, { message: "状态必须为数字" })
   declare status?: number;
 
   @ApiProperty({ name: "roleKeys", type: String, required: false, description: "角色权限" })
@@ -67,12 +67,12 @@ export class FindNoticeDto extends FindByParameter {
 export class FindNoticeDtoByPage extends FindNoticeDto {
   @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()
-  @IsString({ message: "page必须是字符串" })
+  @IsString({ message: "页码必须是字符串" })
   page?: string;
 
   @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
   @IsOptional()
-  @IsString({ message: "pageSize必须是字符串" })
+  @IsString({ message: "每页数量必须是字符串" })
   pageSize?: string;
 }
 
@@ -80,11 +80,11 @@ export class FindNoticeDtoByPage extends FindNoticeDto {
 export class FindNoticeDtoByPageByUserOrRole {
   @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()
-  @IsString({ message: "page必须是字符串" })
+  @IsString({ message: "页码必须是字符串" })
   page?: string;
 
   @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
   @IsOptional()
-  @IsString({ message: "pageSize必须是字符串" })
+  @IsString({ message: "每页数量必须是字符串" })
   pageSize?: string;
 }

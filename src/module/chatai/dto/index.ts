@@ -26,7 +26,7 @@ export class ChatRequestDto {
     example: "chat",
   })
   @IsNotEmpty()
-  @IsString({ message: "type不能为空" })
+  @IsString({ message: "类型不能为空" })
   type: string;
 
   @ApiProperty({

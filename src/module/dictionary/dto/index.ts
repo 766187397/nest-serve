@@ -46,12 +46,12 @@ export class FindDictionaryDto extends FindByParameter {
 export class FindDictionaryDtoByPage extends FindDictionaryDto {
   @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()
-  @IsString({ message: "page必须是字符串" })
+  @IsString({ message: "页码必须是字符串" })
   page?: string;
 
   @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
   @IsOptional()
-  @IsString({ message: "pageSize必须是字符串" })
+  @IsString({ message: "每页数量必须是字符串" })
   pageSize?: string;
 }
 
@@ -120,11 +120,11 @@ export class FindDictionaryItemDto extends FindByParameter {
 export class FindDictionaryItemDtoByPage extends FindDictionaryItemDto {
   @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
   @IsOptional()
-  @IsString({ message: "page必须是字符串" })
+  @IsString({ message: "页码必须是字符串" })
   page?: string;
 
   @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
   @IsOptional()
-  @IsString({ message: "pageSize必须是字符串" })
+  @IsString({ message: "每页数量必须是字符串" })
   pageSize?: string;
 }
