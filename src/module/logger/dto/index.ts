@@ -1,16 +1,6 @@
-import { FindByParameter } from "@/common/dto/base";
-import { ApiProperty } from "@nestjs/swagger";
+import { FindByParameter, PageByParameter } from "@/common/dto/base";
+import { ApiProperty, IntersectionType, PartialType } from "@nestjs/swagger";
 import { IsOptional, IsString } from "class-validator";
 
 /** 分页查询 */
-export class FindLogDtoByPage extends FindByParameter {
-  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
-  @IsOptional()
-  @IsString({ message: "页码必须是字符串" })
-  page?: string;
-
-  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
-  @IsOptional()
-  @IsString({ message: "每页数量必须是字符串" })
-  pageSize?: string;
-}
+export class FindLogDtoByPage extends PartialType(IntersectionType(FindByParameter, PageByParameter)) {}
