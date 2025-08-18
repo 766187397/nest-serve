@@ -15,7 +15,6 @@ import { RoutesModule } from "./module/routes/routes.module";
 import { LoggerModule } from "./module/logger/logger.module";
 import { NoticeModule } from "./module/notice/notice.module";
 import { DictionaryModule } from "./module/dictionary/dictionary.module";
-import { ChataiModule } from "./module/chatai/chatai.module";
 import { EmailModule } from "./module/email/email.module";
 import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
 
@@ -103,7 +102,6 @@ import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
     NoticeModule,
     DictionaryModule,
     EmailModule,
-    ChataiModule,
   ],
   controllers: [],
   providers: [
