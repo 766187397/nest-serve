@@ -1,0 +1,31 @@
+# ----------------- 基础镜像 -----------------
+FROM node:20
+
+# ----------------- 工作目录 -----------------
+WORKDIR /app
+
+# 复制依赖声明文件
+COPY package*.json ./
+
+# 安装所有依赖（含 @nestjs/cli，因为 build 时需要）
+RUN npm ci
+
+# 复制全部源码
+COPY . .
+
+# 执行 NestJS 编译
+RUN npm run build
+
+# 创建运行时目录并一次性赋权
+RUN mkdir -p /app/uploads /app/sqlitedata \
+ && chown -R node:node /app
+
+# 切换到非 root 用户运行
+USER node
+
+# Hugging Face 空间 只开放 7860 端口
+EXPOSE 7860
+ENV PORT=7860
+
+# 启动生产模式
+CMD ["node", "dist/main"]
