@@ -7,7 +7,7 @@ WORKDIR /app
 # 复制依赖声明文件
 COPY package*.json ./
 
-# 安装所有依赖（含 @nestjs/cli，因为 build 时需要）
+# 安装所有依赖（含 @nestjs/cli，因为 build 时需要，当前文件有package-lock.json，如果没有，则 npm install ）
 RUN npm ci
 
 # 复制全部源码
