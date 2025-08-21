@@ -20,6 +20,6 @@ export class Notice extends UUIDBaseEntity {
   @Column({ type: "date", comment: "指定时间", nullable: true })
   specifyTime?: Date;
 
-  @Column({ type: "text", comment: "标记已读用户id", nullable: true, default: "" })
+  @Column({ type: "text", comment: "标记已读用户id", nullable: true })
   READUserIds?: string;
 }
