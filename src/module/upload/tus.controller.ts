@@ -84,7 +84,7 @@ export class TusController implements OnModuleInit {
 @Controller("api/v1/large/tempFile")
 export class CustomizeTusController {
   // 取消上传接口：客户端可以发送 DELETE 请求到 /api/large/tempFile/{upload-id}
-  @Delete(":id")
+  @Delete("delete/:id")
   @ApiParam({ name: "id", description: "上传文件的唯一标识符" })
   @ApiOperation({ summary: "大文件切片取消的方法" })
   cancelUpload(@Param("id") id: string) {
