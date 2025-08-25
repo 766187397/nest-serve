@@ -1,14 +1,3 @@
----
-title: Nest Serve
-emoji: 🌖
-colorFrom: pink
-colorTo: indigo
-sdk: docker
-pinned: false
-license: apache-2.0
-short_description: nest-serve后端服务
----
-
 # nest-serve
 
 > 使用nest开发的后端服务，可以对接不同的平台
