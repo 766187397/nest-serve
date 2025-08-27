@@ -17,6 +17,6 @@ export class Upload extends UUIDBaseEntity {
   @Column({ type: "varchar", length: 255, comment: "文件类型" })
   mimetype: string;
 
-  @Column({ type: "varchar", length: 255, comment: "大文件hash值" })
+  @Column({ type: "varchar", length: 255, comment: "大文件hash值", nullable: true })
   hash: string;
 }
