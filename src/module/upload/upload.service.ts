@@ -4,7 +4,7 @@ import { Upload } from "./entities/upload.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindOptionsWhere, ILike, Repository } from "typeorm";
 import { BaseService } from "@/common/service/base";
-import { FindFileDto, FindFileDtoByPage } from "./dto/index.dto";
+import { FileHashDTO, FindFileDto, FindFileDtoByPage } from "./dto/index.dto";
 import { UploadFile } from "@/types/upload";
 import { PageApiResult } from "@/types/public";
 
@@ -22,7 +22,7 @@ export class UploadService extends BaseService {
    * @param file 文件
    * @returns {Promise<ApiResult<UploadFile | null>>} 统一返回结果
    */
-  async uploadFile(file: any): Promise<ApiResult<UploadFile | null>> {
+  async uploadFile(file: any, hash?: string): Promise<ApiResult<UploadFile | null>> {
     try {
       if (!file) {
         return ApiResult.error("文件不能为空！");
@@ -32,6 +32,7 @@ export class UploadService extends BaseService {
         fileName: file.filename,
         size: file.size,
         mimetype: file.mimetype,
+        hash,
       });
       const savedFile = await this.upload.save(fileData);
       return ApiResult.success<UploadFile>({
@@ -81,7 +82,9 @@ export class UploadService extends BaseService {
    * @param {FindFileDtoByPage} findFileDtoByPage
    * @returns {Promise<ApiResult<PageApiResult<UploadFile[]> | null>>}
    */
-  async getFileByPage(findFileDtoByPage: FindFileDtoByPage): Promise<ApiResult<PageApiResult<UploadFile[]> | null>> {
+  async getFileByPage(
+    findFileDtoByPage: FindFileDtoByPage
+  ): Promise<ApiResult<PageApiResult<UploadFile[]> | null>> {
     try {
       let where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDtoByPage);
       let order = this.buildCommonSort(findFileDtoByPage?.sort);
@@ -162,6 +165,38 @@ export class UploadService extends BaseService {
       });
     } catch (error) {
       return ApiResult.error<null>(error || "删除失败");
+    }
+  }
+
+  /**
+   * 查询文件通过 hash 值和文件大小
+   * @param fileHashDTO  hash 值和文件大小
+   * @returns {Promise<ApiResult<UploadFile | null>>} 统一返回结果
+   */
+  async getFileByHash(fileHashDTO: FileHashDTO): Promise<ApiResult<UploadFile | null>> {
+    try {
+      let file = await this.upload.findOne({
+        where: {
+          hash: fileHashDTO.hash,
+          size: fileHashDTO.size,
+        },
+      });
+
+      let data: UploadFile | null = null;
+      if (file) {
+        data = {
+          ...file,
+          completePath: file ? global.url + file.url : "",
+        };
+      }
+
+      return ApiResult.success<UploadFile | null>({
+        data: data,
+        message: "操作成功",
+        entities: Upload,
+      });
+    } catch (error) {
+      return ApiResult.error<null>(error || "操作失败");
     }
   }
 }

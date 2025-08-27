@@ -15,3 +15,14 @@ export class FindFileDto extends FindByParameter {
 }
 /** 分页查询文件 */
 export class FindFileDtoByPage extends PartialType(IntersectionType(FindFileDto, PageByParameter)) {}
+
+/** hash值和文件大小 */
+export class FileHashDTO {
+  @ApiProperty({ type: "string", required: true, description: "文件hash值" })
+  @IsNotEmpty({ message: "文件hash值不能为空" })
+  hash: string;
+
+  @ApiProperty({ type: "string", required: true, description: "文件大小" })
+  @IsNotEmpty({ message: "文件大小不能为空" })
+  size: string;
+}

@@ -1,5 +1,5 @@
 // src/tus.controller.ts
-import { Controller, All, Delete, Param, Req, Res, OnModuleInit } from "@nestjs/common";
+import { Controller, All, Delete, Param, Req, Res, OnModuleInit, Query, Get } from "@nestjs/common";
 import { Request, Response } from "express";
 import { Server, FileStore, EVENTS } from "tus-node-server";
 import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
@@ -8,6 +8,8 @@ import * as fs from "fs";
 import { ApiResult } from "@/common/utils/result";
 import { UploadService } from "./upload.service";
 import { FileUploadService } from "@/config/multer";
+import { FileHashDTO } from "./dto/index.dto";
+import { UploadFile } from "@/types/upload";
 
 const uploadDir = FileUploadService.rootPath;
 
@@ -54,7 +56,7 @@ export class TusController implements OnModuleInit {
         size: event.file.upload_length,
         mimetype: metadata.filetype,
       };
-      await this.uploadService.uploadFile(file);
+      await this.uploadService.uploadFile(file, metadata.hash);
     });
   }
 
@@ -81,12 +83,14 @@ export class TusController implements OnModuleInit {
 }
 
 @ApiTags("大文件切片上传")
-@Controller("api/v1/large/tempFile")
+@Controller("api/v1/large")
 export class CustomizeTusController {
+  constructor(private readonly uploadService: UploadService) {}
+
   // 取消上传接口：客户端可以发送 DELETE 请求到 /api/large/tempFile/{upload-id}
-  @Delete("delete/:id")
+  @Delete("tempFile/delete/:id")
   @ApiParam({ name: "id", description: "上传文件的唯一标识符" })
-  @ApiOperation({ summary: "大文件切片取消的方法" })
+  @ApiOperation({ summary: "大文件切片取消的方法，删除临时文件" })
   cancelUpload(@Param("id") id: string) {
     const filePath = path.join(uploadDir, id);
     if (fs.existsSync(filePath)) {
@@ -103,5 +107,11 @@ export class CustomizeTusController {
     } else {
       return ApiResult.error("文件未找到。");
     }
+  }
+
+  @Get("upload/second")
+  @ApiOperation({ summary: "大文件秒传", description: "根据文件的hash值查询是否已上传" })
+  async getFileByHash(@Query() fileHashDTO: FileHashDTO): Promise<ApiResult<UploadFile | null>> {
+    return this.uploadService.getFileByHash(fileHashDTO);
   }
 }
