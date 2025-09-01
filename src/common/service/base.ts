@@ -85,7 +85,7 @@ export class BaseService {
    */
   buildVerify({ code, codeKey }: { codeKey: string; code: string }): boolean {
     const codeCache = svgCache.get(codeKey) as { text: string };
-    if (!codeCache || codeCache.text != code) {
+    if (!codeCache || codeCache.text.toLowerCase() != code.toLowerCase()) {
       return false;
     } else {
       svgCache.del(codeKey);
