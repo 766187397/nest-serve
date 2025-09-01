@@ -55,7 +55,10 @@ export class BaseService {
    * @returns {Object} {take:number,skip:number}
    * @throws {Error} page和pageSize必须为正整数或字符串形式的正整数
    */
-  buildCommonPaging(page: number | string = 1, pageSize: number | string = 10): { take: number; skip: number } {
+  buildCommonPaging(
+    page: number | string = 1,
+    pageSize: number | string = 10
+  ): { take: number; skip: number } {
     page = +page;
     pageSize = +pageSize;
     if (!Number.isInteger(page) || !Number.isInteger(pageSize)) {

@@ -249,7 +249,7 @@ export class UsersService extends BaseService {
    */
   async logIn(logInDto: LogInDto, platform: string = "admin"): Promise<ApiResult<UserLogin | null>> {
     try {
-      if (this.buildVerify({ code: logInDto.code, codeKey: logInDto.codeKey })) {
+      if (!this.buildVerify({ code: logInDto.code, codeKey: logInDto.codeKey })) {
         return ApiResult.error("验证码错误或者不存在！");
       }
 

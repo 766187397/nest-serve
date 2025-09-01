@@ -181,7 +181,7 @@ export class EmailService extends BaseService {
    */
   async sendEmail(sendEmail: SendEmail, userInfo?: User): Promise<ApiResult<any>> {
     try {
-      if (this.buildVerify({ code: sendEmail.code, codeKey: sendEmail.codeKey })) {
+      if (!this.buildVerify({ code: sendEmail.code, codeKey: sendEmail.codeKey })) {
         return ApiResult.error("验证码错误或者不存在！");
       }
 
