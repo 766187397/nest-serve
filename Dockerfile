@@ -19,4 +19,5 @@ RUN npm run build
 EXPOSE 3000
 
 # 启动生产模式
-CMD ["node", "dist/main"]
+# CMD ["node", "dist/main"]
+CMD ["npm", "start"]
