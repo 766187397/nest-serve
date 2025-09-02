@@ -121,18 +121,13 @@ docker pull 766187397/nest-serve:latest
 
 ### 时区
 
-项目中处理日期使用了dayjs，由于使用的国外的免费服务器强制指定了时区为：“Asia/Shanghai”
-
-- src/common/service/base.ts
-- src/common/entities/base.ts
+项目免费部署在国外的服务器，为了显示正常给启动命令加上了指定时区（国内的时区）："start": "cross-env TZ=Asia/Shanghai node dist/main",
 
 
 
 ### 缓存
 
 没有找到免费的redis，项目暂时使用的node-cache
-
-
 
 
 
