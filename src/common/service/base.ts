@@ -1,9 +1,15 @@
 import { Between, FindOptionsOrderValue } from "typeorm";
 import * as dayjs from "dayjs";
+import * as utc from "dayjs/plugin/utc";
+import * as timezone from "dayjs/plugin/timezone";
 import { svgCache } from "@/config/nodeCache";
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Shanghai");
 export class BaseService {
-  dayjs = dayjs;
+  public dayjs = dayjs;
+
   /**
    * 通用的处理查询条件
    * @param {object} query 查询条件

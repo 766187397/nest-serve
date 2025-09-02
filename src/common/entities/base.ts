@@ -9,7 +9,13 @@ import {
 } from "typeorm";
 import { Exclude, Transform } from "class-transformer";
 import * as dayjs from "dayjs";
+import * as utc from "dayjs/plugin/utc";
+import * as timezone from "dayjs/plugin/timezone";
 import { v4 as uuidv4 } from "uuid";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Shanghai");
 
 /** 基础实体 */
 export abstract class BaseEntity {

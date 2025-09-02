@@ -117,6 +117,25 @@ docker pull 766187397/nest-serve:latest
 
 
 
+## 注意
+
+### 时区
+
+项目中处理日期使用了dayjs，由于使用的国外的免费服务器强制指定了时区为：“Asia/Shanghai”
+
+- src/common/service/base.ts
+- src/common/entities/base.ts
+
+
+
+### 缓存
+
+没有找到免费的redis，项目暂时使用的node-cache
+
+
+
+
+
 ## 前端项目
 
 gitee：https://gitee.com/sk20020228/admin-vue3-ts
