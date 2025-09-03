@@ -8,7 +8,7 @@ import {
   LogInDto,
   VerificationCodeLoginDto,
 } from "./dto/index";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request, Response } from "express";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
@@ -37,7 +37,10 @@ export class UsersController {
 
   @Get("page/:platform")
   @ApiOperation({ summary: "查询用户列表(分页)" })
-  findByPage(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage) {
+  findByPage(
+    @Param("platform") platform: string,
+    @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage
+  ) {
     return this.usersService.findByPage(findUserDtoByPage, platform);
   }
 
@@ -154,6 +157,12 @@ export class UsersController {
 
   @Get("captcha")
   @ApiOperation({ summary: "获取验证码" })
+  @ApiQuery({
+    name: "background",
+    description: "背景颜色",
+    required: false,
+    type: String,
+  })
   async captcha(@Query("background") background) {
     return await this.usersService.captcha(background);
   }
