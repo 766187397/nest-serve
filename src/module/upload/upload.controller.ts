@@ -101,4 +101,11 @@ export class UploadController {
   getFileById(@Query("id") id: string) {
     return this.uploadService.getFileById(id);
   }
+
+  @Delete("delete/:id")
+  @ApiOperation({ summary: "根据id删除文件" })
+  @ApiParam({ name: "id", required: true, description: "文件 ID" })
+  deleteFileById(@Param("id") id: string) {
+    return this.uploadService.deleteFileById(id);
+  }
 }
