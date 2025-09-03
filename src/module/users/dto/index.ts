@@ -1,7 +1,7 @@
 import { CreateBaseDto, FindByParameter, PageByParameter, VerificationCodeDto } from "@/common/dto/base";
 import { ApiProperty, IntersectionType, PartialType } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
-import { IsArray, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { IsArray, IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from "class-validator";
 
 /** 用户创建Dto */
 export class CreateUserDto extends CreateBaseDto {
@@ -104,4 +104,27 @@ export class VerificationCodeLoginDto {
   @IsEmail({}, { message: "邮箱格式错误" })
   @IsNotEmpty({ message: "邮箱是必填项" })
   email: string;
+}
+
+/** 图形验证码 */
+export class CaptchaDto {
+  @ApiProperty({ description: "背景色", example: "#fff" })
+  @IsOptional()
+  @IsString({ message: "背景色必须是字符串" })
+  background?: string;
+
+  @ApiProperty({ description: "宽", example: "150" })
+  @IsOptional()
+  @IsString({ message: "width必须是字符串" })
+  width?: string;
+
+  @ApiProperty({ description: "高", example: "50" })
+  @IsOptional()
+  @IsString({ message: "height必须是字符串" })
+  height?: string;
+
+  @ApiProperty({ description: "文字大小，最新建议50" })
+  @IsOptional()
+  @IsString({ message: "fontSize必须是字符串" })
+  fontSize?: string;
 }

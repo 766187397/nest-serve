@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import {
+  CaptchaDto,
   CreateUserDto,
   FindUserDto,
   FindUserDtoByPage,
@@ -304,7 +305,10 @@ export class UsersService extends BaseService {
    * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<RefreshToken | null>>} 统一返回结果
    */
-  async refreshToken(refreshToken: string, platform: string = "admin"): Promise<ApiResult<RefreshToken | null>> {
+  async refreshToken(
+    refreshToken: string,
+    platform: string = "admin"
+  ): Promise<ApiResult<RefreshToken | null>> {
     try {
       let options = getPlatformJwtConfig(platform) as JwtConfig;
       let { id } = this.jwtService.verify(refreshToken, {
@@ -451,16 +455,20 @@ export class UsersService extends BaseService {
 
   /**
    * 人机校验
-   * @param {string} background 验证码背景颜色
+   * @param {CaptchaDto} captchaDto 参数
    * @returns {Promise<ApiResult<Captcha | null>>} 统一返回结果
    */
-  async captcha(background: string = "#fff"): Promise<ApiResult<Captcha | null>> {
+  async captcha(captchaDto: CaptchaDto): Promise<ApiResult<Captcha | null>> {
     try {
       const options = {
         size: 4,
         ignoreChars: "10ol",
         noise: 3,
-        background,
+        color: true,
+        background: captchaDto.background || "#fff",
+        width: Number(captchaDto.width) || undefined,
+        height: Number(captchaDto.height) || undefined,
+        fontSize: Number(captchaDto.fontSize) || undefined,
       };
 
       const { text, data } = svgCaptcha.create(options);

@@ -7,6 +7,7 @@ import {
   FindUserDtoByPage,
   LogInDto,
   VerificationCodeLoginDto,
+  CaptchaDto,
 } from "./dto/index";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
@@ -157,13 +158,7 @@ export class UsersController {
 
   @Get("captcha")
   @ApiOperation({ summary: "获取验证码" })
-  @ApiQuery({
-    name: "background",
-    description: "背景颜色",
-    required: false,
-    type: String,
-  })
-  async captcha(@Query("background") background) {
-    return await this.usersService.captcha(background);
+  async captcha(@Query(new FilterEmptyPipe()) captchaDto: CaptchaDto) {
+    return await this.usersService.captcha(captchaDto);
   }
 }
