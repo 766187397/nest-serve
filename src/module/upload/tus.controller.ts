@@ -87,28 +87,6 @@ export class TusController implements OnModuleInit {
 export class CustomizeTusController {
   constructor(private readonly uploadService: UploadService) {}
 
-  // 取消上传接口：客户端可以发送 DELETE 请求到 /api/large/tempFile/{upload-id}
-  @Delete("tempFile/delete/:id")
-  @ApiParam({ name: "id", description: "上传文件的唯一标识符" })
-  @ApiOperation({ summary: "大文件切片取消的方法，删除临时文件" })
-  cancelUpload(@Param("id") id: string) {
-    const filePath = path.join(uploadDir, id);
-    if (fs.existsSync(filePath)) {
-      try {
-        fs.unlinkSync(filePath);
-        return ApiResult.success({
-          data: null,
-          message: "取消上传成功。",
-        });
-      } catch (err) {
-        console.error("取消上传失败：", err);
-        return ApiResult.error("取消上传时发生错误。");
-      }
-    } else {
-      return ApiResult.error("文件未找到。");
-    }
-  }
-
   @Get("upload/second")
   @ApiOperation({ summary: "大文件秒传", description: "根据文件的hash值查询是否已上传" })
   async getFileByHash(@Query() fileHashDTO: FileHashDTO): Promise<ApiResult<UploadFile | null>> {
