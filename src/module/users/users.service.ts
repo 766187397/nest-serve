@@ -466,9 +466,9 @@ export class UsersService extends BaseService {
         noise: 3,
         color: true,
         background: captchaDto.background || "#fff",
-        width: Number(captchaDto.width) || undefined,
-        height: Number(captchaDto.height) || undefined,
-        fontSize: Number(captchaDto.fontSize) || undefined,
+        width: Number(captchaDto.width) || 150,
+        height: Number(captchaDto.height) || 50,
+        fontSize: Number(captchaDto.fontSize) || 50,
       };
 
       const { text, data } = svgCaptcha.create(options);
