@@ -8,6 +8,7 @@ export class JWTWhiteList {
     "/swagger", // swagger 接口文档地址
     "/api/v1/large/files", // 大文件上传
     "/api/v1/large/tempFile", // 大文件上传取消
+    "/api/v1/admin/users/captcha", // 验证码接口
   ];
   // 全匹配
   static whiteListExact: string[] = [
@@ -19,7 +20,6 @@ export class JWTWhiteList {
     "/api/v1/admin/users/refresh/token", // 刷新token
     "/api/v1/upload/file", // 文件上传接口
     "/api/v1/admin/email/send/email", // 邮件发送接口
-    "/api/v1/admin/users/captcha", // 验证码接口
   ];
 }
 
