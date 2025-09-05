@@ -40,15 +40,15 @@ const mysqlLogger: MysqlConfig = {
   /** 数据库类型 */
   DB_TYPE: "mysql",
   /** 数据地址 */
-  DB_HOST: env.DB_HOST || "127.0.0.1",
+  DB_HOST: env.LOG_DB_HOST || "127.0.0.1",
   /** 数据库端口 */
-  DB_PORT: Number(env.DB_PORT) || 3306,
+  DB_PORT: Number(env.LOG_DB_PORT) || 3306,
   /** 数据库用户名 */
-  DB_USER: env.DB_USER || "root",
+  DB_USER: env.LOG_DB_USER || "root",
   /** 数据库密码 */
-  DB_PASSWORD: env.DB_PASSWORD || "123456",
+  DB_PASSWORD: env.LOG_DB_PASSWORD || "123456",
   /** 数据库名称 */
-  DB_DATABASE: env.DB_DATABASE || "nest-serve-logger",
+  DB_DATABASE: env.LOG_DB_DATABASE || "nest-serve-logger",
 };
 
 /** Sqlite配置类型 */
@@ -72,7 +72,7 @@ const sqliteLogger: SqliteConfig = {
   // 数据库类型
   DB_TYPE: "sqlite",
   //  数据库地址
-  DB_DATABASE: join(process.cwd(), env.DB_DATABASE || "sqlitedata/nest-logger.db"),
+  DB_DATABASE: join(process.cwd(), env.LOG_DB_DATABASE || "sqlitedata/nest-logger.db"),
 };
 
 /** 数据库配置 */

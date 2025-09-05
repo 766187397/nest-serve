@@ -22,3 +22,9 @@ export interface RefreshToken {
   access_token: string;
   token_type: string;
 }
+
+/** 人机校验 */
+export interface Captcha {
+  url: string;
+  codeKey: string;
+}

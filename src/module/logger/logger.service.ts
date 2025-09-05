@@ -120,9 +120,19 @@ export class LoggerService extends BaseService {
   }
 
   // 每天午夜执行
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  // 自定义 cron 表达式：每分钟的第30秒执行
-  // @Cron("30 * * * * *")
+  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+
+  /**
+   * cron 规则
+   * 第1位：秒（0）
+   * 第2位：分钟（0）
+   * 第3位：小时（0）
+   * 第4位：日（1）
+   * 第5位：月（任意）
+   * 第6位：星期（任意）
+   */
+  // 自定义 cron 表达式：每月01日0时0分执行
+  @Cron("0 0 0 1 * *")
   async deleteLogs() {
     try {
       console.log("定时任务删除日志");

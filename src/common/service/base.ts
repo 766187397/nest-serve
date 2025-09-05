@@ -1,8 +1,10 @@
 import { Between, FindOptionsOrderValue } from "typeorm";
 import * as dayjs from "dayjs";
+import { svgCache } from "@/config/nodeCache";
 
 export class BaseService {
-  dayjs = dayjs;
+  public dayjs = dayjs;
+
   /**
    * 通用的处理查询条件
    * @param {object} query 查询条件
@@ -54,7 +56,10 @@ export class BaseService {
    * @returns {Object} {take:number,skip:number}
    * @throws {Error} page和pageSize必须为正整数或字符串形式的正整数
    */
-  buildCommonPaging(page: number | string = 1, pageSize: number | string = 10): { take: number; skip: number } {
+  buildCommonPaging(
+    page: number | string = 1,
+    pageSize: number | string = 10
+  ): { take: number; skip: number } {
     page = +page;
     pageSize = +pageSize;
     if (!Number.isInteger(page) || !Number.isInteger(pageSize)) {
@@ -70,5 +75,22 @@ export class BaseService {
     const take = pageSize;
     const skip = (page - 1) * pageSize;
     return { take, skip };
+  }
+
+  /**
+   * 校验验证码是否正确
+   * @param param
+   * @param {string} param.code 验证码
+   * @param {string} param.codeKey 验证码KEY
+   * @returns {boolean} true 为正确, false 为错误
+   */
+  buildVerify({ code, codeKey }: { codeKey: string; code: string }): boolean {
+    const codeCache = svgCache.get(codeKey) as { text: string };
+    if (!codeCache || codeCache.text.toLowerCase() != code.toLowerCase()) {
+      return false;
+    } else {
+      svgCache.del(codeKey);
+      return true;
+    }
   }
 }

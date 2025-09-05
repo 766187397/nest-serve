@@ -3,9 +3,7 @@ import { Transform } from "class-transformer";
 import { IsNumber, IsOptional, IsString, Matches } from "class-validator";
 import { FindOptionsOrderValue } from "typeorm";
 
-/**
- * 创建基础数据
- */
+/** 创建基础数据 */
 export class CreateBaseDto {
   @ApiProperty({ description: "排序", required: false, example: 1 })
   @IsOptional()
@@ -18,9 +16,7 @@ export class CreateBaseDto {
   status?: number;
 }
 
-/**
- * 查询参数
- */
+/** 查询参数 */
 export class FindByParameter {
   @ApiProperty({
     description: "排序: ASC - 升序，DESC - 降序",
@@ -59,4 +55,34 @@ export class FindByParameter {
   )
   // @IsString({ message: "时间范围必须为字符串，并且需要使用逗号隔开" })
   time?: string | string[];
+}
+
+/** 分页参数 */
+export class PageByParameter {
+  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
+  @IsOptional()
+  @IsString({ message: "页码必须是字符串" })
+  page?: string;
+
+  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
+  @IsOptional()
+  @IsString({ message: "每页数量必须是字符串" })
+  pageSize?: string;
+}
+
+/** 验证码 */
+export class VerificationCodeDto {
+  @ApiProperty({
+    description: "验证码",
+    required: true,
+  })
+  @IsString({ message: "验证码必须为字符串" })
+  code: string;
+
+  @ApiProperty({
+    description: "验证码对应的键",
+    required: true,
+  })
+  @IsString({ message: "验证码对应的键必须为字符串" })
+  codeKey: string;
 }

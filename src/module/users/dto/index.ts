@@ -1,10 +1,25 @@
-import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
-import { ApiProperty } from "@nestjs/swagger";
+import { CreateBaseDto, FindByParameter, PageByParameter, VerificationCodeDto } from "@/common/dto/base";
+import { ApiProperty, IntersectionType, PartialType } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
-import { IsArray, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { IsArray, IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from "class-validator";
 
-/** 由于使用PartialType会丢失装饰器则抽离可选公用的参数 */
-class UserOptionalDto extends CreateBaseDto {
+/** 用户创建Dto */
+export class CreateUserDto extends CreateBaseDto {
+  @ApiProperty({ description: "账号", example: "admin" })
+  @IsString({ message: "账号必须是字符串" })
+  @IsNotEmpty({ message: "账号是必填项" }) // 必填校验
+  account: string;
+
+  @ApiProperty({ description: "昵称", example: "管理员" })
+  @IsString({ message: "昵称必须是字符串" })
+  @IsNotEmpty({ message: "昵称是必填项" })
+  nickName: string;
+
+  @ApiProperty({ description: "密码", example: "123456" })
+  @IsString({ message: "密码必须是字符串" })
+  @IsNotEmpty({ message: "密码是必填项" })
+  password: string;
+
   @ApiProperty({ description: "邮箱", required: false, example: "admin@qq.com" })
   @Transform(({ value }) => (value === "" ? undefined : value))
   @IsOptional() // 可选
@@ -33,56 +48,19 @@ class UserOptionalDto extends CreateBaseDto {
   roleIds?: number[];
 }
 
-/**
- * 用户创建Dto
- */
-export class CreateUserDto extends UserOptionalDto {
-  @ApiProperty({ description: "账号", example: "admin" })
-  @IsString({ message: "账号字符串" })
-  @IsNotEmpty({ message: "账号是必填项" }) // 必填校验
-  account: string;
-
-  @ApiProperty({ description: "昵称", example: "管理员" })
-  @IsString({ message: "昵称字符串" })
-  @IsNotEmpty({ message: "昵称是必填项" })
-  nickName: string;
-
-  @ApiProperty({ description: "密码", example: "123456" })
-  @IsString({ message: "密码字符串" })
-  @IsNotEmpty({ message: "密码是必填项" })
-  password: string;
-}
-
 /** 用户更新Dto  */
-export class UpdateUserDto extends UserOptionalDto {
-  @ApiProperty({ description: "账号", example: "admin" })
-  @IsOptional()
-  @IsString({ message: "账号字符串" })
-  account?: string | undefined;
+export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
-  @ApiProperty({ description: "昵称", example: "管理员" })
-  @IsOptional()
-  @IsString({ message: "昵称字符串" })
-  nickName?: string | undefined;
-
-  @ApiProperty({ description: "密码", example: "123456" })
-  @IsOptional()
-  @IsString({ message: "密码字符串" })
-  password?: string | undefined;
-}
-
-/**
- * 查询所有用户信息
- */
+/** 查询所有用户信息 */
 export class FindUserDto extends FindByParameter {
   @ApiProperty({ type: "string", description: "账号", required: false, example: "admin" })
   @IsOptional()
-  @IsString()
+  @IsString({ message: "账号必须是字符串" })
   account?: string | undefined;
 
   @ApiProperty({ type: "string", description: "昵称", required: false, example: "管理员" })
   @IsOptional()
-  @IsString()
+  @IsString({ message: "昵称必须是字符串" })
   nickName?: string | undefined;
 
   // Transform 空值处理
@@ -99,23 +77,11 @@ export class FindUserDto extends FindByParameter {
   phone?: string | undefined;
 }
 
-/**
- * 分页查询用户信息
- */
-export class FindUserDtoByPage extends FindUserDto {
-  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
-  @IsOptional()
-  @IsString({ message: "page必须是字符串" })
-  page?: string;
-
-  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
-  @IsOptional()
-  @IsString({ message: "pageSize必须是字符串" })
-  pageSize?: string;
-}
+/** 分页查询用户信息 */
+export class FindUserDtoByPage extends PartialType(IntersectionType(FindUserDto, PageByParameter)) {}
 
 /** 登录 */
-export class LogInDto {
+export class LogInDto extends VerificationCodeDto {
   @ApiProperty({ description: "账号", example: "admin" })
   @IsString({ message: "账号字符串" })
   @IsNotEmpty({ message: "账号是必填项" }) // 必填校验
@@ -127,15 +93,38 @@ export class LogInDto {
   password: string;
 }
 
-/** 验证码 */
+/** 邮箱验证码 */
 export class VerificationCodeLoginDto {
   @ApiProperty({ description: "验证码", example: "123456" })
   @IsString({ message: "验证码字符串" })
   @IsNotEmpty({ message: "验证码是必填项" })
-  code: string;
+  emailCode: string;
 
   @ApiProperty({ description: "邮箱", example: "766187397@qq.com" })
   @IsEmail({}, { message: "邮箱格式错误" })
   @IsNotEmpty({ message: "邮箱是必填项" })
   email: string;
+}
+
+/** 图形验证码 */
+export class CaptchaDto {
+  @ApiProperty({ description: "背景色", example: "#fff" })
+  @IsOptional()
+  @IsString({ message: "背景色必须是字符串" })
+  background?: string;
+
+  @ApiProperty({ description: "宽", example: "150" })
+  @IsOptional()
+  @IsString({ message: "width必须是字符串" })
+  width?: string;
+
+  @ApiProperty({ description: "高", example: "50" })
+  @IsOptional()
+  @IsString({ message: "height必须是字符串" })
+  height?: string;
+
+  @ApiProperty({ description: "文字大小，最新建议50" })
+  @IsOptional()
+  @IsString({ message: "fontSize必须是字符串" })
+  fontSize?: string;
 }

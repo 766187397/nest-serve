@@ -22,19 +22,14 @@ node版本>=20
 
 ## 功能
 
-- 用户
-- 角色
-- 路由
-- 日志
+- 用户管理
+- 角色管理
+- 路由管理
+- 日志管理&定时任务清理
 - 文件上传&大文件上传
 - 数据字典
 - 通知公告
-- AI接口调用：硅基流动对话接口、生成图片接口套壳
-  - 日志错误AI分析
-  - 用户操作日志统计优化
-  - 通知公告润色
-  - 图像生成（头像、icon等）
-
+- 邮箱管理
 - API文档：knife4j&swagger
 
 
@@ -127,6 +122,20 @@ knife4j to http://localhost:3000/doc.html
 ```
 docker pull 766187397/nest-serve:latest
 ```
+
+
+
+## 注意
+
+### 时区
+
+项目免费部署在国外的服务器，为了显示正常给启动命令加上了指定时区（国内的时区）："start": "cross-env TZ=Asia/Shanghai node dist/main",
+
+
+
+### 缓存
+
+没有找到免费的redis，项目暂时使用的node-cache
 
 
 

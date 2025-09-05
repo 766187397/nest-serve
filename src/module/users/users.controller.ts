@@ -7,8 +7,9 @@ import {
   FindUserDtoByPage,
   LogInDto,
   VerificationCodeLoginDto,
+  CaptchaDto,
 } from "./dto/index";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request, Response } from "express";
 import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
@@ -37,7 +38,10 @@ export class UsersController {
 
   @Get("page/:platform")
   @ApiOperation({ summary: "查询用户列表(分页)" })
-  findByPage(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage) {
+  findByPage(
+    @Param("platform") platform: string,
+    @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage
+  ) {
     return this.usersService.findByPage(findUserDtoByPage, platform);
   }
 
@@ -143,11 +147,18 @@ export class UsersController {
     const data = await this.usersService.exportUserList(findUserDtoByPage, platform);
     if ("buffer" in data) {
       res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(data.fileName)}"`);
+      res.setHeader("Access-Control-Expose-Headers", `Content-Disposition`);
       // 4. 发送文件
       res.status(200).send(data.buffer);
       return;
     }
     const { __isApiResult, ...dataResult } = data as ApiResult<null>;
     return dataResult;
+  }
+
+  @Get("captcha")
+  @ApiOperation({ summary: "获取验证码" })
+  async captcha(@Query(new FilterEmptyPipe()) captchaDto: CaptchaDto) {
+    return await this.usersService.captcha(captchaDto);
   }
 }

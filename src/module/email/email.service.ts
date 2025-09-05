@@ -11,7 +11,7 @@ import { ILike, Repository } from "typeorm";
 import { PageApiResult } from "@/types/public";
 import { User } from "@/module/users/entities/user.entity";
 import { generateRandomString } from "@/common/utils/tool";
-import { cache, cacheTime } from "@/config/nodeCache";
+import { emailCache, cacheTime } from "@/config/nodeCache";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 // 创建一个SMTP客户端配置对象
@@ -181,22 +181,26 @@ export class EmailService extends BaseService {
    */
   async sendEmail(sendEmail: SendEmail, userInfo?: User): Promise<ApiResult<any>> {
     try {
+      if (!this.buildVerify({ code: sendEmail.code, codeKey: sendEmail.codeKey })) {
+        return ApiResult.error("验证码错误或者不存在！");
+      }
+
       const emailTemplate = await this.emailRepository.findOneBy({ type: sendEmail.type });
       if (!emailTemplate) {
         return ApiResult.error({ code: 404, message: "邮箱模板不存在" });
       }
 
       // 清理所有缓存
-      // cache.flushAll();
+      // emailCache.flushAll();
       // 查看现在的缓存项
-      // console.log('cache.keys() :>> ', cache.keys());
+      // console.log('emailCache.keys() :>> ', emailCache.keys());
       // 删除特定的缓存项
-      // cache.del('key1');
+      // emailCache.del('key1');
       // 删除已经过期的
-      // cache.check()
+      // emailCache.check()
       // 判断是否存在cache.has()
       // 检查该收件人是否在缓存中
-      const info: EmailCahce = cache.get(sendEmail.email) as EmailCahce;
+      const info: EmailCahce = emailCache.get(sendEmail.email) as EmailCahce;
       if (info && info.state) {
         return ApiResult.error({
           code: 429,
@@ -216,6 +220,7 @@ export class EmailService extends BaseService {
         subject: title,
         // text: "",
         html,
+        headers: { "Content-Type": "text/html; charset=utf-8" },
       };
       return new Promise((resolve, reject) => {
         // 发送邮件
@@ -226,7 +231,7 @@ export class EmailService extends BaseService {
 
           // 将收件人的邮箱地址添加到缓存中
           let time = this.dayjs().add(cacheTime, "m");
-          cache.set(sendEmail.email, {
+          emailCache.set(sendEmail.email, {
             state: true,
             time: time.format("YYYY-MM-DD HH:mm:ss"),
             code: code,
