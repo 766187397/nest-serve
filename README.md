@@ -6,6 +6,14 @@
 
 
 
+## 项目介绍
+
+> 使用zread.ai生成的项目介绍
+
+地址：https://zread.ai/766187397/nest-serve
+
+
+
 ## 版本
 
 node版本>=20
