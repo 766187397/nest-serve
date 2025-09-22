@@ -191,9 +191,9 @@ export class UsersService extends BaseService {
       // 查询是否存在账号、电话号码或邮箱
       const exist = await this.userRepository.find({
         where: [
-          { id: Not(id), account: userInfo.account },
-          { id: Not(id), phone: userInfo.phone },
-          { id: Not(id), email: userInfo.email },
+          { id: Not(id), account: userInfo.account, platform: userInfo.platform },
+          { id: Not(id), phone: userInfo.phone, platform: userInfo.platform },
+          { id: Not(id), email: userInfo.email, platform: userInfo.platform },
         ],
       });
 

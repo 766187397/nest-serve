@@ -164,8 +164,8 @@ export class RolesService extends BaseService {
 
       const exist = await this.roleRepository.find({
         where: [
-          { id: Not(id), name: role.name },
-          { id: Not(id), roleKey: role.roleKey },
+          { id: Not(id), name: role.name, platform: role.platform },
+          { id: Not(id), roleKey: role.roleKey, platform: role.platform },
         ],
       });
       if (exist && exist.length > 0) {

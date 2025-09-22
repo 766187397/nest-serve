@@ -143,9 +143,8 @@ export class RoutesService extends BaseService {
       if (!route) {
         return ApiResult.error("路由不存在");
       }
-
       const exist = await this.routeRepository.findOne({
-        where: { id: Not(id), name: route.name },
+        where: { id: Not(id), name: route.name, platform: route.platform },
       });
       if (exist) {
         return ApiResult.error<null>(`路由${exist.name}已存在`);
