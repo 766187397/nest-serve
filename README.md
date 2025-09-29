@@ -2,7 +2,7 @@
 
 > 使用nest开发的后端服务，可以对接不同的平台
 >
-> 预览地址：https://www.766187397.dpdns.org
+> 预览地址：https://nest-serve.zeabur.app
 
 
 
