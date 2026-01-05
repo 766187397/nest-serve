@@ -483,3 +483,105 @@ describe('UsersController', () => {
   });
 });
 ```
+
+## 13. 推荐使用 node-knife4j-ui
+
+### 13.1 node-knife4j-ui 简介
+
+**node-knife4j-ui** 是一个基于 Knife4j 的轻量级 Swagger UI 增强工具，它提供了更美观、更易用的 API 文档界面，同时保持了简单的配置和使用方式。
+
+**主要特点**：
+- 🎨 现代化的 UI 设计，提供更好的用户体验
+- 🚀 轻量级，安装和配置简单
+- 📱 响应式设计，支持移动端访问
+- 🔧 丰富的功能扩展，如接口搜索、离线文档、接口测试等
+- 📊 提供接口调用统计和分析功能
+- 🔒 支持多种认证方式
+- 🌐 支持多语言切换
+
+### 13.2 安装依赖
+
+```bash
+# 安装 node-knife4j-ui
+npm install node-knife4j-ui
+```
+
+### 13.3 配置 node-knife4j-ui
+
+```typescript
+// src/main.ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { knife4jSetup } from 'node-knife4j-ui';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  
+  // 配置 Swagger 文档
+  const config = new DocumentBuilder()
+    .setTitle('NestJS API 文档')
+    .setDescription('这是一个基于 NestJS 构建的 API 文档')
+    .setVersion('1.0')
+    .addTag('API')
+    .addBearerAuth()
+    .build();
+  
+  const document = SwaggerModule.createDocument(app, config);
+  
+  // 使用 node-knife4j-ui
+  knife4jSetup(app, [
+    {
+      url: '/swagger-json',
+      name: 'API V1',
+      swaggerVersion: '3.0',
+      location: '/swagger-json',
+    },
+  ]);
+  
+  // 设置 Swagger JSON 路径
+  app.getHttpAdapter().get('/swagger-json', (req, res) => {
+    res.send(document);
+  });
+  
+  await app.listen(3000);
+  console.log('API 文档地址: http://localhost:3000/doc.html');
+}
+bootstrap();
+```
+
+### 13.4 访问 node-knife4j-ui
+
+启动应用后，访问以下地址查看 API 文档：
+
+```
+http://localhost:3000/doc.html
+```
+
+### 13.5 强烈推荐理由
+
+我们强烈推荐使用 **node-knife4j-ui**，原因如下：
+
+1. **更优秀的 UI 体验**：现代化的设计，更直观的操作界面，提升 API 文档的可读性和易用性
+2. **更丰富的功能**：提供了比原生 Swagger UI 更多的功能，如接口搜索、离线文档、接口测试等
+3. **简单的配置**：安装和配置非常简单，只需要几行代码即可集成
+4. **活跃的维护**：该库保持活跃的更新和维护，持续优化用户体验和功能
+5. **良好的兼容性**：与 NestJS 和 Swagger 完美兼容
+6. **支持多语言**：支持中文等多种语言，适合国内开发者使用
+7. **轻量级**：体积小，性能好，不会给应用带来额外的负担
+
+相比其他 Swagger UI 增强工具，**node-knife4j-ui** 具有更好的用户体验和更丰富的功能，同时保持了简单的配置和使用方式，是 NestJS 应用 API 文档生成的最佳选择之一。
+
+### 13.6 与其他工具的对比
+
+| 特性 | node-knife4j-ui | swagger-ui-express | knife4j-nestjs-v3 |
+|------|----------------|-------------------|------------------|
+| UI 设计 | 现代化、美观 | 传统、简洁 | 丰富、功能多 |
+| 配置复杂度 | 简单 | 中等 | 中等 |
+| 功能丰富度 | 非常丰富 | 基础 | 丰富 |
+| 性能 | 轻量级、高性能 | 中等 | 中等 |
+| 维护活跃度 | 高 | 中 | 中 |
+| 中文支持 | 原生支持 | 需配置 | 支持 |
+| 移动端支持 | 响应式设计 | 不友好 | 一般 |
+
+通过对比可以看出，**node-knife4j-ui** 在 UI 设计、功能丰富度、配置复杂度和性能等方面都具有明显优势，是构建高质量 API 文档的理想选择。
