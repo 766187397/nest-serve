@@ -1,7 +1,20 @@
-import { CreateBaseDto, FindByParameter, PageByParameter, VerificationCodeDto } from "@/common/dto/base";
+import {
+  CreateBaseDto,
+  FindByParameter,
+  PageByParameter,
+  VerificationCodeDto,
+} from "@/common/dto/base";
 import { ApiProperty, IntersectionType, PartialType } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
-import { IsArray, IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from "class-validator";
+import {
+  IsArray,
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+} from "class-validator";
 
 /** 用户创建Dto */
 export class CreateUserDto extends CreateBaseDto {
@@ -20,19 +33,32 @@ export class CreateUserDto extends CreateBaseDto {
   @IsNotEmpty({ message: "密码是必填项" })
   password: string;
 
-  @ApiProperty({ description: "邮箱", required: false, example: "admin@qq.com" })
+  @ApiProperty({
+    description: "邮箱",
+    required: false,
+    example: "admin@qq.com",
+  })
   @Transform(({ value }) => (value === "" ? undefined : value))
   @IsOptional() // 可选
   @IsEmail({}, { message: "邮箱格式错误" })
   email?: string;
 
-  @ApiProperty({ description: "手机号", required: false, example: "13800138000" })
+  @ApiProperty({
+    description: "手机号",
+    required: false,
+    example: "13800138000",
+  })
   @Transform(({ value }) => (value === "" ? undefined : value))
   @IsOptional()
   @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" }) // 正则校验
   phone?: string;
 
-  @ApiProperty({ description: "性别 0未知 1男 2女", required: false, example: "0", enum: ["0", "1", "2"] })
+  @ApiProperty({
+    description: "性别 0未知 1男 2女",
+    required: false,
+    example: "0",
+    enum: ["0", "1", "2"],
+  })
   @IsOptional()
   @IsIn(["0", "1", "2"], { message: "性别只能是0、1、2" }) // 枚举校验
   sex?: string;
@@ -53,24 +79,44 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
 /** 查询所有用户信息 */
 export class FindUserDto extends FindByParameter {
-  @ApiProperty({ type: "string", description: "账号", required: false, example: "admin" })
+  @ApiProperty({
+    type: "string",
+    description: "账号",
+    required: false,
+    example: "admin",
+  })
   @IsOptional()
   @IsString({ message: "账号必须是字符串" })
   account?: string | undefined;
 
-  @ApiProperty({ type: "string", description: "昵称", required: false, example: "管理员" })
+  @ApiProperty({
+    type: "string",
+    description: "昵称",
+    required: false,
+    example: "管理员",
+  })
   @IsOptional()
   @IsString({ message: "昵称必须是字符串" })
   nickName?: string | undefined;
 
   // Transform 空值处理
-  @ApiProperty({ type: "string", description: "邮箱", required: false, example: "admin@qq.com" })
+  @ApiProperty({
+    type: "string",
+    description: "邮箱",
+    required: false,
+    example: "admin@qq.com",
+  })
   @Transform(({ value }) => (value === "" ? undefined : value))
   @IsOptional()
   @IsEmail({}, { message: "邮箱格式错误" })
   email?: string | undefined;
 
-  @ApiProperty({ type: "string", description: "手机号", required: false, example: "13800138000" })
+  @ApiProperty({
+    type: "string",
+    description: "手机号",
+    required: false,
+    example: "13800138000",
+  })
   @Transform(({ value }) => (value === "" ? undefined : value))
   @IsOptional()
   @Matches(/^1[3456789]\d{9}$/, { message: "手机号格式错误" })
@@ -78,7 +124,9 @@ export class FindUserDto extends FindByParameter {
 }
 
 /** 分页查询用户信息 */
-export class FindUserDtoByPage extends PartialType(IntersectionType(FindUserDto, PageByParameter)) {}
+export class FindUserDtoByPage extends PartialType(
+  IntersectionType(FindUserDto, PageByParameter),
+) {}
 
 /** 登录 */
 export class LogInDto extends VerificationCodeDto {

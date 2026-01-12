@@ -15,7 +15,7 @@ export class LoggerService extends BaseService {
     @InjectRepository(Log, "logger")
     private logRepository: Repository<Log>,
     @Inject(SchedulerRegistry)
-    private schedulerRegistry: SchedulerRegistry
+    private schedulerRegistry: SchedulerRegistry,
   ) {
     super();
   }
@@ -26,12 +26,20 @@ export class LoggerService extends BaseService {
    * @param data 日志数据
    * @param statusCode 状态码
    */
-  async create(request: Request, data: string = "", statusCode: string = "200") {
+  async create(
+    request: Request,
+    data: string = "",
+    statusCode: string = "200",
+  ) {
     const url: string = request.url || "";
     const platform: string = url.split("/")[3] || "";
     const { account = "", nickName = "" } = request.userInfo || {};
     const method = request.method || "";
-    let { referer = "", "sec-ch-ua-platform": apiPlatform = "", "sec-ch-ua": browser = "" } = request.headers;
+    let {
+      referer = "",
+      "sec-ch-ua-platform": apiPlatform = "",
+      "sec-ch-ua": browser = "",
+    } = request.headers;
     try {
       browser = (browser as string).replace(/"/g, "");
       apiPlatform = (apiPlatform as string).replace(/"/g, "");
@@ -47,7 +55,7 @@ export class LoggerService extends BaseService {
       request.ip ||
       "";
 
-    let resData = JSON.stringify(data);
+    const resData = JSON.stringify(data);
     const responseTime = Date.now() - request["startTime"] || 0; // 计算响应时间(毫秒)
     try {
       const data = {
@@ -84,12 +92,15 @@ export class LoggerService extends BaseService {
    */
   async findByPage(
     findLogDtoByPage: FindLogDtoByPage,
-    platform: string = "admin"
+    platform: string = "admin",
   ): Promise<ApiResult<PageApiResult<Log[]> | null>> {
     try {
-      let { take, skip } = this.buildCommonPaging(findLogDtoByPage?.page, findLogDtoByPage?.pageSize);
-      let where = this.buildCommonQuery(findLogDtoByPage);
-      let order = this.buildCommonSort(findLogDtoByPage?.sort);
+      const { take, skip } = this.buildCommonPaging(
+        findLogDtoByPage?.page,
+        findLogDtoByPage?.pageSize,
+      );
+      const where = this.buildCommonQuery(findLogDtoByPage);
+      const order = this.buildCommonSort(findLogDtoByPage?.sort);
       // 查询符合条件的用户
       const [data, total] = await this.logRepository.findAndCount({
         where: {

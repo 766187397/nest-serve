@@ -2,14 +2,21 @@
 import { ApiResult } from "@/common/utils/result";
 import { getPlatformJwtConfig } from "@/config/jwt";
 import { JWTWhiteList } from "@/config/whiteList";
-import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from "@nestjs/common";
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Response } from "express";
+import { HttpStatusCodes } from "@/common/constants/http-status";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
+    private readonly jwtService: JwtService, // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -21,7 +28,10 @@ export class AuthGuard implements CanActivate {
     let state = false; // 是否匹配白名单
     const url = req.url;
     // 检查白名单
-    if (whiteListStartsWith.some((prefix) => url.startsWith(prefix)) || whiteListExact.includes(url)) {
+    if (
+      whiteListStartsWith.some((prefix) => url.startsWith(prefix)) ||
+      whiteListExact.includes(url)
+    ) {
       state = true; // 如果匹配白名单，跳过 JWT 验证
     }
 
@@ -35,7 +45,7 @@ export class AuthGuard implements CanActivate {
       token = req.headers["authorization"]?.split(" ")[1]; // 从请求头获取 Bearer Token
     }
     if (!token && !state) {
-      // let { __isApiResult, ...data } = ApiResult.error({ code: 401, message: "请登录后访问！", data: null });
+      // let { __isApiResult, ...data } = ApiResult.error({ code: HttpStatusCodes.UNAUTHORIZED, message: "请登录后访问！", data: null });
       throw new HttpException("请登录后访问！", HttpStatus.UNAUTHORIZED);
       return false;
     }
@@ -44,7 +54,7 @@ export class AuthGuard implements CanActivate {
       const options = getPlatformJwtConfig(url.split("/")[3]);
       if (options && token) {
         let user: any;
-        user = this.jwtService.verify(token as string, {
+        user = this.jwtService.verify(token, {
           secret: options.secret,
         });
         req.userInfo = user; // 将用户信息附加到请求对象上
@@ -54,7 +64,10 @@ export class AuthGuard implements CanActivate {
       if (state) {
         return true;
       } else {
-        throw new HttpException("授权失败，Token无效！", HttpStatus.UNAUTHORIZED);
+        throw new HttpException(
+          "授权失败，Token无效！",
+          HttpStatus.UNAUTHORIZED,
+        );
         return false;
       }
     }

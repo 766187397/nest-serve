@@ -10,7 +10,11 @@ export class CreateBaseDto {
   @IsNumber({}, { message: "排序必须为数字" })
   sort?: number;
 
-  @ApiProperty({ description: "状态；1 - 启用，2 - 禁用；根据模块业务定义", required: false, example: 1 })
+  @ApiProperty({
+    description: "状态；1 - 启用，2 - 禁用；根据模块业务定义",
+    required: false,
+    example: 1,
+  })
   @IsOptional()
   @IsNumber({}, { message: "状态必须为数字" })
   status?: number;
@@ -50,8 +54,9 @@ export class FindByParameter {
   @Matches(
     /^(\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2})[,，至到](\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2})$/,
     {
-      message: "日期范围格式错误，应为“YYYY-M-D HH:MM:SS,YYYY-M-D HH:MM:SS”或使用中文分隔符“，”、“至”、“到”",
-    }
+      message:
+        "日期范围格式错误，应为“YYYY-M-D HH:MM:SS,YYYY-M-D HH:MM:SS”或使用中文分隔符“，”、“至”、“到”",
+    },
   )
   // @IsString({ message: "时间范围必须为字符串，并且需要使用逗号隔开" })
   time?: string | string[];
@@ -59,12 +64,24 @@ export class FindByParameter {
 
 /** 分页参数 */
 export class PageByParameter {
-  @ApiProperty({ name: "page", type: Number, required: false, description: "页码", default: 1 })
+  @ApiProperty({
+    name: "page",
+    type: Number,
+    required: false,
+    description: "页码",
+    default: 1,
+  })
   @IsOptional()
   @IsString({ message: "页码必须是字符串" })
   page?: string;
 
-  @ApiProperty({ name: "pageSize", type: Number, required: false, description: "每页数量", default: 10 })
+  @ApiProperty({
+    name: "pageSize",
+    type: Number,
+    required: false,
+    description: "每页数量",
+    default: 10,
+  })
   @IsOptional()
   @IsString({ message: "每页数量必须是字符串" })
   pageSize?: string;

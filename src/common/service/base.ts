@@ -10,11 +10,13 @@ export class BaseService {
    * @param {object} query 查询条件
    * @returns {{ [key: string]: any }} 处理后的查询条件
    */
-  buildCommonQuery(query: { [key: string]: any } | undefined): { [key: string]: any } {
+  buildCommonQuery(query: { [key: string]: any } | undefined): {
+    [key: string]: any;
+  } {
     if (typeof query === "undefined") {
       return {};
     }
-    let where: { [key: string]: any } = {};
+    const where: { [key: string]: any } = {};
     if (query.status) {
       where.status = query.status;
     }
@@ -25,8 +27,8 @@ export class BaseService {
       time = query.time;
     }
     if (time.length == 2) {
-      let start = dayjs(time[0]).startOf("day").toDate();
-      let end = dayjs(time[1]).endOf("day").toDate();
+      const start = dayjs(time[0]).startOf("day").toDate();
+      const end = dayjs(time[1]).endOf("day").toDate();
       where.createdAt = Between(start, end);
     }
     return where;
@@ -37,7 +39,9 @@ export class BaseService {
    * @param {FindOptionsOrderValue} sort 排序条件sort DESC | ASC
    * @returns {{[key: string]: FindOptionsOrderValue}} 处理后的排序条件
    */
-  buildCommonSort(sort?: FindOptionsOrderValue): { [key: string]: FindOptionsOrderValue } {
+  buildCommonSort(sort?: FindOptionsOrderValue): {
+    [key: string]: FindOptionsOrderValue;
+  } {
     const sortAll = ["ASC", "DESC", "asc", "desc"];
 
     if (typeof sort === "undefined") {
@@ -58,7 +62,7 @@ export class BaseService {
    */
   buildCommonPaging(
     page: number | string = 1,
-    pageSize: number | string = 10
+    pageSize: number | string = 10,
   ): { take: number; skip: number } {
     page = +page;
     pageSize = +pageSize;
@@ -82,14 +86,20 @@ export class BaseService {
    * @param param
    * @param {string} param.code 验证码
    * @param {string} param.codeKey 验证码KEY
-   * @returns {boolean} true 为正确, false 为错误
+   * @returns {Promise<boolean>} true 为正确, false 为错误
    */
-  buildVerify({ code, codeKey }: { codeKey: string; code: string }): boolean {
-    const codeCache = svgCache.get(codeKey) as { text: string };
+  async buildVerify({
+    code,
+    codeKey,
+  }: {
+    codeKey: string;
+    code: string;
+  }): Promise<boolean> {
+    const codeCache = await svgCache.get<{ text: string }>(codeKey);
     if (!codeCache || codeCache.text.toLowerCase() != code.toLowerCase()) {
       return false;
     } else {
-      svgCache.del(codeKey);
+      await svgCache.del(codeKey);
       return true;
     }
   }

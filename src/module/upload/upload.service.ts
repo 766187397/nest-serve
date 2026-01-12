@@ -7,12 +7,13 @@ import { BaseService } from "@/common/service/base";
 import { FileHashDTO, FindFileDto, FindFileDtoByPage } from "./dto/index.dto";
 import { UploadFile } from "@/types/upload";
 import { PageApiResult } from "@/types/public";
+import { HttpStatusCodes } from "@/common/constants/http-status";
 
 @Injectable()
 export class UploadService extends BaseService {
   constructor(
     @InjectRepository(Upload)
-    private upload: Repository<Upload>
+    private upload: Repository<Upload>,
   ) {
     super();
   }
@@ -22,7 +23,10 @@ export class UploadService extends BaseService {
    * @param file 文件
    * @returns {Promise<ApiResult<UploadFile | null>>} 统一返回结果
    */
-  async uploadFile(file: any, hash?: string): Promise<ApiResult<UploadFile | null>> {
+  async uploadFile(
+    file: any,
+    hash?: string,
+  ): Promise<ApiResult<UploadFile | null>> {
     try {
       if (!file) {
         return ApiResult.error("文件不能为空！");
@@ -36,9 +40,12 @@ export class UploadService extends BaseService {
       });
       const savedFile = await this.upload.save(fileData);
       return ApiResult.success<UploadFile>({
-        data: { ...savedFile, completePath: global.url + "/" + file.path.replace(/\\/g, "/") },
+        data: {
+          ...savedFile,
+          completePath: global.url + "/" + file.path.replace(/\\/g, "/"),
+        },
         message: "上传成功",
-        code: 200,
+        code: HttpStatusCodes.OK,
         entities: Upload,
       });
     } catch (error) {
@@ -51,14 +58,19 @@ export class UploadService extends BaseService {
    * @param {FindFileDto} findFileDto 查询参数
    * @returns {Promise<ApiResult<UploadFile[] | null>>} 统一返回结果
    */
-  async getFileAll(findFileDto: FindFileDto): Promise<ApiResult<UploadFile[] | null>> {
+  async getFileAll(
+    findFileDto: FindFileDto,
+  ): Promise<ApiResult<UploadFile[] | null>> {
     try {
-      let where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDto);
-      let order = this.buildCommonSort(findFileDto?.sort);
+      const where: FindOptionsWhere<Upload> =
+        this.buildCommonQuery(findFileDto);
+      const order = this.buildCommonSort(findFileDto?.sort);
       const files = await this.upload.find({
         where: {
           ...where,
-          fileName: findFileDto?.fileName ? ILike(`%${findFileDto.fileName}%`) : undefined,
+          fileName: findFileDto?.fileName
+            ? ILike(`%${findFileDto.fileName}%`)
+            : undefined,
         },
         order,
       });
@@ -83,16 +95,22 @@ export class UploadService extends BaseService {
    * @returns {Promise<ApiResult<PageApiResult<UploadFile[]> | null>>}
    */
   async getFileByPage(
-    findFileDtoByPage: FindFileDtoByPage
+    findFileDtoByPage: FindFileDtoByPage,
   ): Promise<ApiResult<PageApiResult<UploadFile[]> | null>> {
     try {
-      let where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDtoByPage);
-      let order = this.buildCommonSort(findFileDtoByPage?.sort);
-      const { take, skip } = this.buildCommonPaging(findFileDtoByPage.page, findFileDtoByPage.pageSize);
+      const where: FindOptionsWhere<Upload> =
+        this.buildCommonQuery(findFileDtoByPage);
+      const order = this.buildCommonSort(findFileDtoByPage?.sort);
+      const { take, skip } = this.buildCommonPaging(
+        findFileDtoByPage.page,
+        findFileDtoByPage.pageSize,
+      );
       const [data, total] = await this.upload.findAndCount({
         where: {
           ...where,
-          fileName: findFileDtoByPage?.fileName ? ILike(`%${findFileDtoByPage.fileName}%`) : undefined,
+          fileName: findFileDtoByPage?.fileName
+            ? ILike(`%${findFileDtoByPage.fileName}%`)
+            : undefined,
         },
         order,
         skip,
@@ -118,7 +136,7 @@ export class UploadService extends BaseService {
           pageSize: findFileDtoByPage?.pageSize || 10,
         },
         message: "查询成功",
-        code: 200,
+        code: HttpStatusCodes.OK,
         entities: Upload,
       });
     } catch (error) {
@@ -173,9 +191,11 @@ export class UploadService extends BaseService {
    * @param fileHashDTO  hash 值和文件大小
    * @returns {Promise<ApiResult<UploadFile | null>>} 统一返回结果
    */
-  async getFileByHash(fileHashDTO: FileHashDTO): Promise<ApiResult<UploadFile | null>> {
+  async getFileByHash(
+    fileHashDTO: FileHashDTO,
+  ): Promise<ApiResult<UploadFile | null>> {
     try {
-      let file = await this.upload.findOne({
+      const file = await this.upload.findOne({
         where: {
           hash: fileHashDTO.hash,
           size: fileHashDTO.size,

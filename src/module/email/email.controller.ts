@@ -1,10 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  Req,
+  Headers,
+  HttpCode,
+} from "@nestjs/common";
 import { EmailService } from "./email.service";
 import { CreateEmailDto, FindEmailDto, FindEmailtoByPage, SendEmail, UpdateEmailDto } from "./dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request } from "express";
 import { User } from "@/module/users/entities/user.entity";
+import { HttpStatusCodes } from "@/common/constants/http-status";
 
 @ApiTags("邮箱管理")
 // @ApiBearerAuth("Authorization")
@@ -19,21 +32,24 @@ import { User } from "@/module/users/entities/user.entity";
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}
 
-  @Post("create/:platform")
+  @Post()
   @ApiOperation({ summary: "创建邮箱模板" })
-  create(@Param("platform") platform: string, @Body() createEmailDto: CreateEmailDto) {
+  create(@Headers("x-platform") platform: string, @Body() createEmailDto: CreateEmailDto) {
     return this.emailService.create(createEmailDto, platform);
   }
 
-  @Get("page/:platform")
+  @Get("page")
   @ApiOperation({ summary: "查询邮箱列表(分页)" })
-  findByPage(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findEmailtoByPage: FindEmailtoByPage) {
+  findByPage(
+    @Headers("x-platform") platform: string,
+    @Query(new FilterEmptyPipe()) findEmailtoByPage: FindEmailtoByPage
+  ) {
     return this.emailService.findByPage(findEmailtoByPage, platform);
   }
 
-  @Get("all/:platform")
+  @Get("all")
   @ApiOperation({ summary: "查询邮箱列表(不分页)" })
-  findAll(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findEmailDto: FindEmailDto) {
+  findAll(@Headers("x-platform") platform: string, @Query(new FilterEmptyPipe()) findEmailDto: FindEmailDto) {
     return this.emailService.findAll(findEmailDto, platform);
   }
 
@@ -43,14 +59,15 @@ export class EmailController {
     return this.emailService.findOne(+id);
   }
 
-  @Patch("update/:id")
+  @Patch(":id")
   @ApiOperation({ summary: "更新邮箱模板" })
   update(@Param("id") id: string, @Body() updateEmailDto: UpdateEmailDto) {
     return this.emailService.update(+id, updateEmailDto);
   }
 
-  @Delete("delete/:id")
+  @Delete(":id")
   @ApiOperation({ summary: "删除邮箱模板" })
+  @HttpCode(HttpStatusCodes.NO_CONTENT)
   remove(@Param("id") id: string) {
     return this.emailService.remove(+id);
   }
@@ -58,7 +75,7 @@ export class EmailController {
   @Post("send/email")
   @ApiOperation({ summary: "发送邮箱（自定义变量格式：验证码为{code}）" })
   sendEmail(@Body() sendEmail: SendEmail, @Req() req: Request) {
-    let userInfo = req.userInfo as User;
+    const userInfo = req.userInfo as User;
     return this.emailService.sendEmail(sendEmail, userInfo);
   }
 }

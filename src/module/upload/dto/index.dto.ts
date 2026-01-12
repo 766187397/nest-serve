@@ -4,7 +4,12 @@ import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 /** 文件上传  */
 export class FileUploadDTO {
-  @ApiProperty({ type: "string", format: "binary", required: true, description: "文件上传" })
+  @ApiProperty({
+    type: "string",
+    format: "binary",
+    required: true,
+    description: "文件上传",
+  })
   @IsNotEmpty({ message: "文件不能为空" })
   file: any;
 }
@@ -14,7 +19,9 @@ export class FindFileDto extends FindByParameter {
   fileName?: string;
 }
 /** 分页查询文件 */
-export class FindFileDtoByPage extends PartialType(IntersectionType(FindFileDto, PageByParameter)) {}
+export class FindFileDtoByPage extends PartialType(
+  IntersectionType(FindFileDto, PageByParameter),
+) {}
 
 /** hash值和文件大小 */
 export class FileHashDTO {

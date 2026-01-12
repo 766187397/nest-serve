@@ -1,5 +1,11 @@
 // src/filters/route-not-found.filter.ts
-import { ExceptionFilter, Catch, ArgumentsHost, NotFoundException } from "@nestjs/common";
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  NotFoundException,
+  HttpStatus,
+} from "@nestjs/common";
 import { Request, Response } from "express";
 import { ApiResult } from "@/common/utils/result";
 
@@ -11,10 +17,11 @@ export class RouteNotFoundFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     // 自定义路由不存在响应
     const { __isApiResult, ...data } = ApiResult.error<null>({
-      code: 404,
-      message: "请求的路由不存在或者请求方式错误,请检查API路径和请求方式是否正确",
+      code: HttpStatus.NOT_FOUND,
+      message:
+        "请求的路由不存在或者请求方式错误,请检查API路径和请求方式是否正确",
       data: null,
     });
-    response.status(404).json(data);
+    response.status(HttpStatus.NOT_FOUND).json(data);
   }
 }

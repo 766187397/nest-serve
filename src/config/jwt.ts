@@ -12,7 +12,9 @@ export interface JwtConfig {
  * @param {string} platform 平台标识字符串(admin/web/app/mini)
  * @returns {JwtConfig} 平台对应的 JWT 配置
  */
-export function getPlatformJwtConfig(platform: string = "admin"): JwtConfig | undefined {
+export function getPlatformJwtConfig(
+  platform: string = "admin",
+): JwtConfig | undefined {
   const configs = {
     admin: {
       secret: "vAT6Syz5kWD64I63",

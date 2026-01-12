@@ -1,6 +1,6 @@
 /** 邮箱缓存 */
 export interface EmailCahce {
-  state: Boolean;
+  state: boolean;
   time: string;
   code: string;
 }

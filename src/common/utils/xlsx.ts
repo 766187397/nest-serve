@@ -12,10 +12,12 @@ export function exportWithKeyValueHeader(
   data: any[],
   headerMap: Record<string, string>,
   fileName: string = "export",
-  sheetName: string = "Sheet1"
+  sheetName: string = "Sheet1",
 ): { buffer: Buffer; fileName: string } {
   // 添加.xlsx后缀（如果用户没有提供）
-  const finalFileName = fileName.endsWith(".xlsx") ? fileName : `${fileName}.xlsx`;
+  const finalFileName = fileName.endsWith(".xlsx")
+    ? fileName
+    : `${fileName}.xlsx`;
 
   // 转换数据格式
   const formattedData = data.map((item) => {
@@ -47,7 +49,7 @@ export function exportWithKeyValueHeader(
 export function importWithKeyValueHeader(
   fileBuffer: Buffer,
   headerMap: Record<string, string>,
-  sheetName?: string
+  sheetName?: string,
 ): any[] {
   // 读取Excel
   const workbook = XLSX.read(fileBuffer);

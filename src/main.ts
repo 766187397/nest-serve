@@ -1,13 +1,15 @@
 import * as dotenv from "dotenv";
 // 根据环境加载对应的 .env 文件
-const envFilePath = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env";
+const envFilePath = process.env.NODE_ENV
+  ? `.env.${process.env.NODE_ENV}`
+  : ".env";
 global.envFilePath = envFilePath;
 dotenv.config({ path: envFilePath });
 
 // 项目地址端口
 let port = process.env.PORT || 3000;
-let baseUrl = process.env.BASE_URL || "localhost";
-let IP = process.env.IP || "127.0.0.1";
+const baseUrl = process.env.BASE_URL || "localhost";
+const IP = process.env.IP || "127.0.0.1";
 let url = `${baseUrl}`;
 global.url = url;
 
@@ -15,7 +17,11 @@ import { NestFactory, Reflector } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { SwaggerModule } from "@nestjs/swagger";
 import { SwaggerConfig } from "./config/swagger";
-import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from "@nestjs/common";
+import {
+  ClassSerializerInterceptor,
+  INestApplication,
+  ValidationPipe,
+} from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import { LoggerService } from "./module/logger/logger.service";
 import { LoggerInterceptor } from "./module/logger/logger.interceptor";
@@ -36,7 +42,10 @@ async function bootstrap() {
   app.use(cookieParser());
 
   // 创建 Swagger 文档
-  const document = SwaggerModule.createDocument(app, SwaggerConfig.swaggerOptions);
+  const document = SwaggerModule.createDocument(
+    app,
+    SwaggerConfig.swaggerOptions,
+  );
   // 将 Swagger 文档存储在全局对象中
   global.swaggerDocument = document;
   // 设置 Swagger UI 路由
@@ -48,7 +57,7 @@ async function bootstrap() {
       transform: true, // 自动转换类型
       whitelist: true, // 只允许 DTO 中声明的字段 仅对DTO中的生效
       // forbidNonWhitelisted: true, // 如果有非法字段，抛出异常 仅对DTO中的生效
-    })
+    }),
   );
 
   const loggerService = app.get(LoggerService); // 从 DI 容器中获取 LoggerService
@@ -57,7 +66,7 @@ async function bootstrap() {
     // 全局的异常过滤器
     new GlobalExceptionFilter(loggerService),
     // 404过滤器
-    new RouteNotFoundFilter()
+    new RouteNotFoundFilter(),
   );
 
   // 全局拦截器
@@ -67,7 +76,7 @@ async function bootstrap() {
     // 返回格式处理拦截器
     new ApiResultInterceptor(),
     // 自定义日志拦截器
-    new LoggerInterceptor(loggerService)
+    new LoggerInterceptor(loggerService),
   );
 
   run(app);

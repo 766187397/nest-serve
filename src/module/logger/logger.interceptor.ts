@@ -1,4 +1,9 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from "@nestjs/common";
 import { LoggerService } from "./logger.service";
 import { Observable, tap } from "rxjs";
 import { LoggerWhiteList } from "@/config/whiteList";
@@ -20,14 +25,21 @@ export class LoggerInterceptor implements NestInterceptor {
 
     const url: string = request.url || "";
     // 如果是白名单中的接口就不记录到日志
-    if (whiteListStartsWith.some((prefix) => url.startsWith(prefix)) || whiteListExact.includes(url)) {
+    if (
+      whiteListStartsWith.some((prefix) => url.startsWith(prefix)) ||
+      whiteListExact.includes(url)
+    ) {
       return next.handle();
     }
 
     return next.handle().pipe(
       tap(async (data) => {
-        this.loggerService.create(request, data, response.statusCode.toString());
-      })
+        this.loggerService.create(
+          request,
+          data,
+          response.statusCode.toString(),
+        );
+      }),
     );
   }
 }

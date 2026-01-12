@@ -1,6 +1,13 @@
 import { CreateBaseDto, FindByParameter } from "@/common/dto/base";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from "class-validator";
 
 /** 创建路由信息 */
 export class CreateRouteDto extends CreateBaseDto {
@@ -19,7 +26,10 @@ export class CreateRouteDto extends CreateBaseDto {
   @IsNotEmpty({ message: "路由显示名称不能为空" })
   title: string;
 
-  @ApiProperty({ description: "前端路由路径（可以含动态参数）", required: false })
+  @ApiProperty({
+    description: "前端路由路径（可以含动态参数）",
+    required: false,
+  })
   @IsString({ message: "路由路径必须为字符串" })
   @IsNotEmpty({ message: "路由路径不能为空" })
   path: string;
@@ -57,7 +67,10 @@ export class CreateRouteDto extends CreateBaseDto {
 
 /** 更新路由信息 */
 export class UpdateRouteDto extends PartialType(CreateRouteDto) {
-  @ApiProperty({ description: "平台标识（如admin/web/app/mini等）", required: false })
+  @ApiProperty({
+    description: "平台标识（如admin/web/app/mini等）",
+    required: false,
+  })
   @IsOptional()
   @IsString({ message: "平台必须为字符串" })
   platform?: string;

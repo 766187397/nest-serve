@@ -20,7 +20,7 @@ import { join } from "path";
         serveStaticOptions: {
           maxAge: "1y", // 设置缓存时间
         },
-      }
+      },
     ),
   ],
   controllers: [Knife4jController],

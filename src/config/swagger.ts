@@ -14,7 +14,7 @@ export class SwaggerConfig {
         description: "输入 Token",
         in: "header",
       },
-      "Authorization"
+      "Authorization",
     )
     .build();
 }

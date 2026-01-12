@@ -7,6 +7,7 @@ import {
   HttpException,
   BadRequestException,
   PayloadTooLargeException,
+  HttpStatus,
 } from "@nestjs/common";
 import { Request, Response } from "express";
 import { QueryFailedError } from "typeorm";
@@ -21,13 +22,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    let status = 500;
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = "Internal server error";
     const url: string = request.url || "";
     const apiPlatform: string = url.split("/")[3] || "";
     const { account = "", nickName = "" } = request.userInfo || {};
     const method = request.method || "";
-    let { referer = "", "sec-ch-ua-platform": platform = "", "sec-ch-ua": browser = "" } = request.headers;
+    let {
+      referer = "",
+      "sec-ch-ua-platform": platform = "",
+      "sec-ch-ua": browser = "",
+    } = request.headers;
     try {
       browser = (browser as string).replace(/"/g, "");
       platform = (platform as string).replace(/"/g, "");

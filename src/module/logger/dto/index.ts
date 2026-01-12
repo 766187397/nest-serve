@@ -3,4 +3,6 @@ import { ApiProperty, IntersectionType, PartialType } from "@nestjs/swagger";
 import { IsOptional, IsString } from "class-validator";
 
 /** 分页查询 */
-export class FindLogDtoByPage extends PartialType(IntersectionType(FindByParameter, PageByParameter)) {}
+export class FindLogDtoByPage extends PartialType(
+  IntersectionType(FindByParameter, PageByParameter),
+) {}

@@ -8,9 +8,17 @@ import {
   Res,
   UploadedFile,
   UseInterceptors,
+  HttpCode,
 } from "@nestjs/common";
 import { UploadService } from "./upload.service";
-import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FileUploadService } from "@/config/multer";
 import { FindFileDto, FindFileDtoByPage } from "./dto/index.dto";
@@ -20,6 +28,7 @@ import * as https from "https";
 import * as http from "http";
 import { URL } from "url";
 import { Response } from "express";
+import { HttpStatusCodes } from "@/common/constants/http-status";
 
 @ApiTags("文件上传")
 @Controller("api/v1/upload")
@@ -56,7 +65,9 @@ export class UploadController {
 
   @Get("page")
   @ApiOperation({ summary: "分页查询文件" })
-  getFileByPage(@Query(new FilterEmptyPipe()) findFileDtoByPage: FindFileDtoByPage) {
+  getFileByPage(
+    @Query(new FilterEmptyPipe()) findFileDtoByPage: FindFileDtoByPage,
+  ) {
     return this.uploadService.getFileByPage(findFileDtoByPage);
   }
 
@@ -82,9 +93,18 @@ export class UploadController {
     client
       .get(fileUrl, (upstream) => {
         // 透传关键头
-        res.setHeader("Content-Type", upstream.headers["content-type"] || "application/octet-stream");
-        res.setHeader("Content-Length", upstream.headers["content-length"] || "");
-        res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(filename)}"`);
+        res.setHeader(
+          "Content-Type",
+          upstream.headers["content-type"] || "application/octet-stream",
+        );
+        res.setHeader(
+          "Content-Length",
+          upstream.headers["content-length"] || "",
+        );
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${encodeURIComponent(filename)}"`,
+        );
         res.setHeader("Access-Control-Expose-Headers", `Content-Disposition`);
 
         // 管道转发
@@ -105,6 +125,7 @@ export class UploadController {
   @Delete("delete/:id")
   @ApiOperation({ summary: "根据id删除文件" })
   @ApiParam({ name: "id", required: true, description: "文件 ID" })
+  @HttpCode(HttpStatusCodes.NO_CONTENT)
   deleteFileById(@Param("id") id: string) {
     return this.uploadService.deleteFileById(id);
   }

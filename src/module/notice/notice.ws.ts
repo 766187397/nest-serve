@@ -21,7 +21,8 @@ export class NoticeWS implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`客户端连接时触发: ${client.id}`);
     // console.log("query", client.handshake.query);
     const token = client.handshake.query.token as string;
-    let { __isApiResult, ...data } = await this.noticeService.handleWsFindUserOrRole(token, "admin");
+    const { __isApiResult, ...data } =
+      await this.noticeService.handleWsFindUserOrRole(token, "admin");
     client.emit("list", data);
   }
 
@@ -36,7 +37,8 @@ export class NoticeWS implements OnGatewayConnection, OnGatewayDisconnect {
     console.log("payload", payload);
     const token = payload.token;
 
-    let { __isApiResult, ...data } = await this.noticeService.handleWsFindUserOrRole(token, "admin");
+    const { __isApiResult, ...data } =
+      await this.noticeService.handleWsFindUserOrRole(token, "admin");
     // 广播消息给所有客户端（包括发送者）
     // this.server.emit("message", payload);
 

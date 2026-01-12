@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from "@nestjs/common";
+import { Controller, Get, Param, Query, Headers } from "@nestjs/common";
 import { LoggerService } from "./logger.service";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
@@ -18,9 +18,12 @@ import { Roles } from "@/common/decorator/roles.decorator";
 export class LoggerController {
   constructor(private readonly loggerService: LoggerService) {}
   @Roles("admin", "dev")
-  @Get("page/:platform")
+  @Get("page")
   @ApiOperation({ summary: "查询日志列表(分页)" })
-  findByPage(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findLogDtoByPage: FindLogDtoByPage) {
+  findByPage(
+    @Headers("x-platform") platform: string,
+    @Query(new FilterEmptyPipe()) findLogDtoByPage: FindLogDtoByPage,
+  ) {
     return this.loggerService.findByPage(findLogDtoByPage, platform);
   }
 }

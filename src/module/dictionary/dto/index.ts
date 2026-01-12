@@ -1,4 +1,8 @@
-import { CreateBaseDto, FindByParameter, PageByParameter } from "@/common/dto/base";
+import {
+  CreateBaseDto,
+  FindByParameter,
+  PageByParameter,
+} from "@/common/dto/base";
 import { ApiProperty, IntersectionType, PartialType } from "@nestjs/swagger";
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
@@ -32,7 +36,7 @@ export class FindDictionaryDto extends FindByParameter {
 }
 /** 分页查询字典分类 */
 export class FindDictionaryDtoByPage extends PartialType(
-  IntersectionType(FindDictionaryDto, PageByParameter)
+  IntersectionType(FindDictionaryDto, PageByParameter),
 ) {}
 
 /** 创建字典项 */
@@ -59,7 +63,9 @@ export class CreateDictionaryItemDto extends CreateBaseDto {
 }
 
 /** 更新字典项 */
-export class UpdateDictionaryItemDto extends PartialType(CreateDictionaryItemDto) {}
+export class UpdateDictionaryItemDto extends PartialType(
+  CreateDictionaryItemDto,
+) {}
 
 /** 字典项查询参数 */
 export class FindDictionaryItemDto extends FindByParameter {
@@ -81,5 +87,5 @@ export class FindDictionaryItemDto extends FindByParameter {
 
 /** 分页查询字典项 */
 export class FindDictionaryItemDtoByPage extends PartialType(
-  IntersectionType(FindDictionaryItemDto, PageByParameter)
+  IntersectionType(FindDictionaryItemDto, PageByParameter),
 ) {}

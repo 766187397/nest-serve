@@ -1,4 +1,9 @@
-import { CreateBaseDto, FindByParameter, PageByParameter, VerificationCodeDto } from "@/common/dto/base";
+import {
+  CreateBaseDto,
+  FindByParameter,
+  PageByParameter,
+  VerificationCodeDto,
+} from "@/common/dto/base";
 import { ApiProperty, IntersectionType, PartialType } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
@@ -14,7 +19,10 @@ export class CreateEmailDto extends CreateBaseDto {
   @IsNotEmpty({ message: "标题是必填项" })
   title: string;
 
-  @ApiProperty({ description: "邮件内容；自定义变量有{code|createdAt|用户信息}", example: "这是测试邮件" })
+  @ApiProperty({
+    description: "邮件内容；自定义变量有{code|createdAt|用户信息}",
+    example: "这是测试邮件",
+  })
   @IsString({ message: "内容字符串" })
   @IsNotEmpty({ message: "内容是必填项" })
   content: string;
@@ -32,7 +40,9 @@ export class FindEmailDto extends FindByParameter {
 }
 
 /** 分页请求模板 */
-export class FindEmailtoByPage extends PartialType(IntersectionType(FindEmailDto, PageByParameter)) {}
+export class FindEmailtoByPage extends PartialType(
+  IntersectionType(FindEmailDto, PageByParameter),
+) {}
 
 /** 发送邮件 */
 export class SendEmail extends VerificationCodeDto {

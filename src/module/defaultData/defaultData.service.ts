@@ -39,7 +39,7 @@ export class defaultData implements OnApplicationBootstrap {
 
     /** 通知公告 */
     @InjectRepository(Notice)
-    private readonly noticeRepository: Repository<Notice>
+    private readonly noticeRepository: Repository<Notice>,
   ) {}
 
   async onApplicationBootstrap() {
@@ -57,8 +57,12 @@ export class defaultData implements OnApplicationBootstrap {
     if (count === 0) {
       // 如果没有用户，插入默认数据
       const password = await bcryptService.encryptStr("123456");
-      const admin = await this.roleRepository.findOne({ where: { roleKey: "admin" } }); // 获取角色
-      const web = await this.roleRepository.findOne({ where: { roleKey: "web" } }); // 获取角色
+      const admin = await this.roleRepository.findOne({
+        where: { roleKey: "admin" },
+      }); // 获取角色
+      const web = await this.roleRepository.findOne({
+        where: { roleKey: "web" },
+      }); // 获取角色
       const defaultData = [
         {
           account: "admin",
@@ -91,8 +95,12 @@ export class defaultData implements OnApplicationBootstrap {
   private async seedRoles() {
     const count = await this.roleRepository.count();
     if (count === 0) {
-      const route1 = await this.routeRepository.find({ where: { platform: "admin" } }); // 获取路由
-      const route2 = await this.routeRepository.find({ where: { platform: "web" } }); // 获取路由
+      const route1 = await this.routeRepository.find({
+        where: { platform: "admin" },
+      }); // 获取路由
+      const route2 = await this.routeRepository.find({
+        where: { platform: "web" },
+      }); // 获取路由
       // 如果没有角色，插入默认数据
       const defaultData = [
         {
@@ -549,7 +557,9 @@ export class defaultData implements OnApplicationBootstrap {
           description: "用户性别:0未知 1男 2女",
         },
       ];
-      const dictionaries = dictionariesData.map((item) => this.dictionaryRepository.create(item));
+      const dictionaries = dictionariesData.map((item) =>
+        this.dictionaryRepository.create(item),
+      );
       const dictionaryList = await this.dictionaryRepository.save(dictionaries);
 
       // 插入字典项
@@ -616,7 +626,9 @@ export class defaultData implements OnApplicationBootstrap {
         },
       ];
 
-      const dictionariesItem = dictionariesItemData.map((item) => this.dictionaryItemRepository.create(item));
+      const dictionariesItem = dictionariesItemData.map((item) =>
+        this.dictionaryItemRepository.create(item),
+      );
       await this.dictionaryItemRepository.save(dictionariesItem); // 插入数据
     }
   }

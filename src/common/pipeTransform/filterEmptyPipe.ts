@@ -6,7 +6,11 @@ export class FilterEmptyPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
     if (typeof value === "object") {
       return Object.keys(value).reduce((acc, key) => {
-        if (value[key] !== "" && value[key] !== null && value[key] !== undefined) {
+        if (
+          value[key] !== "" &&
+          value[key] !== null &&
+          value[key] !== undefined
+        ) {
           acc[key] = this.transform(value[key], metadata);
         }
         return acc;

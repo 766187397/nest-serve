@@ -1,8 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  Headers,
+  HttpCode,
+} from "@nestjs/common";
 import { RolesService } from "./roles.service";
-import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from "./dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+  CreateRoleDto,
+  FindRoleDto,
+  FindRoleDtoByPage,
+  UpdateRoleDto,
+} from "./dto";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
+import { HttpStatusCodes } from "@/common/constants/http-status";
 
 @ApiTags("角色管理")
 // @ApiBearerAuth("Authorization")
@@ -17,21 +39,30 @@ import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
-  @Post("create/:platform")
+  @Post()
   @ApiOperation({ summary: "创建角色" })
-  create(@Param("platform") platform: string, @Body() createRoleDto: CreateRoleDto) {
+  create(
+    @Headers("x-platform") platform: string,
+    @Body() createRoleDto: CreateRoleDto,
+  ) {
     return this.rolesService.create(createRoleDto, platform);
   }
 
-  @Get("page/:platform")
+  @Get("page")
   @ApiOperation({ summary: "查询角色列表(分页)" })
-  findByPage(@Param("platform") platform: string, @Query(new FilterEmptyPipe()) findRoleDtoByPage: FindRoleDtoByPage) {
+  findByPage(
+    @Headers("x-platform") platform: string,
+    @Query(new FilterEmptyPipe()) findRoleDtoByPage: FindRoleDtoByPage,
+  ) {
     return this.rolesService.findByPage(findRoleDtoByPage, platform);
   }
 
-  @Get("all/:platform")
+  @Get("all")
   @ApiOperation({ summary: "查询角色列表(不分页)" })
-  findAll(@Param("platform") platform: string, @Body() findRoleDto: FindRoleDto) {
+  findAll(
+    @Headers("x-platform") platform: string,
+    @Query(new FilterEmptyPipe()) findRoleDto: FindRoleDto,
+  ) {
     return this.rolesService.findAll(findRoleDto, platform);
   }
 
@@ -49,6 +80,7 @@ export class RolesController {
 
   @Delete(":id")
   @ApiOperation({ summary: "删除角色" })
+  @HttpCode(HttpStatusCodes.NO_CONTENT)
   remove(@Param("id") id: string) {
     return this.rolesService.remove(id);
   }

@@ -10,7 +10,17 @@ import { Email } from "@/module/email/entities/email.entity";
 import { Notice } from "@/module/notice/entities/notice.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Role, Route, Dictionary, DictionaryItem, Email, Notice])],
+  imports: [
+    TypeOrmModule.forFeature([
+      User,
+      Role,
+      Route,
+      Dictionary,
+      DictionaryItem,
+      Email,
+      Notice,
+    ]),
+  ],
   controllers: [],
   providers: [defaultData],
 })

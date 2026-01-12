@@ -1,11 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  Req,
+  Headers,
+  HttpCode,
+} from "@nestjs/common";
 import { NoticeService } from "./notice.service";
-import { CreateNoticeDto, FindNoticeDtoByPage, FindNoticeDtoByPageByUserOrRole, UpdateNoticeDto } from "./dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+  CreateNoticeDto,
+  FindNoticeDtoByPage,
+  FindNoticeDtoByPageByUserOrRole,
+  UpdateNoticeDto,
+} from "./dto";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 import { FilterEmptyPipe } from "@/common/pipeTransform/filterEmptyPipe";
 import { Request } from "express";
 import { User } from "../users/entities/user.entity";
 import { NoticeWS } from "./notice.ws";
+import {
+  HttpStatusCodes,
+  BusinessStatusCodes,
+} from "@/common/constants/http-status";
 
 @ApiTags("公告")
 // @ApiBearerAuth("Authorization")
@@ -20,39 +46,53 @@ import { NoticeWS } from "./notice.ws";
 export class NoticeController {
   constructor(
     private readonly noticeService: NoticeService,
-    private readonly noticeWS: NoticeWS
+    private readonly noticeWS: NoticeWS,
   ) {}
 
-  @Post("create/:platform")
+  @Post()
   @ApiOperation({ summary: "创建公告" })
-  async create(@Param("platform") platform: string, @Body() createNoticeDto: CreateNoticeDto) {
-    let { __isApiResult, ...data } = await this.noticeService.create(createNoticeDto, platform);
-    if (data.code === 200 && data.data?.status === 2) {
+  async create(
+    @Headers("x-platform") platform: string,
+    @Body() createNoticeDto: CreateNoticeDto,
+  ) {
+    const { __isApiResult, ...data } = await this.noticeService.create(
+      createNoticeDto,
+      platform,
+    );
+    if (data.code === BusinessStatusCodes.SUCCESS && data.data?.status === 2) {
       // 广播新公告给所有连接的客户端
       this.noticeWS.broadcastAlert(`有新公告`);
     }
     return data;
   }
 
-  @Get("page/:platform")
+  @Get("page")
   @ApiOperation({ summary: "查询公告列表(分页,后端编辑使用查询所有)" })
   findByPage(
-    @Param("platform") platform: string,
-    @Query(new FilterEmptyPipe()) findNoticeDtoByPage: FindNoticeDtoByPage
+    @Headers("x-platform") platform: string,
+    @Query(new FilterEmptyPipe()) findNoticeDtoByPage: FindNoticeDtoByPage,
   ) {
     return this.noticeService.findByPage(findNoticeDtoByPage, platform);
   }
 
-  @Get("page/userOrRole/:platform")
-  @ApiOperation({ summary: "查询公告列表(分页,查询当前用户和角色权限对应的公告)" })
+  @Get("page/userOrRole")
+  @ApiOperation({
+    summary: "查询公告列表(分页,查询当前用户和角色权限对应的公告)",
+  })
   findByPageByUserOrRole(
-    @Param("platform") platform: string,
-    @Query(new FilterEmptyPipe()) findNoticeDtoByPage: FindNoticeDtoByPageByUserOrRole,
-    @Req() req: Request
+    @Headers("x-platform") platform: string,
+    @Query(new FilterEmptyPipe())
+    findNoticeDtoByPage: FindNoticeDtoByPageByUserOrRole,
+    @Req() req: Request,
   ) {
     const userInfo = req.userInfo as User;
     const roleKeys = userInfo?.roles.map((item) => item.roleKey);
-    return this.noticeService.findByPageByUserAndRole(findNoticeDtoByPage, platform, roleKeys, userInfo.id);
+    return this.noticeService.findByPageByUserAndRole(
+      findNoticeDtoByPage,
+      platform,
+      roleKeys,
+      userInfo.id,
+    );
   }
 
   @Get("info/:id")
@@ -61,19 +101,26 @@ export class NoticeController {
     return this.noticeService.findOne(id);
   }
 
-  @Patch("update/:id")
+  @Patch(":id")
   @ApiOperation({ summary: "更新公告" })
-  async update(@Param("id") id: string, @Body() updateNoticeDto: UpdateNoticeDto) {
-    let { __isApiResult, ...data } = await this.noticeService.update(id, updateNoticeDto);
-    if (data.code === 200) {
+  async update(
+    @Param("id") id: string,
+    @Body() updateNoticeDto: UpdateNoticeDto,
+  ) {
+    const { __isApiResult, ...data } = await this.noticeService.update(
+      id,
+      updateNoticeDto,
+    );
+    if (data.code === BusinessStatusCodes.SUCCESS) {
       // 广播新公告给所有连接的客户端
       this.noticeWS.broadcastAlert(`有新公告`);
     }
     return data;
   }
 
-  @Delete("delete/:id")
+  @Delete(":id")
   @ApiOperation({ summary: "删除公告" })
+  @HttpCode(HttpStatusCodes.NO_CONTENT)
   remove(@Param("id") id: string) {
     return this.noticeService.remove(id);
   }
@@ -81,13 +128,17 @@ export class NoticeController {
   @Post("read/:id")
   @ApiOperation({ summary: "标记公告为已读" })
   async read(@Param("id") id: string, @Req() req: Request) {
-    return this.noticeService.handleMarkByUserId(req.userInfo?.id as string, id);
+    return this.noticeService.handleMarkByUserId(
+      req.userInfo?.id as string,
+      id,
+    );
   }
 
   @Get("ws")
   @ApiOperation({
     summary: "WebSocket 未读公告",
-    description: "通过ws获取前三条未读的通知公告，展示用于WebSocket服务（前端使用socket.io-client这个包）",
+    description:
+      "通过ws获取前三条未读的通知公告，展示用于WebSocket服务（前端使用socket.io-client这个包）",
   })
   ws() {}
 }

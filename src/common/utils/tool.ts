@@ -22,7 +22,7 @@ export function ObjectFilterAbnormal<T extends object>(obj: T): T {
  */
 export function calculatePagination(
   page: number | string = 1,
-  pageSize: number | string = 10
+  pageSize: number | string = 10,
 ): { take: number; skip: number } | Error {
   page = +page;
   pageSize = +pageSize;
@@ -49,7 +49,7 @@ export function calculatePagination(
  */
 export function generateRandomString(
   length: number,
-  chars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  chars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
 ): string {
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);

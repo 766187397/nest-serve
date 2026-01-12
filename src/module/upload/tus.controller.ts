@@ -1,5 +1,15 @@
 // src/tus.controller.ts
-import { Controller, All, Delete, Param, Req, Res, OnModuleInit, Query, Get } from "@nestjs/common";
+import {
+  Controller,
+  All,
+  Delete,
+  Param,
+  Req,
+  Res,
+  OnModuleInit,
+  Query,
+  Get,
+} from "@nestjs/common";
 import { Request, Response } from "express";
 import { Server, FileStore, EVENTS } from "tus-node-server";
 import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
@@ -50,7 +60,7 @@ export class TusController implements OnModuleInit {
       const newPath = path.join(this.uploadDir, `${event.file.id}${extension}`);
 
       fs.renameSync(oldPath, newPath);
-      let file = {
+      const file = {
         path: newPath,
         filename: `${event.file.id}${extension}`,
         size: event.file.upload_length,
@@ -88,8 +98,13 @@ export class CustomizeTusController {
   constructor(private readonly uploadService: UploadService) {}
 
   @Get("upload/second")
-  @ApiOperation({ summary: "大文件秒传", description: "根据文件的hash值查询是否已上传" })
-  async getFileByHash(@Query() fileHashDTO: FileHashDTO): Promise<ApiResult<UploadFile | null>> {
+  @ApiOperation({
+    summary: "大文件秒传",
+    description: "根据文件的hash值查询是否已上传",
+  })
+  async getFileByHash(
+    @Query() fileHashDTO: FileHashDTO,
+  ): Promise<ApiResult<UploadFile | null>> {
     return this.uploadService.getFileByHash(fileHashDTO);
   }
 }

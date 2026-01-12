@@ -1,5 +1,9 @@
 // class-validator 的校验比较单一，有的时候需要校验多种类型，需要自定义函数
-import { registerDecorator, ValidationOptions, ValidationArguments } from "class-validator";
+import {
+  registerDecorator,
+  ValidationOptions,
+  ValidationArguments,
+} from "class-validator";
 
 export function IsStringOrNumber(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {

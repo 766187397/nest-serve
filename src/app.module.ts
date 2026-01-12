@@ -16,7 +16,13 @@ import { LoggerModule } from "./module/logger/logger.module";
 import { NoticeModule } from "./module/notice/notice.module";
 import { DictionaryModule } from "./module/dictionary/dictionary.module";
 import { EmailModule } from "./module/email/email.module";
-import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
+import DBConfig, {
+  type MysqlConfig,
+  type SqliteConfig,
+  type PgConfig,
+} from "@/config/db";
+import { CacheModule } from "./common/module/cache.module";
+import { CacheInitModule } from "./common/module/cache-init.module";
 
 @Module({
   imports: [
@@ -26,19 +32,35 @@ import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
       envFilePath: `.env.${process.env.NODE_ENV || "dev"}`,
     }),
     TypeOrmModule.forRootAsync({
-      // name: "data",
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const dbType = DBConfig.dbConfig.DB_TYPE as "mysql" | "sqlite";
+        const dbType = DBConfig.dbConfig.DB_TYPE as
+          | "mysql"
+          | "sqlite"
+          | "postgres";
         if (dbType === "sqlite") {
-          const config = DBConfig.dbConfig as SqliteConfig;
+          const config = DBConfig.dbConfig;
           return {
             type: dbType,
             database: config.DB_DATABASE,
-            synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
-            logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
-            entities: [join(__dirname, "module/**/!(*logger)*.entity.{ts,js}")], // 匹配非logger所有 .entity.ts 或 .entity.js 文件
-            migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
+            synchronize: process.env.NODE_ENV !== "production",
+            logging: process.env.NODE_ENV !== "production",
+            entities: [join(__dirname, "module/**/!(*logger)*.entity.{ts,js}")],
+            migrations: ["src/migrations/**/*{.ts,.js}"],
+          };
+        } else if (dbType === "postgres") {
+          const config = DBConfig.dbConfig as PgConfig;
+          return {
+            type: dbType,
+            host: config.DB_HOST,
+            port: config.DB_PORT,
+            username: config.DB_USER,
+            password: config.DB_PASSWORD,
+            database: config.DB_DATABASE,
+            synchronize: process.env.NODE_ENV !== "production",
+            logging: process.env.NODE_ENV !== "production",
+            entities: [join(__dirname, "module/**/!(*logger)*.entity.{ts,js}")],
+            migrations: ["src/migrations/**/*{.ts,.js}"],
           };
         } else {
           const config = DBConfig.dbConfig as MysqlConfig;
@@ -49,10 +71,10 @@ import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
             username: config.DB_USER,
             password: config.DB_PASSWORD,
             database: config.DB_DATABASE,
-            synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
-            logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
-            entities: [join(__dirname, "module/**/!(*logger)*.entity.{ts,js}")], // 匹配非logger所有 .entity.ts 或 .entity.js 文件
-            migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
+            synchronize: process.env.NODE_ENV !== "production",
+            logging: process.env.NODE_ENV !== "production",
+            entities: [join(__dirname, "module/**/!(*logger)*.entity.{ts,js}")],
+            migrations: ["src/migrations/**/*{.ts,.js}"],
           };
         }
       },
@@ -62,16 +84,33 @@ import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
       name: "logger",
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const dbType = DBConfig.dbConfig.DB_TYPE as "mysql" | "sqlite";
+        const dbType = DBConfig.dbLogger.DB_TYPE as
+          | "mysql"
+          | "sqlite"
+          | "postgres";
         if (dbType === "sqlite") {
-          const config = DBConfig.dbLogger as SqliteConfig;
+          const config = DBConfig.dbLogger;
           return {
             type: dbType,
             database: config.DB_DATABASE,
-            synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
-            logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
-            entities: [join(__dirname, "module/logger/**/*.entity.{ts,js}")], // 日志模块的实体
-            migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
+            synchronize: process.env.NODE_ENV !== "production",
+            logging: process.env.NODE_ENV !== "production",
+            entities: [join(__dirname, "module/logger/**/*.entity.{ts,js}")],
+            migrations: ["src/migrations/**/*{.ts,.js}"],
+          };
+        } else if (dbType === "postgres") {
+          const config = DBConfig.dbLogger as PgConfig;
+          return {
+            type: dbType,
+            host: config.DB_HOST,
+            port: config.DB_PORT,
+            username: config.DB_USER,
+            password: config.DB_PASSWORD,
+            database: config.DB_DATABASE,
+            synchronize: process.env.NODE_ENV !== "production",
+            logging: process.env.NODE_ENV !== "production",
+            entities: [join(__dirname, "module/logger/**/*.entity.{ts,js}")],
+            migrations: ["src/migrations/**/*{.ts,.js}"],
           };
         } else {
           const config = DBConfig.dbLogger as MysqlConfig;
@@ -82,10 +121,10 @@ import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
             username: config.DB_USER,
             password: config.DB_PASSWORD,
             database: config.DB_DATABASE,
-            synchronize: process.env.NODE_ENV !== "production", // 开发环境可以为 true，生产环境为 false
-            logging: process.env.NODE_ENV !== "production", // 开发环境启用日志
-            entities: [join(__dirname, "module/logger/**/*.entity.{ts,js}")], // 日志模块的实体
-            migrations: ["src/migrations/**/*{.ts,.js}"], // 迁移路径
+            synchronize: process.env.NODE_ENV !== "production",
+            logging: process.env.NODE_ENV !== "production",
+            entities: [join(__dirname, "module/logger/**/*.entity.{ts,js}")],
+            migrations: ["src/migrations/**/*{.ts,.js}"],
           };
         }
       },
@@ -102,6 +141,8 @@ import DBConfig, { type MysqlConfig, type SqliteConfig } from "@/config/db";
     NoticeModule,
     DictionaryModule,
     EmailModule,
+    CacheModule,
+    CacheInitModule,
   ],
   controllers: [],
   providers: [

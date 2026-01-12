@@ -16,7 +16,7 @@ export class RoutesService extends BaseService {
     @InjectRepository(Route)
     private readonly treeRouteRepository: TreeRepository<Route>,
     @InjectRepository(Role)
-    private roleRepository: Repository<Role>
+    private roleRepository: Repository<Role>,
   ) {
     super();
   }
@@ -27,7 +27,10 @@ export class RoutesService extends BaseService {
    * @param {string} platform 路由信息
    * @returns { ApiResult<null> } 统一返回结果
    */
-  async create(createRouteDto: CreateRouteDto, platform: string = "admin"): Promise<ApiResult<null>> {
+  async create(
+    createRouteDto: CreateRouteDto,
+    platform: string = "admin",
+  ): Promise<ApiResult<null>> {
     try {
       let parent: Route | null = null;
       if (createRouteDto.parentId) {
@@ -62,10 +65,13 @@ export class RoutesService extends BaseService {
    * @param {string} platform 平台标识（如admin/web/app/mini等）
    * @returns {Promise<ApiResult<Route[] | null>>} 统一返回结果
    */
-  async findAll(findRouteDto: FindRouteDto, platform: string = "admin"): Promise<ApiResult<Route[] | null>> {
+  async findAll(
+    findRouteDto: FindRouteDto,
+    platform: string = "admin",
+  ): Promise<ApiResult<Route[] | null>> {
     try {
-      let order = this.buildCommonSort(findRouteDto?.sort);
-      let data = await this.routeRepository.find({
+      const order = this.buildCommonSort(findRouteDto?.sort);
+      const data = await this.routeRepository.find({
         where: {
           platform,
           type: findRouteDto.type,
@@ -73,7 +79,7 @@ export class RoutesService extends BaseService {
         order: { ...order },
         relations: ["parent"],
       });
-      let trees = this.buildTree(data);
+      const trees = this.buildTree(data);
 
       return ApiResult.success<Route[]>({ data: trees });
     } catch (error) {
@@ -114,7 +120,7 @@ export class RoutesService extends BaseService {
    */
   async findOne(id: string): Promise<ApiResult<Route | null>> {
     try {
-      let data: RouteInfo = await this.routeRepository.findOne({
+      const data: RouteInfo = await this.routeRepository.findOne({
         where: { id },
         relations: ["children", "parent"],
       });
@@ -133,7 +139,10 @@ export class RoutesService extends BaseService {
    * @param {UpdateRouteDto} updateRouteDto 路由信息
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(id: string, updateRouteDto: UpdateRouteDto): Promise<ApiResult<null>> {
+  async update(
+    id: string,
+    updateRouteDto: UpdateRouteDto,
+  ): Promise<ApiResult<null>> {
     try {
       // 查询当前路由是否存在
       const route = await this.routeRepository.findOne({
@@ -156,7 +165,10 @@ export class RoutesService extends BaseService {
           return ApiResult.error("父级路由不能为当前路由");
         }
         const parentRoute = await this.routeRepository.findOne({
-          where: { id: updateRouteDto.parentId, platform: updateRouteDto.platform },
+          where: {
+            id: updateRouteDto.parentId,
+            platform: updateRouteDto.platform,
+          },
         });
         if (!parentRoute) {
           return ApiResult.error("父级路由不存在");
@@ -202,11 +214,13 @@ export class RoutesService extends BaseService {
   async getRoutesByRoleId(
     rolesIds: string[],
     platform: string = "admin",
-    type?: string
+    type?: string,
   ): Promise<ApiResult<RoleRoutes[] | null>> {
     try {
       if (rolesIds.length === 0) {
-        return ApiResult.error<null>("当前用户未绑定角色，无法获取绑定的路由信息！");
+        return ApiResult.error<null>(
+          "当前用户未绑定角色，无法获取绑定的路由信息！",
+        );
       }
       const queryBuilderRole = this.roleRepository
         .createQueryBuilder("role")
@@ -215,13 +229,15 @@ export class RoutesService extends BaseService {
         .where("role.id  IN (:...ids)", { ids: rolesIds })
         .groupBy("route.id");
 
-      const routeIds = (await queryBuilderRole.getRawMany()).map((item) => item.routeId);
+      const routeIds = (await queryBuilderRole.getRawMany()).map(
+        (item) => item.routeId,
+      );
       // 没有绑定路由
       if (routeIds.length === 0) {
         return ApiResult.success<RoleRoutes[]>({ data: [] }); // 无权限
       }
 
-      let order = this.buildCommonSort();
+      const order = this.buildCommonSort();
       // 2. 获取顶层路由节点
       const rootRoutes = await this.routeRepository.find({
         where: {

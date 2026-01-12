@@ -14,7 +14,9 @@ export class FileUploadService {
       destination: this.rootPath, // 设置保存上传文件的目录
       filename: (req, file, cb) => {
         // 保留中文
-        const safeFileName = Buffer.from(file.originalname, "latin1").toString("utf8"); // 处理非ASCII字符
+        const safeFileName = Buffer.from(file.originalname, "latin1").toString(
+          "utf8",
+        ); // 处理非ASCII字符
         cb(null, `${Date.now()}-${safeFileName}`);
       },
     }),

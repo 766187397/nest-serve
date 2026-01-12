@@ -19,6 +19,22 @@ export interface MysqlConfig {
   DB_DATABASE: string;
 }
 
+/** PostgreSQL配置类型 */
+export interface PgConfig {
+  /** 数据库类型 */
+  DB_TYPE: string;
+  /** 数据地址 */
+  DB_HOST: string;
+  /** 数据库端口 */
+  DB_PORT: number;
+  /** 数据库用户名 */
+  DB_USER: string;
+  /** 数据库密码 */
+  DB_PASSWORD: string;
+  /** 数据库名称 */
+  DB_DATABASE: string;
+}
+
 /** mysql 配置 */
 const mysqlConfig: MysqlConfig = {
   /** 数据库类型 */
@@ -51,6 +67,38 @@ const mysqlLogger: MysqlConfig = {
   DB_DATABASE: env.LOG_DB_DATABASE || "nest-serve-logger",
 };
 
+/** PostgreSQL 配置 */
+const pgConfig: PgConfig = {
+  /** 数据库类型 */
+  DB_TYPE: "postgres",
+  /** 数据地址 */
+  DB_HOST: env.DB_HOST || "127.0.0.1",
+  /** 数据库端口 */
+  DB_PORT: Number(env.DB_PORT) || 5432,
+  /** 数据库用户名 */
+  DB_USER: env.DB_USER || "postgres",
+  /** 数据库密码 */
+  DB_PASSWORD: env.DB_PASSWORD || "123456",
+  /** 数据库名称 */
+  DB_DATABASE: env.DB_DATABASE || "nest-serve",
+};
+
+/** PostgreSQL 日志 */
+const pgLogger: PgConfig = {
+  /** 数据库类型 */
+  DB_TYPE: "postgres",
+  /** 数据地址 */
+  DB_HOST: env.LOG_DB_HOST || "127.0.0.1",
+  /** 数据库端口 */
+  DB_PORT: Number(env.LOG_DB_PORT) || 5432,
+  /** 数据库用户名 */
+  DB_USER: env.LOG_DB_USER || "postgres",
+  /** 数据库密码 */
+  DB_PASSWORD: env.LOG_DB_PASSWORD || "123456",
+  /** 数据库名称 */
+  DB_DATABASE: env.LOG_DB_DATABASE || "nest-serve-logger",
+};
+
 /** Sqlite配置类型 */
 export interface SqliteConfig {
   /** 数据库类型 */
@@ -72,18 +120,31 @@ const sqliteLogger: SqliteConfig = {
   // 数据库类型
   DB_TYPE: "sqlite",
   //  数据库地址
-  DB_DATABASE: join(process.cwd(), env.LOG_DB_DATABASE || "sqlitedata/nest-logger.db"),
+  DB_DATABASE: join(
+    process.cwd(),
+    env.LOG_DB_DATABASE || "sqlitedata/nest-logger.db",
+  ),
 };
 
 /** 数据库配置 */
-let dbConfig: MysqlConfig | SqliteConfig;
+let dbConfig: MysqlConfig | SqliteConfig | PgConfig;
 /** 日志配置 */
-let dbLogger: MysqlConfig | SqliteConfig;
+let dbLogger: MysqlConfig | SqliteConfig | PgConfig;
 
 const DB_TYPE = env.DB_TYPE;
 const LOG_DB_TYPE = env.LOG_DB_TYPE;
-dbConfig = DB_TYPE === "sqlite" ? sqliteConfig : mysqlConfig;
-dbLogger = LOG_DB_TYPE === "sqlite" ? sqliteLogger : mysqlLogger;
+dbConfig =
+  DB_TYPE === "sqlite"
+    ? sqliteConfig
+    : DB_TYPE === "postgres"
+      ? pgConfig
+      : mysqlConfig;
+dbLogger =
+  LOG_DB_TYPE === "sqlite"
+    ? sqliteLogger
+    : LOG_DB_TYPE === "postgres"
+      ? pgLogger
+      : mysqlLogger;
 
 export default {
   dbConfig,

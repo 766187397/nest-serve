@@ -1,6 +1,12 @@
 // api-result.interceptor.ts
 import { ResultWhiteList } from "@/config/whiteList";
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpStatus } from "@nestjs/common";
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
+  HttpStatus,
+} from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
@@ -16,7 +22,10 @@ export class ApiResultInterceptor implements NestInterceptor {
     const whiteListExact: string[] = ResultWhiteList.whiteListExact;
     let whiteState = false;
     // 如果是白名单中的接口就不记录到日志
-    if (whiteListStartsWith.some((prefix) => request.url.startsWith(prefix)) || whiteListExact.includes(request.url)) {
+    if (
+      whiteListStartsWith.some((prefix) => request.url.startsWith(prefix)) ||
+      whiteListExact.includes(request.url)
+    ) {
       whiteState = true;
     }
     return next.handle().pipe(
@@ -37,14 +46,14 @@ export class ApiResultInterceptor implements NestInterceptor {
         // 如果请求路径以 /api/v 开头，又不是自定义的请求格式，则包装响应格式
         else if (request.url.startsWith("/api/v")) {
           return {
-            code: 200,
+            code: HttpStatus.OK,
             message: "操作成功",
             data,
           };
         }
         // 其他格式响应不处理
         return data;
-      })
+      }),
     );
   }
 }

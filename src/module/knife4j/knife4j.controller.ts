@@ -17,7 +17,7 @@ export class Knife4jController {
   @Get("download")
   @ApiOperation({ summary: "下载 Swagger JSON" })
   download(@Res({ passthrough: true }) res: Response) {
-    let swaggerJson = this.knife4jService.getSwagger();
+    const swaggerJson = this.knife4jService.getSwagger();
     // 设置响应头，告诉浏览器这是一个附件（即文件下载）
     res.set({
       "Content-Type": "application/json",
@@ -31,7 +31,7 @@ export class Knife4jController {
   @Get("v3/api-docs/swagger-config")
   @ApiOperation({ summary: "knife4j 接口文档配置" })
   getSwaggerConfig(@Res({ passthrough: true }) res: Response) {
-    let swaggerDocs = this.knife4jService.getSwagger().data;
+    const swaggerDocs = this.knife4jService.getSwagger().data;
     const groups = [
       {
         name: "全部",
@@ -68,13 +68,13 @@ export class Knife4jController {
     });
     swaggerDocs.urls = groups;
     res.setHeader("Content-Type", "application/json");
-    return swaggerDocs
+    return swaggerDocs;
   }
 
   @Get("swagger-resources")
   @ApiOperation({ summary: "knife4j 接口文档配置" })
   getSwaggerResources(@Res({ passthrough: true }) res: Response) {
-    let swaggerDocs = this.knife4jService.getSwagger().data;
+    const swaggerDocs = this.knife4jService.getSwagger().data;
     const groups = [
       {
         name: "全部",
@@ -116,17 +116,17 @@ export class Knife4jController {
   @Get("api-docs/:groupName")
   @ApiOperation({ summary: "knife4j 分组接口文档" })
   getSwaggerByGroup(@Param("groupName") groupName: string) {
-    let swaggerJson = this.knife4jService.getSwagger();
-    let swaggerDocs = swaggerJson.data;
-    let paths = swaggerDocs.paths;
-    let groupPaths = {};
+    const swaggerJson = this.knife4jService.getSwagger();
+    const swaggerDocs = swaggerJson.data;
+    const paths = swaggerDocs.paths;
+    const groupPaths = {};
     if (groupName === "全部") {
       return swaggerDocs;
     }
-    for (let path in paths) {
-      let pathObject = paths[path];
-      for (let method in pathObject) {
-        let operation = pathObject[method];
+    for (const path in paths) {
+      const pathObject = paths[path];
+      for (const method in pathObject) {
+        const operation = pathObject[method];
         if (operation && operation.tags && operation.tags.includes(groupName)) {
           groupPaths[path] = groupPaths[path] || {};
           groupPaths[path][method] = operation;

@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  HttpCode,
+} from "@nestjs/common";
 import { DictionaryService } from "./dictionary.service";
 import {
   CreateDictionaryDto,
@@ -10,7 +20,12 @@ import {
   UpdateDictionaryDto,
   UpdateDictionaryItemDto,
 } from "./dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 
 @ApiTags("字典管理")
 // @ApiBearerAuth("Authorization")
@@ -51,12 +66,16 @@ export class DictionaryController {
 
   @Patch("update/:id")
   @ApiOperation({ summary: "更新字典分类信息" })
-  update(@Param("id") id: string, @Body() updateDictionaryDto: UpdateDictionaryDto) {
+  update(
+    @Param("id") id: string,
+    @Body() updateDictionaryDto: UpdateDictionaryDto,
+  ) {
     return this.dictionaryService.update(id, updateDictionaryDto);
   }
 
   @Delete("delete/:id")
   @ApiOperation({ summary: "删除字典分类" })
+  @HttpCode(204)
   remove(@Param("id") id: string) {
     return this.dictionaryService.remove(id);
   }
@@ -82,7 +101,9 @@ export class DictionaryItemController {
 
   @Get("page")
   @ApiOperation({ summary: "字典项分页查询" })
-  findByPage(@Query() findDictionaryItemDtoByPage: FindDictionaryItemDtoByPage) {
+  findByPage(
+    @Query() findDictionaryItemDtoByPage: FindDictionaryItemDtoByPage,
+  ) {
     return this.dictionaryService.findItemByPage(findDictionaryItemDtoByPage);
   }
 
@@ -100,12 +121,16 @@ export class DictionaryItemController {
 
   @Patch("update/:id")
   @ApiOperation({ summary: "更新字典项信息" })
-  update(@Param("id") id: string, @Body() updateDictionaryItemDto: UpdateDictionaryItemDto) {
+  update(
+    @Param("id") id: string,
+    @Body() updateDictionaryItemDto: UpdateDictionaryItemDto,
+  ) {
     return this.dictionaryService.updateItem(id, updateDictionaryItemDto);
   }
 
   @Delete("delete/:id")
   @ApiOperation({ summary: "删除字典项" })
+  @HttpCode(204)
   remove(@Param("id") id: string) {
     return this.dictionaryService.removeItem(id);
   }
