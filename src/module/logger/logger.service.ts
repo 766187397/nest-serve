@@ -1,21 +1,21 @@
-import { ApiResult } from "@/common/utils/result";
-import { Inject, Injectable } from "@nestjs/common";
-import { BaseService } from "@/common/service/base";
-import { Log } from "./entities/logger.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { LessThan, Repository } from "typeorm";
-import { FindLogDtoByPage } from "./dto/index";
-import { PageApiResult } from "@/types/public";
-import { Request } from "express";
-import { Cron, CronExpression, SchedulerRegistry } from "@nestjs/schedule";
+import { ApiResult } from '@/common/utils/result';
+import { Inject, Injectable } from '@nestjs/common';
+import { BaseService } from '@/common/service/base';
+import { Log } from './entities/logger.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { LessThan, Repository } from 'typeorm';
+import { FindLogDtoByPage } from './dto/index';
+import { PageApiResult } from '@/types/public';
+import { Request } from 'express';
+import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 
 @Injectable()
 export class LoggerService extends BaseService {
   constructor(
-    @InjectRepository(Log, "logger")
+    @InjectRepository(Log, 'logger')
     private logRepository: Repository<Log>,
     @Inject(SchedulerRegistry)
-    private schedulerRegistry: SchedulerRegistry,
+    private schedulerRegistry: SchedulerRegistry
   ) {
     super();
   }
@@ -26,37 +26,33 @@ export class LoggerService extends BaseService {
    * @param data 日志数据
    * @param statusCode 状态码
    */
-  async create(
-    request: Request,
-    data: string = "",
-    statusCode: string = "200",
-  ) {
-    const url: string = request.url || "";
-    const platform: string = url.split("/")[3] || "";
-    const { account = "", nickName = "" } = request.userInfo || {};
-    const method = request.method || "";
+  async create(request: Request, data: string = '', statusCode: string = '200') {
+    const url: string = request.url || '';
+    const platform: string = url.split('/')[3] || '';
+    const { account = '', nickName = '' } = request.userInfo || {};
+    const method = request.method || '';
     let {
-      referer = "",
-      "sec-ch-ua-platform": apiPlatform = "",
-      "sec-ch-ua": browser = "",
+      referer = '',
+      'sec-ch-ua-platform': apiPlatform = '',
+      'sec-ch-ua': browser = '',
     } = request.headers;
     try {
-      browser = (browser as string).replace(/"/g, "");
-      apiPlatform = (apiPlatform as string).replace(/"/g, "");
+      browser = (browser as string).replace(/"/g, '');
+      apiPlatform = (apiPlatform as string).replace(/"/g, '');
     } catch (error) {
-      apiPlatform = "";
-      browser = "";
+      apiPlatform = '';
+      browser = '';
     }
 
     // 获取客户端的 IP 地址
     const IP =
-      (request.headers["x-forwarded-for"] as string)?.split(",")[0] ||
+      (request.headers['x-forwarded-for'] as string)?.split(',')[0] ||
       request.connection.remoteAddress ||
       request.ip ||
-      "";
+      '';
 
     const resData = JSON.stringify(data);
-    const responseTime = Date.now() - request["startTime"] || 0; // 计算响应时间(毫秒)
+    const responseTime = Date.now() - request['startTime'] || 0; // 计算响应时间(毫秒)
     try {
       const data = {
         account,
@@ -74,13 +70,13 @@ export class LoggerService extends BaseService {
       };
 
       if (!data.resData) {
-        data.resData = "";
+        data.resData = '';
       }
 
       const logger = this.logRepository.create(data);
       await this.logRepository.save(logger);
     } catch (error) {
-      console.error("日志插入失败:", error);
+      console.error('日志插入失败:', error);
     }
   }
 
@@ -92,12 +88,12 @@ export class LoggerService extends BaseService {
    */
   async findByPage(
     findLogDtoByPage: FindLogDtoByPage,
-    platform: string = "admin",
+    platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<Log[]> | null>> {
     try {
       const { take, skip } = this.buildCommonPaging(
         findLogDtoByPage?.page,
-        findLogDtoByPage?.pageSize,
+        findLogDtoByPage?.pageSize
       );
       const where = this.buildCommonQuery(findLogDtoByPage);
       const order = this.buildCommonSort(findLogDtoByPage?.sort);
@@ -126,7 +122,7 @@ export class LoggerService extends BaseService {
         },
       });
     } catch (error) {
-      return ApiResult.error<null>(error || "查询日志失败，请稍后重试");
+      return ApiResult.error<null>(error || '查询日志失败，请稍后重试');
     }
   }
 
@@ -143,15 +139,15 @@ export class LoggerService extends BaseService {
    * 第6位：星期（任意）
    */
   // 自定义 cron 表达式：每月01日0时0分执行
-  @Cron("0 0 0 1 * *")
+  @Cron('0 0 0 1 * *')
   async deleteLogs() {
     try {
-      console.log("定时任务删除日志");
+      console.log('定时任务删除日志');
       await this.logRepository.delete({
-        createdAt: LessThan(this.dayjs().subtract(30, "day").toDate()),
+        createdAt: LessThan(this.dayjs().subtract(30, 'day').toDate()),
       });
     } catch (error) {
-      console.log("日志删除失败，请稍后再试", error);
+      console.log('日志删除失败，请稍后再试', error);
     }
   }
 }

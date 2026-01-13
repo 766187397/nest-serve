@@ -1,9 +1,9 @@
 // 获取环境变量
 const env = process.env;
 let secure = true;
-if (env.EMAIL_SECURE == "true") {
+if (env.EMAIL_SECURE == 'true') {
   secure = true;
-} else if (env.EMAIL_SECURE == "false") {
+} else if (env.EMAIL_SECURE == 'false') {
   secure = false;
 }
 

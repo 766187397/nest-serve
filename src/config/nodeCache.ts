@@ -1,5 +1,5 @@
-import { Injectable } from "@nestjs/common";
-import { CacheService } from "@/common/service/cache.service";
+import { Injectable } from '@nestjs/common';
+import { CacheService } from '@/common/service/cache.service';
 
 @Injectable()
 export class NodeCacheService {

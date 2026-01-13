@@ -5,9 +5,9 @@ import {
   ArgumentsHost,
   NotFoundException,
   HttpStatus,
-} from "@nestjs/common";
-import { Request, Response } from "express";
-import { ApiResult } from "@/common/utils/result";
+} from '@nestjs/common';
+import { Request, Response } from 'express';
+import { ApiResult } from '@/common/utils/result';
 
 @Catch(NotFoundException)
 export class RouteNotFoundFilter implements ExceptionFilter {
@@ -18,8 +18,7 @@ export class RouteNotFoundFilter implements ExceptionFilter {
     // 自定义路由不存在响应
     const { __isApiResult, ...data } = ApiResult.error<null>({
       code: HttpStatus.NOT_FOUND,
-      message:
-        "请求的路由不存在或者请求方式错误,请检查API路径和请求方式是否正确",
+      message: '请求的路由不存在或者请求方式错误,请检查API路径和请求方式是否正确',
       data: null,
     });
     response.status(HttpStatus.NOT_FOUND).json(data);

@@ -124,25 +124,25 @@ export const BusinessStatusCodes = {
 
 /** 状态码描述信息映射 */
 export const HttpStatusMessages = {
-  [HttpStatusCodes.OK]: "操作成功",
-  [HttpStatusCodes.CREATED]: "创建成功",
-  [HttpStatusCodes.ACCEPTED]: "请求已接受",
-  [HttpStatusCodes.NO_CONTENT]: "操作成功",
-  [HttpStatusCodes.BAD_REQUEST]: "参数错误",
-  [HttpStatusCodes.UNAUTHORIZED]: "未授权，请重新登录",
-  [HttpStatusCodes.FORBIDDEN]: "权限不足",
-  [HttpStatusCodes.NOT_FOUND]: "请求资源不存在",
-  [HttpStatusCodes.METHOD_NOT_ALLOWED]: "请求方法不被允许",
-  [HttpStatusCodes.CONFLICT]: "数据已存在",
-  [HttpStatusCodes.PAYLOAD_TOO_LARGE]: "请求实体过大",
-  [HttpStatusCodes.UNSUPPORTED_MEDIA_TYPE]: "不支持的媒体类型",
-  [HttpStatusCodes.UNPROCESSABLE_ENTITY]: "验证失败",
-  [HttpStatusCodes.TOO_MANY_REQUESTS]: "请求过于频繁",
-  [HttpStatusCodes.INTERNAL_SERVER_ERROR]: "服务器异常，请联系管理员",
-  [HttpStatusCodes.NOT_IMPLEMENTED]: "功能未实现",
-  [HttpStatusCodes.BAD_GATEWAY]: "网关错误",
-  [HttpStatusCodes.SERVICE_UNAVAILABLE]: "服务不可用",
-  [HttpStatusCodes.GATEWAY_TIMEOUT]: "网关超时",
+  [HttpStatusCodes.OK]: '操作成功',
+  [HttpStatusCodes.CREATED]: '创建成功',
+  [HttpStatusCodes.ACCEPTED]: '请求已接受',
+  [HttpStatusCodes.NO_CONTENT]: '操作成功',
+  [HttpStatusCodes.BAD_REQUEST]: '参数错误',
+  [HttpStatusCodes.UNAUTHORIZED]: '未授权，请重新登录',
+  [HttpStatusCodes.FORBIDDEN]: '权限不足',
+  [HttpStatusCodes.NOT_FOUND]: '请求资源不存在',
+  [HttpStatusCodes.METHOD_NOT_ALLOWED]: '请求方法不被允许',
+  [HttpStatusCodes.CONFLICT]: '数据已存在',
+  [HttpStatusCodes.PAYLOAD_TOO_LARGE]: '请求实体过大',
+  [HttpStatusCodes.UNSUPPORTED_MEDIA_TYPE]: '不支持的媒体类型',
+  [HttpStatusCodes.UNPROCESSABLE_ENTITY]: '验证失败',
+  [HttpStatusCodes.TOO_MANY_REQUESTS]: '请求过于频繁',
+  [HttpStatusCodes.INTERNAL_SERVER_ERROR]: '服务器异常，请联系管理员',
+  [HttpStatusCodes.NOT_IMPLEMENTED]: '功能未实现',
+  [HttpStatusCodes.BAD_GATEWAY]: '网关错误',
+  [HttpStatusCodes.SERVICE_UNAVAILABLE]: '服务不可用',
+  [HttpStatusCodes.GATEWAY_TIMEOUT]: '网关超时',
 };
 
 /**
@@ -151,5 +151,5 @@ export const HttpStatusMessages = {
  * @returns {string} 状态码描述信息
  */
 export function getHttpStatusMessage(statusCode: number): string {
-  return HttpStatusMessages[statusCode] || "未知错误";
+  return HttpStatusMessages[statusCode] || '未知错误';
 }

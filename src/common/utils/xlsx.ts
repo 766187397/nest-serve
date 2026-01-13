@@ -1,4 +1,4 @@
-import * as XLSX from "xlsx";
+import * as XLSX from 'xlsx';
 
 /**
  * 按key-value格式导出Excel
@@ -11,13 +11,11 @@ import * as XLSX from "xlsx";
 export function exportWithKeyValueHeader(
   data: any[],
   headerMap: Record<string, string>,
-  fileName: string = "export",
-  sheetName: string = "Sheet1",
+  fileName: string = 'export',
+  sheetName: string = 'Sheet1'
 ): { buffer: Buffer; fileName: string } {
   // 添加.xlsx后缀（如果用户没有提供）
-  const finalFileName = fileName.endsWith(".xlsx")
-    ? fileName
-    : `${fileName}.xlsx`;
+  const finalFileName = fileName.endsWith('.xlsx') ? fileName : `${fileName}.xlsx`;
 
   // 转换数据格式
   const formattedData = data.map((item) => {
@@ -34,7 +32,7 @@ export function exportWithKeyValueHeader(
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
   return {
-    buffer: XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }),
+    buffer: XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }),
     fileName: finalFileName,
   };
 }
@@ -49,7 +47,7 @@ export function exportWithKeyValueHeader(
 export function importWithKeyValueHeader(
   fileBuffer: Buffer,
   headerMap: Record<string, string>,
-  sheetName?: string,
+  sheetName?: string
 ): any[] {
   // 读取Excel
   const workbook = XLSX.read(fileBuffer);
@@ -64,7 +62,7 @@ export function importWithKeyValueHeader(
     const newItem: Record<string, any> = {};
     Object.keys(item).forEach((key) => {
       // 提取原始字段名(去掉显示名称)
-      const [originalKey] = key.split(":");
+      const [originalKey] = key.split(':');
       const mappedKey = headerMap[originalKey] || originalKey;
       newItem[mappedKey] = item[key];
     });

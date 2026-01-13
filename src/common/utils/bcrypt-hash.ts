@@ -1,8 +1,8 @@
-import * as bcrypt from "bcrypt";
+import * as bcrypt from 'bcrypt';
 
 export class BcryptService {
   // 不要设置这个值太多，测试环4左右即可，生产环境设置为10-12（这个值越大越耗时间）
-  private readonly saltRounds = global.envFilePath == "prod" ? 10 : 4;
+  private readonly saltRounds = global.envFilePath == 'prod' ? 10 : 4;
 
   /**
    * 哈希加密

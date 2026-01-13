@@ -1,6 +1,6 @@
-import { Between, FindOptionsOrderValue } from "typeorm";
-import * as dayjs from "dayjs";
-import { svgCache } from "@/config/nodeCache";
+import { Between, FindOptionsOrderValue } from 'typeorm';
+import * as dayjs from 'dayjs';
+import { svgCache } from '@/config/nodeCache';
 
 export class BaseService {
   public dayjs = dayjs;
@@ -13,7 +13,7 @@ export class BaseService {
   buildCommonQuery(query: { [key: string]: any } | undefined): {
     [key: string]: any;
   } {
-    if (typeof query === "undefined") {
+    if (typeof query === 'undefined') {
       return {};
     }
     const where: { [key: string]: any } = {};
@@ -21,14 +21,14 @@ export class BaseService {
       where.status = query.status;
     }
     let time: string[] = [];
-    if (typeof query.time === "string") {
+    if (typeof query.time === 'string') {
       time = query.time.split(/[,，、到至]+/);
     } else if (Array.isArray(query.time)) {
       time = query.time;
     }
     if (time.length == 2) {
-      const start = dayjs(time[0]).startOf("day").toDate();
-      const end = dayjs(time[1]).endOf("day").toDate();
+      const start = dayjs(time[0]).startOf('day').toDate();
+      const end = dayjs(time[1]).endOf('day').toDate();
       where.createdAt = Between(start, end);
     }
     return where;
@@ -42,15 +42,15 @@ export class BaseService {
   buildCommonSort(sort?: FindOptionsOrderValue): {
     [key: string]: FindOptionsOrderValue;
   } {
-    const sortAll = ["ASC", "DESC", "asc", "desc"];
+    const sortAll = ['ASC', 'DESC', 'asc', 'desc'];
 
-    if (typeof sort === "undefined") {
-      return { sort: "DESC", createdAt: "DESC" };
+    if (typeof sort === 'undefined') {
+      return { sort: 'DESC', createdAt: 'DESC' };
     }
     if (sortAll.includes(sort as string)) {
       return { sort: sort, createdAt: sort };
     }
-    return { sort: "DESC", createdAt: "DESC" };
+    return { sort: 'DESC', createdAt: 'DESC' };
   }
 
   /**
@@ -62,18 +62,18 @@ export class BaseService {
    */
   buildCommonPaging(
     page: number | string = 1,
-    pageSize: number | string = 10,
+    pageSize: number | string = 10
   ): { take: number; skip: number } {
     page = +page;
     pageSize = +pageSize;
     if (!Number.isInteger(page) || !Number.isInteger(pageSize)) {
-      throw new Error("page和pageSize必须为正整数或字符串形式的正整数");
+      throw new Error('page和pageSize必须为正整数或字符串形式的正整数');
     }
     if (page < 1) {
-      throw new Error("page不能小于1");
+      throw new Error('page不能小于1');
     }
     if (pageSize < 1) {
-      throw new Error("pageSize不能小于1");
+      throw new Error('pageSize不能小于1');
     }
     // 计算take和skip
     const take = pageSize;
@@ -88,13 +88,7 @@ export class BaseService {
    * @param {string} param.codeKey 验证码KEY
    * @returns {Promise<boolean>} true 为正确, false 为错误
    */
-  async buildVerify({
-    code,
-    codeKey,
-  }: {
-    codeKey: string;
-    code: string;
-  }): Promise<boolean> {
+  async buildVerify({ code, codeKey }: { codeKey: string; code: string }): Promise<boolean> {
     const codeCache = await svgCache.get<{ text: string }>(codeKey);
     if (!codeCache || codeCache.text.toLowerCase() != code.toLowerCase()) {
       return false;

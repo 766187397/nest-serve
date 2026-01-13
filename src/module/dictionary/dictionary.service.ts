@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import {
   CreateDictionaryDto,
   CreateDictionaryItemDto,
@@ -8,14 +8,14 @@ import {
   FindDictionaryItemDtoByPage,
   UpdateDictionaryDto,
   UpdateDictionaryItemDto,
-} from "./dto";
-import { BaseService } from "@/common/service/base";
-import { Dictionary } from "./entities/dictionary.entity";
-import { DictionaryItem } from "./entities/dictionaryItem.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, Not, Repository } from "typeorm";
-import { ApiResult } from "@/common/utils/result";
-import { PageApiResult } from "@/types/public";
+} from './dto';
+import { BaseService } from '@/common/service/base';
+import { Dictionary } from './entities/dictionary.entity';
+import { DictionaryItem } from './entities/dictionaryItem.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ILike, Not, Repository } from 'typeorm';
+import { ApiResult } from '@/common/utils/result';
+import { PageApiResult } from '@/types/public';
 
 @Injectable()
 export class DictionaryService extends BaseService {
@@ -23,7 +23,7 @@ export class DictionaryService extends BaseService {
     @InjectRepository(Dictionary)
     private readonly dictionaryRepository: Repository<Dictionary>,
     @InjectRepository(DictionaryItem)
-    private readonly dictionaryItemRepository: Repository<DictionaryItem>,
+    private readonly dictionaryItemRepository: Repository<DictionaryItem>
   ) {
     super();
   }
@@ -33,15 +33,13 @@ export class DictionaryService extends BaseService {
    * @param {CreateDictionaryDto} createDictionaryDto   创建字典分类DTO
    * @returns {Promise<ApiResult<Dictionary | null>>}   统一返回结果
    */
-  async create(
-    createDictionaryDto: CreateDictionaryDto,
-  ): Promise<ApiResult<Dictionary | null>> {
+  async create(createDictionaryDto: CreateDictionaryDto): Promise<ApiResult<Dictionary | null>> {
     try {
       const dictionary = await this.dictionaryRepository.findOne({
         where: { type: createDictionaryDto.type },
       });
       if (dictionary) {
-        return ApiResult.error<null>("字典类型已存在");
+        return ApiResult.error<null>('字典类型已存在');
       }
       const data = await this.dictionaryRepository.save(createDictionaryDto);
       return ApiResult.success<Dictionary>({ data });
@@ -56,14 +54,14 @@ export class DictionaryService extends BaseService {
    * @returns {Promise<ApiResult<PageApiResult<Dictionary[]> | null>>}   统一返回结果
    */
   async findByPage(
-    findDictionaryDtoByPage: FindDictionaryDtoByPage,
+    findDictionaryDtoByPage: FindDictionaryDtoByPage
   ): Promise<ApiResult<PageApiResult<Dictionary[]> | null>> {
     try {
       const where = this.buildCommonQuery(findDictionaryDtoByPage);
       const order = this.buildCommonSort(findDictionaryDtoByPage?.sort);
       const { skip, take } = this.buildCommonPaging(
         findDictionaryDtoByPage.page,
-        findDictionaryDtoByPage.pageSize,
+        findDictionaryDtoByPage.pageSize
       );
       const [data, total] = await this.dictionaryRepository.findAndCount({
         where: {
@@ -88,7 +86,7 @@ export class DictionaryService extends BaseService {
         },
       });
     } catch (error) {
-      return ApiResult.error<null>(error || "字典查询失败，请稍后再试");
+      return ApiResult.error<null>(error || '字典查询失败，请稍后再试');
     }
   }
 
@@ -97,24 +95,20 @@ export class DictionaryService extends BaseService {
    * @param {FindDictionaryDto} findDictionaryDto   查询条件
    * @returns
    */
-  async findAll(
-    findDictionaryDto: FindDictionaryDto,
-  ): Promise<ApiResult<Dictionary[] | null>> {
+  async findAll(findDictionaryDto: FindDictionaryDto): Promise<ApiResult<Dictionary[] | null>> {
     try {
       const where = this.buildCommonQuery(findDictionaryDto);
       const order = this.buildCommonSort(findDictionaryDto?.sort);
       const data = await this.dictionaryRepository.find({
         where: {
           ...where,
-          name: findDictionaryDto?.name
-            ? ILike(`%${findDictionaryDto.name}%`)
-            : undefined,
+          name: findDictionaryDto?.name ? ILike(`%${findDictionaryDto.name}%`) : undefined,
         },
         order,
       }); // 查询所有字典分类并返回;
       return ApiResult.success<Dictionary[]>({ data });
     } catch (error) {
-      return ApiResult.error<null>(error || "字典查询失败，请稍后再试");
+      return ApiResult.error<null>(error || '字典查询失败，请稍后再试');
     }
   }
 
@@ -128,7 +122,7 @@ export class DictionaryService extends BaseService {
       const data = await this.dictionaryRepository.findOne({ where: { id } });
       return ApiResult.success<Dictionary>({ data });
     } catch (error) {
-      return ApiResult.error<null>(error || "字典查询失败，请稍后再试");
+      return ApiResult.error<null>(error || '字典查询失败，请稍后再试');
     }
   }
 
@@ -138,21 +132,18 @@ export class DictionaryService extends BaseService {
    * @param {UpdateDictionaryDto} updateDictionaryDto   更新字典分类DTO
    * @returns {Promise<ApiResult<null>>}   统一返回结果
    */
-  async update(
-    id: string,
-    updateDictionaryDto: UpdateDictionaryDto,
-  ): Promise<ApiResult<null>> {
+  async update(id: string, updateDictionaryDto: UpdateDictionaryDto): Promise<ApiResult<null>> {
     try {
       const exist = await this.dictionaryRepository.findOne({
         where: { id: Not(id), type: updateDictionaryDto?.type },
       });
       if (exist) {
-        return ApiResult.error<null>("字典类型已存在");
+        return ApiResult.error<null>('字典类型已存在');
       }
       await this.dictionaryRepository.update(id, updateDictionaryDto);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || "字典更新失败，请稍后再试");
+      return ApiResult.error<null>(error || '字典更新失败，请稍后再试');
     }
   }
 
@@ -165,7 +156,7 @@ export class DictionaryService extends BaseService {
     try {
       const dictionary = await this.dictionaryRepository.findOneBy({ id });
       if (!dictionary) {
-        return ApiResult.error<null>("字典不存在");
+        return ApiResult.error<null>('字典不存在');
       } else {
         const dictionaryItem = await this.dictionaryItemRepository.find({
           where: { category: { id: dictionary.id } },
@@ -179,7 +170,7 @@ export class DictionaryService extends BaseService {
       await this.dictionaryRepository.softDelete(id);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || "字典删除失败，请稍后再试");
+      return ApiResult.error<null>(error || '字典删除失败，请稍后再试');
     }
   }
 
@@ -189,7 +180,7 @@ export class DictionaryService extends BaseService {
    * @returns {Promise<ApiResult<DictionaryItem | null>>}    统一返回结果
    */
   async createItem(
-    createDictionaryItemDto: CreateDictionaryItemDto,
+    createDictionaryItemDto: CreateDictionaryItemDto
   ): Promise<ApiResult<DictionaryItem | null>> {
     try {
       const { categoryId, ...option } = createDictionaryItemDto;
@@ -197,7 +188,7 @@ export class DictionaryService extends BaseService {
         where: { id: categoryId },
       });
       if (!dictionary) {
-        return ApiResult.error<null>("字典分类不存在");
+        return ApiResult.error<null>('字典分类不存在');
       }
 
       const data = await this.dictionaryItemRepository.save({
@@ -216,7 +207,7 @@ export class DictionaryService extends BaseService {
    * @returns {Promise<ApiResult<PageApiResult<DictionaryItem[]> | null>>}   统一返回结果
    */
   async findItemByPage(
-    findDictionaryItemDtoByPage: FindDictionaryItemDtoByPage,
+    findDictionaryItemDtoByPage: FindDictionaryItemDtoByPage
   ): Promise<ApiResult<PageApiResult<DictionaryItem[]> | null>> {
     try {
       let dictionaryId;
@@ -227,13 +218,13 @@ export class DictionaryService extends BaseService {
         where: { id: dictionaryId, type: findDictionaryItemDtoByPage?.type },
       });
       if (!category) {
-        return ApiResult.error<null>("字典分类不存在");
+        return ApiResult.error<null>('字典分类不存在');
       }
       const where = this.buildCommonQuery(findDictionaryItemDtoByPage);
       const order = this.buildCommonSort(findDictionaryItemDtoByPage?.sort);
       const { skip, take } = this.buildCommonPaging(
         findDictionaryItemDtoByPage.page,
-        findDictionaryItemDtoByPage.pageSize,
+        findDictionaryItemDtoByPage.pageSize
       );
       const [data, total] = await this.dictionaryItemRepository.findAndCount({
         where: {
@@ -272,7 +263,7 @@ export class DictionaryService extends BaseService {
    * @returns {Promise<ApiResult<DictionaryItem[] | null>>}   统一返回结果
    */
   async findItemAll(
-    findDictionaryItemDto: FindDictionaryItemDto,
+    findDictionaryItemDto: FindDictionaryItemDto
   ): Promise<ApiResult<DictionaryItem[] | null>> {
     try {
       let dictionaryId;
@@ -283,7 +274,7 @@ export class DictionaryService extends BaseService {
         where: { id: dictionaryId, type: findDictionaryItemDto?.type },
       });
       if (!category) {
-        return ApiResult.error<null>("字典分类不存在");
+        return ApiResult.error<null>('字典分类不存在');
       }
       const where = this.buildCommonQuery(findDictionaryItemDto);
       const order = this.buildCommonSort(findDictionaryItemDto?.sort);
@@ -320,7 +311,7 @@ export class DictionaryService extends BaseService {
       });
       return ApiResult.success<DictionaryItem>({ data });
     } catch (error) {
-      return ApiResult.error<null>(error || "字典查询失败，请稍后再试");
+      return ApiResult.error<null>(error || '字典查询失败，请稍后再试');
     }
   }
 
@@ -332,16 +323,13 @@ export class DictionaryService extends BaseService {
    */
   async updateItem(
     id: string,
-    updateDictionaryItemDto: UpdateDictionaryItemDto,
+    updateDictionaryItemDto: UpdateDictionaryItemDto
   ): Promise<ApiResult<null>> {
     try {
-      const data = await this.dictionaryItemRepository.update(
-        id,
-        updateDictionaryItemDto,
-      );
+      const data = await this.dictionaryItemRepository.update(id, updateDictionaryItemDto);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || "字典更新失败，请稍后再试");
+      return ApiResult.error<null>(error || '字典更新失败，请稍后再试');
     }
   }
 
@@ -355,7 +343,7 @@ export class DictionaryService extends BaseService {
       await this.dictionaryItemRepository.softDelete(id);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || "字典删除失败，请稍后再试");
+      return ApiResult.error<null>(error || '字典删除失败，请稍后再试');
     }
   }
 }

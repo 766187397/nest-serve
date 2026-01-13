@@ -1,17 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import {
-  CreateRoleDto,
-  FindRoleDto,
-  FindRoleDtoByPage,
-  UpdateRoleDto,
-} from "./dto";
-import { BaseService } from "@/common/service/base";
-import { Role } from "./entities/role.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Brackets, ILike, In, Not, Repository, UpdateResult } from "typeorm";
-import { ApiResult } from "@/common/utils/result";
-import { PageApiResult } from "@/types/public";
-import { Route } from "@/module/routes/entities/route.entity";
+import { Injectable } from '@nestjs/common';
+import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from './dto';
+import { BaseService } from '@/common/service/base';
+import { Role } from './entities/role.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Brackets, ILike, In, Not, Repository, UpdateResult } from 'typeorm';
+import { ApiResult } from '@/common/utils/result';
+import { PageApiResult } from '@/types/public';
+import { Route } from '@/module/routes/entities/route.entity';
 
 @Injectable()
 export class RolesService extends BaseService {
@@ -20,7 +15,7 @@ export class RolesService extends BaseService {
     private roleRepository: Repository<Role>,
 
     @InjectRepository(Route)
-    private routeRepository: Repository<Route>,
+    private routeRepository: Repository<Route>
   ) {
     super();
   }
@@ -32,26 +27,26 @@ export class RolesService extends BaseService {
    */
   async create(
     createRoleDto: CreateRoleDto,
-    platform: string = "admin",
+    platform: string = 'admin'
   ): Promise<ApiResult<Role | null>> {
     try {
       const { name, roleKey } = createRoleDto;
       // 构建查询条件
-      const queryBuilder = this.roleRepository.createQueryBuilder("role");
-      queryBuilder.andWhere("role.platform = :platform", { platform });
+      const queryBuilder = this.roleRepository.createQueryBuilder('role');
+      queryBuilder.andWhere('role.platform = :platform', { platform });
       if (name || roleKey) {
         queryBuilder.andWhere(
           new Brackets((qb) => {
-            if (name) qb.where("role.name = :name", { name });
-            if (roleKey) qb.orWhere("role.roleKey = :roleKey", { roleKey });
-          }),
+            if (name) qb.where('role.name = :name', { name });
+            if (roleKey) qb.orWhere('role.roleKey = :roleKey', { roleKey });
+          })
         );
       }
       // 执行查询
       const existingRole = await queryBuilder.getOne();
       // 如果查询结果存在，返回错误
       if (existingRole) {
-        return ApiResult.error<null>("角色名称或角色标识已存在");
+        return ApiResult.error<null>('角色名称或角色标识已存在');
       }
       const role = this.roleRepository.create(createRoleDto);
       role.platform = platform; // 指定平台
@@ -59,9 +54,8 @@ export class RolesService extends BaseService {
       const data = await this.roleRepository.save(role); // 保存到数据库并返回
       return ApiResult.success<Role>({ data });
     } catch (error) {
-      const errorMessage =
-        typeof error === "string" ? error : JSON.stringify(error);
-      return ApiResult.error<any>(errorMessage || "创建角色失败，请稍后重试");
+      const errorMessage = typeof error === 'string' ? error : JSON.stringify(error);
+      return ApiResult.error<any>(errorMessage || '创建角色失败，请稍后重试');
     }
   }
 
@@ -73,12 +67,12 @@ export class RolesService extends BaseService {
    */
   async findByPage(
     findRoleDtoByPage: FindRoleDtoByPage,
-    platform: string = "admin",
+    platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<Role[]> | null>> {
     try {
       const { take, skip } = this.buildCommonPaging(
         findRoleDtoByPage?.page,
-        findRoleDtoByPage?.pageSize,
+        findRoleDtoByPage?.pageSize
       );
       const where = this.buildCommonQuery(findRoleDtoByPage);
       const order = this.buildCommonSort(findRoleDtoByPage?.sort);
@@ -87,9 +81,7 @@ export class RolesService extends BaseService {
         where: {
           ...where,
           platform: platform,
-          name: findRoleDtoByPage?.name
-            ? ILike(`%${findRoleDtoByPage.name}%`)
-            : undefined,
+          name: findRoleDtoByPage?.name ? ILike(`%${findRoleDtoByPage.name}%`) : undefined,
           roleKey: findRoleDtoByPage?.roleKey,
         },
         order: {
@@ -111,7 +103,7 @@ export class RolesService extends BaseService {
         },
       });
     } catch (error) {
-      return ApiResult.error<null>(error || "查询角色失败，请稍后重试");
+      return ApiResult.error<null>(error || '查询角色失败，请稍后重试');
     }
   }
 
@@ -123,7 +115,7 @@ export class RolesService extends BaseService {
    */
   async findAll(
     findRoleDto: FindRoleDto,
-    platform: string = "admin",
+    platform: string = 'admin'
   ): Promise<ApiResult<Role[] | null>> {
     try {
       const where = this.buildCommonQuery(findRoleDto);
@@ -141,7 +133,7 @@ export class RolesService extends BaseService {
       }); // 查询所有用户并返回;
       return ApiResult.success<Role[]>({ data });
     } catch (error) {
-      return ApiResult.error<null>(error || "查询角色失败，请稍后重试");
+      return ApiResult.error<null>(error || '查询角色失败，请稍后重试');
     }
   }
 
@@ -151,21 +143,18 @@ export class RolesService extends BaseService {
    * @param {string} platform 平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<Role | null>>} 统一返回结果
    */
-  async findOne(
-    id: string,
-    platform: string = "admin",
-  ): Promise<ApiResult<Role | null>> {
+  async findOne(id: string, platform: string = 'admin'): Promise<ApiResult<Role | null>> {
     try {
       const data = await this.roleRepository.findOne({
         where: { id, platform },
-        relations: ["routes"],
+        relations: ['routes'],
       });
       if (!data) {
-        return ApiResult.error<null>("角色不存在");
+        return ApiResult.error<null>('角色不存在');
       }
       return ApiResult.success<Role>({ data });
     } catch (error) {
-      return ApiResult.error<null>(error || "查询角色失败，请稍后重试");
+      return ApiResult.error<null>(error || '查询角色失败，请稍后重试');
     }
   }
 
@@ -175,14 +164,11 @@ export class RolesService extends BaseService {
    * @param {UpdateRoleDto} updateRoleDto 更新角色信息
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(
-    id: string,
-    updateRoleDto: UpdateRoleDto,
-  ): Promise<ApiResult<null>> {
+  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<ApiResult<null>> {
     try {
       const role = await this.roleRepository.findOne({ where: { id } });
       if (!role) {
-        return ApiResult.error("角色不存在");
+        return ApiResult.error('角色不存在');
       }
 
       const exist = await this.roleRepository.find({
@@ -192,7 +178,7 @@ export class RolesService extends BaseService {
         ],
       });
       if (exist && exist.length > 0) {
-        return ApiResult.error("角色名称或角色标识已存在");
+        return ApiResult.error('角色名称或角色标识已存在');
       }
 
       // role = { ...role, ...updateRoleDto };
@@ -205,7 +191,7 @@ export class RolesService extends BaseService {
       await this.roleRepository.save(role);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || "角色更新失败，请稍后再试");
+      return ApiResult.error<null>(error || '角色更新失败，请稍后再试');
     }
   }
 
@@ -219,7 +205,7 @@ export class RolesService extends BaseService {
       const data = await this.roleRepository.softDelete(id);
       return ApiResult.success<UpdateResult>({ data });
     } catch (error) {
-      return ApiResult.error<null>(error || "角色删除失败，请稍后再试");
+      return ApiResult.error<null>(error || '角色删除失败，请稍后再试');
     }
   }
 }

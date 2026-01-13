@@ -1,22 +1,22 @@
 // auth.guard.ts
-import { ApiResult } from "@/common/utils/result";
-import { getPlatformJwtConfig } from "@/config/jwt";
-import { JWTWhiteList } from "@/config/whiteList";
+import { ApiResult } from '@/common/utils/result';
+import { getPlatformJwtConfig } from '@/config/jwt';
+import { JWTWhiteList } from '@/config/whiteList';
 import {
   Injectable,
   CanActivate,
   ExecutionContext,
   HttpException,
   HttpStatus,
-} from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { Response } from "express";
-import { HttpStatusCodes } from "@/common/constants/http-status";
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
+import { HttpStatusCodes } from '@/common/constants/http-status';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService, // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
+    private readonly jwtService: JwtService // JwtService 是 NestJS 提供的用于生成和验证 JWT 的服务
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -42,16 +42,16 @@ export class AuthGuard implements CanActivate {
     }
     // 如果没有从 Cookie 中获取到 Token，则尝试从请求头中获取
     if (!token) {
-      token = req.headers["authorization"]?.split(" ")[1]; // 从请求头获取 Bearer Token
+      token = req.headers['authorization']?.split(' ')[1]; // 从请求头获取 Bearer Token
     }
     if (!token && !state) {
       // let { __isApiResult, ...data } = ApiResult.error({ code: HttpStatusCodes.UNAUTHORIZED, message: "请登录后访问！", data: null });
-      throw new HttpException("请登录后访问！", HttpStatus.UNAUTHORIZED);
+      throw new HttpException('请登录后访问！', HttpStatus.UNAUTHORIZED);
       return false;
     }
 
     try {
-      const options = getPlatformJwtConfig(url.split("/")[3]);
+      const options = getPlatformJwtConfig(url.split('/')[3]);
       if (options && token) {
         let user: any;
         user = this.jwtService.verify(token, {
@@ -64,10 +64,7 @@ export class AuthGuard implements CanActivate {
       if (state) {
         return true;
       } else {
-        throw new HttpException(
-          "授权失败，Token无效！",
-          HttpStatus.UNAUTHORIZED,
-        );
+        throw new HttpException('授权失败，Token无效！', HttpStatus.UNAUTHORIZED);
         return false;
       }
     }

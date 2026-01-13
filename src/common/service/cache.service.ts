@@ -1,13 +1,8 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-  OnModuleInit,
-} from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import Redis from "ioredis";
-import * as NodeCache from "node-cache";
-import { getRedisConfig, RedisConfig } from "@/config/redis";
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import Redis from 'ioredis';
+import * as NodeCache from 'node-cache';
+import { getRedisConfig, RedisConfig } from '@/config/redis';
 
 @Injectable()
 export class CacheService implements OnModuleInit, OnModuleDestroy {
@@ -29,7 +24,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     if (this.config.enabled) {
       await this.connectRedis();
     } else {
-      this.logger.warn("Redis is disabled, using fallback cache (NodeCache)");
+      this.logger.warn('Redis is disabled, using fallback cache (NodeCache)');
     }
   }
 
@@ -49,7 +44,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         retryStrategy: (times) => {
           if (times > 3) {
             this.logger.error(
-              "Redis connection failed after 3 retries, switching to fallback cache",
+              'Redis connection failed after 3 retries, switching to fallback cache'
             );
             this.isRedisAvailable = false;
             return null;
@@ -61,18 +56,18 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         enableReadyCheck: true,
       });
 
-      this.redis.on("connect", () => {
-        this.logger.log("Redis connected successfully");
+      this.redis.on('connect', () => {
+        this.logger.log('Redis connected successfully');
         this.isRedisAvailable = true;
       });
 
-      this.redis.on("error", (error) => {
+      this.redis.on('error', (error) => {
         this.logger.error(`Redis connection error: ${error.message}`);
         this.isRedisAvailable = false;
       });
 
-      this.redis.on("close", () => {
-        this.logger.warn("Redis connection closed");
+      this.redis.on('close', () => {
+        this.logger.warn('Redis connection closed');
         this.isRedisAvailable = false;
       });
 
@@ -82,7 +77,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
       this.logger.error(`Failed to connect to Redis: ${error.message}`);
       this.isRedisAvailable = false;
       if (this.config.fallbackEnabled) {
-        this.logger.warn("Fallback cache (NodeCache) is enabled");
+        this.logger.warn('Fallback cache (NodeCache) is enabled');
       }
     }
   }
@@ -172,18 +167,14 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
           deletedCount = await this.redis.del(...keys);
         }
       } catch (error) {
-        this.logger.error(
-          `Redis delPattern error for pattern ${pattern}: ${error.message}`,
-        );
+        this.logger.error(`Redis delPattern error for pattern ${pattern}: ${error.message}`);
         this.isRedisAvailable = false;
       }
     }
 
     if (this.config.fallbackEnabled) {
       const allKeys = this.fallbackCache.keys();
-      const matchingKeys = allKeys.filter((key) =>
-        key.startsWith(fullPattern.replace("*", "")),
-      );
+      const matchingKeys = allKeys.filter((key) => key.startsWith(fullPattern.replace('*', '')));
       if (matchingKeys.length > 0) {
         this.fallbackCache.del(matchingKeys);
         deletedCount += matchingKeys.length;
@@ -201,9 +192,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         const result = await this.redis.exists(fullKey);
         return result === 1;
       } catch (error) {
-        this.logger.error(
-          `Redis exists error for key ${key}: ${error.message}`,
-        );
+        this.logger.error(`Redis exists error for key ${key}: ${error.message}`);
         this.isRedisAvailable = false;
       }
     }
@@ -243,9 +232,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         const ttl = await this.redis.ttl(fullKey);
         return ttl;
       } catch (error) {
-        this.logger.error(
-          `Redis getTTL error for key ${key}: ${error.message}`,
-        );
+        this.logger.error(`Redis getTTL error for key ${key}: ${error.message}`);
         this.isRedisAvailable = false;
       }
     }
@@ -269,9 +256,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         const result = await this.redis.expire(fullKey, ttl);
         return result === 1;
       } catch (error) {
-        this.logger.error(
-          `Redis setTTL error for key ${key}: ${error.message}`,
-        );
+        this.logger.error(`Redis setTTL error for key ${key}: ${error.message}`);
         this.isRedisAvailable = false;
       }
     }

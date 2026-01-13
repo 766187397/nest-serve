@@ -1,13 +1,8 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from "@nestjs/common";
-import { LoggerService } from "./logger.service";
-import { Observable, tap } from "rxjs";
-import { LoggerWhiteList } from "@/config/whiteList";
-import { Request } from "express";
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { LoggerService } from './logger.service';
+import { Observable, tap } from 'rxjs';
+import { LoggerWhiteList } from '@/config/whiteList';
+import { Request } from 'express';
 
 @Injectable()
 export class LoggerInterceptor implements NestInterceptor {
@@ -23,7 +18,7 @@ export class LoggerInterceptor implements NestInterceptor {
     const response = context.switchToHttp().getResponse();
     request.startTime = Date.now();
 
-    const url: string = request.url || "";
+    const url: string = request.url || '';
     // 如果是白名单中的接口就不记录到日志
     if (
       whiteListStartsWith.some((prefix) => url.startsWith(prefix)) ||
@@ -34,12 +29,8 @@ export class LoggerInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap(async (data) => {
-        this.loggerService.create(
-          request,
-          data,
-          response.statusCode.toString(),
-        );
-      }),
+        this.loggerService.create(request, data, response.statusCode.toString());
+      })
     );
   }
 }

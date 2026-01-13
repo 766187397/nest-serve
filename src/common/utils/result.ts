@@ -1,5 +1,5 @@
-import { HttpException } from "@nestjs/common";
-import { plainToInstance } from "class-transformer";
+import { HttpException } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 
 interface Result<T> {
   code?: number;
@@ -25,14 +25,14 @@ export class ApiResult<T> {
 
   constructor(
     public code: number = 200,
-    public message: string = "操作成功",
+    public message: string = '操作成功',
     public data: T | null = null,
-    public timestamp: string = new Date().toISOString(),
+    public timestamp: string = new Date().toISOString()
   ) {}
 
   static success<T>({
     data = null,
-    message = "创建成功",
+    message = '创建成功',
     code = 201,
     entities,
   }: Result<T> = {}): ApiResult<T> {
@@ -43,7 +43,7 @@ export class ApiResult<T> {
   }
 
   static error<T>(param: Error | string | Result<T> = {}): ApiResult<T> {
-    let message = "操作失败",
+    let message = '操作失败',
       code = 400,
       data: T | null = null;
     if (param instanceof HttpException) {
@@ -51,12 +51,10 @@ export class ApiResult<T> {
       const response = param.getResponse();
       // 如果是对象，直接使用其中的 message 字段，否则使用默认的 message
       const errorMessage =
-        typeof response === "object" && response["message"]
-          ? response["message"]
-          : message;
+        typeof response === 'object' && response['message'] ? response['message'] : message;
       const statusCode = param.getStatus() || code; // 获取 HttpException 的状态码，默认使用传入的 code
       return new ApiResult<T>(statusCode, errorMessage, null);
-    } else if (typeof param === "string") {
+    } else if (typeof param === 'string') {
       // 如果是字符串类型，认为它是错误消息
       message = param;
     } else if (param instanceof Error) {

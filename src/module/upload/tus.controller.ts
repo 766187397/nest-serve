@@ -1,30 +1,20 @@
 // src/tus.controller.ts
-import {
-  Controller,
-  All,
-  Delete,
-  Param,
-  Req,
-  Res,
-  OnModuleInit,
-  Query,
-  Get,
-} from "@nestjs/common";
-import { Request, Response } from "express";
-import { Server, FileStore, EVENTS } from "tus-node-server";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
-import * as path from "path";
-import * as fs from "fs";
-import { ApiResult } from "@/common/utils/result";
-import { UploadService } from "./upload.service";
-import { FileUploadService } from "@/config/multer";
-import { FileHashDTO } from "./dto/index.dto";
-import { UploadFile } from "@/types/upload";
+import { Controller, All, Delete, Param, Req, Res, OnModuleInit, Query, Get } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { Server, FileStore, EVENTS } from 'tus-node-server';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import * as path from 'path';
+import * as fs from 'fs';
+import { ApiResult } from '@/common/utils/result';
+import { UploadService } from './upload.service';
+import { FileUploadService } from '@/config/multer';
+import { FileHashDTO } from './dto/index.dto';
+import { UploadFile } from '@/types/upload';
 
 const uploadDir = FileUploadService.rootPath;
 
-@ApiTags("大文件切片上传")
-@Controller("api/v1/large/files")
+@ApiTags('大文件切片上传')
+@Controller('api/v1/large/files')
 export class TusController implements OnModuleInit {
   constructor(private readonly uploadService: UploadService) {}
 
@@ -42,7 +32,7 @@ export class TusController implements OnModuleInit {
 
     // 创建 tus server 实例并传入配置项
     this.tusServer = new Server({
-      path: "/api/v1/large/files", // 必须和前端的 endpoint 保持一致
+      path: '/api/v1/large/files', // 必须和前端的 endpoint 保持一致
       relativeLocation: true, // 表示将 FileStore 的 path 作为相对路径
     });
 
@@ -53,8 +43,8 @@ export class TusController implements OnModuleInit {
 
     // 监听上传完成事件，并基于 metadata 重命名文件（添加原始扩展名）
     this.tusServer.on(EVENTS.EVENT_UPLOAD_COMPLETE, async (event) => {
-      const metadata = this.parseMetadata(event.file.upload_metadata || "");
-      const originalName = metadata.filename || "unnamed";
+      const metadata = this.parseMetadata(event.file.upload_metadata || '');
+      const originalName = metadata.filename || 'unnamed';
       const extension = path.extname(originalName); // 获取原始文件的扩展名
       const oldPath = path.join(this.uploadDir, event.file.id);
       const newPath = path.join(this.uploadDir, `${event.file.id}${extension}`);
@@ -71,8 +61,8 @@ export class TusController implements OnModuleInit {
   }
 
   // 用于处理除了 DELETE 之外的所有请求，将请求交给 tus-node-server 处理
-  @All("*")
-  @ApiOperation({ summary: "大文件切片上传，前端也得使用tus" })
+  @All('*')
+  @ApiOperation({ summary: '大文件切片上传，前端也得使用tus' })
   async handleTus(@Req() req: Request, @Res() res: Response) {
     this.tusServer.handle(req, res);
   }
@@ -81,30 +71,28 @@ export class TusController implements OnModuleInit {
   private parseMetadata(metadata: string): Record<string, string> {
     const result: Record<string, string> = {};
     if (!metadata) return result;
-    const parts = metadata.split(",");
+    const parts = metadata.split(',');
     for (const part of parts) {
-      const [key, base64Value] = part.split(" ");
+      const [key, base64Value] = part.split(' ');
       if (key && base64Value) {
-        result[key] = Buffer.from(base64Value, "base64").toString("utf-8");
+        result[key] = Buffer.from(base64Value, 'base64').toString('utf-8');
       }
     }
     return result;
   }
 }
 
-@ApiTags("大文件切片上传")
-@Controller("api/v1/large")
+@ApiTags('大文件切片上传')
+@Controller('api/v1/large')
 export class CustomizeTusController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Get("upload/second")
+  @Get('upload/second')
   @ApiOperation({
-    summary: "大文件秒传",
-    description: "根据文件的hash值查询是否已上传",
+    summary: '大文件秒传',
+    description: '根据文件的hash值查询是否已上传',
   })
-  async getFileByHash(
-    @Query() fileHashDTO: FileHashDTO,
-  ): Promise<ApiResult<UploadFile | null>> {
+  async getFileByHash(@Query() fileHashDTO: FileHashDTO): Promise<ApiResult<UploadFile | null>> {
     return this.uploadService.getFileByHash(fileHashDTO);
   }
 }

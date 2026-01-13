@@ -1,12 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from "./dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Route } from "./entities/route.entity";
-import { In, IsNull, Not, Repository, TreeRepository } from "typeorm";
-import { BaseService } from "@/common/service/base";
-import { ApiResult } from "@/common/utils/result";
-import { Role } from "@/module/roles/entities/role.entity";
-import { RoleRoutes, RouteInfo } from "@/types/routes";
+import { Injectable } from '@nestjs/common';
+import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from './dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Route } from './entities/route.entity';
+import { In, IsNull, Not, Repository, TreeRepository } from 'typeorm';
+import { BaseService } from '@/common/service/base';
+import { ApiResult } from '@/common/utils/result';
+import { Role } from '@/module/roles/entities/role.entity';
+import { RoleRoutes, RouteInfo } from '@/types/routes';
 
 @Injectable()
 export class RoutesService extends BaseService {
@@ -16,7 +16,7 @@ export class RoutesService extends BaseService {
     @InjectRepository(Route)
     private readonly treeRouteRepository: TreeRepository<Route>,
     @InjectRepository(Role)
-    private roleRepository: Repository<Role>,
+    private roleRepository: Repository<Role>
   ) {
     super();
   }
@@ -29,17 +29,17 @@ export class RoutesService extends BaseService {
    */
   async create(
     createRouteDto: CreateRouteDto,
-    platform: string = "admin",
+    platform: string = 'admin'
   ): Promise<ApiResult<null>> {
     try {
       let parent: Route | null = null;
       if (createRouteDto.parentId) {
         parent = await this.routeRepository.findOne({
           where: { id: createRouteDto.parentId, platform },
-          relations: ["children"],
+          relations: ['children'],
         });
         if (!parent) {
-          return ApiResult.error<null>("父级路由不存在");
+          return ApiResult.error<null>('父级路由不存在');
         }
       }
       const routeInfo = await this.routeRepository.findOne({
@@ -55,7 +55,7 @@ export class RoutesService extends BaseService {
       await this.routeRepository.save(route);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || "路由创建失败，请稍后再试");
+      return ApiResult.error<null>(error || '路由创建失败，请稍后再试');
     }
   }
 
@@ -67,7 +67,7 @@ export class RoutesService extends BaseService {
    */
   async findAll(
     findRouteDto: FindRouteDto,
-    platform: string = "admin",
+    platform: string = 'admin'
   ): Promise<ApiResult<Route[] | null>> {
     try {
       const order = this.buildCommonSort(findRouteDto?.sort);
@@ -77,13 +77,13 @@ export class RoutesService extends BaseService {
           type: findRouteDto.type,
         },
         order: { ...order },
-        relations: ["parent"],
+        relations: ['parent'],
       });
       const trees = this.buildTree(data);
 
       return ApiResult.success<Route[]>({ data: trees });
     } catch (error) {
-      return ApiResult.error<null>(error || "路由查询失败，请稍后再试");
+      return ApiResult.error<null>(error || '路由查询失败，请稍后再试');
     }
   }
 
@@ -122,14 +122,14 @@ export class RoutesService extends BaseService {
     try {
       const data: RouteInfo = await this.routeRepository.findOne({
         where: { id },
-        relations: ["children", "parent"],
+        relations: ['children', 'parent'],
       });
       if (data && data.parent) {
         data.parentId = data.parent.id;
       }
       return ApiResult.success<Route>({ data });
     } catch (error) {
-      return ApiResult.error<null>(error || "路由查询失败，请稍后再试");
+      return ApiResult.error<null>(error || '路由查询失败，请稍后再试');
     }
   }
 
@@ -139,18 +139,15 @@ export class RoutesService extends BaseService {
    * @param {UpdateRouteDto} updateRouteDto 路由信息
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(
-    id: string,
-    updateRouteDto: UpdateRouteDto,
-  ): Promise<ApiResult<null>> {
+  async update(id: string, updateRouteDto: UpdateRouteDto): Promise<ApiResult<null>> {
     try {
       // 查询当前路由是否存在
       const route = await this.routeRepository.findOne({
         where: { id },
-        relations: ["children", "parent"],
+        relations: ['children', 'parent'],
       });
       if (!route) {
-        return ApiResult.error("路由不存在");
+        return ApiResult.error('路由不存在');
       }
       const exist = await this.routeRepository.findOne({
         where: { id: Not(id), name: route.name, platform: route.platform },
@@ -162,7 +159,7 @@ export class RoutesService extends BaseService {
       // 如果有新的 parent，查询对应的父级路由
       if (updateRouteDto.parentId) {
         if (updateRouteDto.parentId == route.id) {
-          return ApiResult.error("父级路由不能为当前路由");
+          return ApiResult.error('父级路由不能为当前路由');
         }
         const parentRoute = await this.routeRepository.findOne({
           where: {
@@ -171,7 +168,7 @@ export class RoutesService extends BaseService {
           },
         });
         if (!parentRoute) {
-          return ApiResult.error("父级路由不存在");
+          return ApiResult.error('父级路由不存在');
         }
         route.parent = parentRoute || null; // 如果 parent 为 null，则设置为 null
       }
@@ -186,7 +183,7 @@ export class RoutesService extends BaseService {
       await this.routeRepository.save(route);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || "路由更新失败，请稍后再试");
+      return ApiResult.error<null>(error || '路由更新失败，请稍后再试');
     }
   }
 
@@ -200,7 +197,7 @@ export class RoutesService extends BaseService {
       await this.routeRepository.softDelete(id);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || "路由删除失败，请稍后再试");
+      return ApiResult.error<null>(error || '路由删除失败，请稍后再试');
     }
   }
 
@@ -213,25 +210,21 @@ export class RoutesService extends BaseService {
    */
   async getRoutesByRoleId(
     rolesIds: string[],
-    platform: string = "admin",
-    type?: string,
+    platform: string = 'admin',
+    type?: string
   ): Promise<ApiResult<RoleRoutes[] | null>> {
     try {
       if (rolesIds.length === 0) {
-        return ApiResult.error<null>(
-          "当前用户未绑定角色，无法获取绑定的路由信息！",
-        );
+        return ApiResult.error<null>('当前用户未绑定角色，无法获取绑定的路由信息！');
       }
       const queryBuilderRole = this.roleRepository
-        .createQueryBuilder("role")
-        .select("route.id", "routeId")
-        .leftJoin("role.routes", "route")
-        .where("role.id  IN (:...ids)", { ids: rolesIds })
-        .groupBy("route.id");
+        .createQueryBuilder('role')
+        .select('route.id', 'routeId')
+        .leftJoin('role.routes', 'route')
+        .where('role.id  IN (:...ids)', { ids: rolesIds })
+        .groupBy('route.id');
 
-      const routeIds = (await queryBuilderRole.getRawMany()).map(
-        (item) => item.routeId,
-      );
+      const routeIds = (await queryBuilderRole.getRawMany()).map((item) => item.routeId);
       // 没有绑定路由
       if (routeIds.length === 0) {
         return ApiResult.success<RoleRoutes[]>({ data: [] }); // 无权限
@@ -246,7 +239,7 @@ export class RoutesService extends BaseService {
           type,
         },
         order: { ...order },
-        relations: ["parent"],
+        relations: ['parent'],
       });
 
       // // 3. 对每个根节点查询完整子树（使用 findDescendantsTree）
@@ -259,7 +252,7 @@ export class RoutesService extends BaseService {
 
       return ApiResult.success<RoleRoutes[]>({ data: routeList });
     } catch (error) {
-      return ApiResult.error<null>(error || "获取路由失败，请稍后再试");
+      return ApiResult.error<null>(error || '获取路由失败，请稍后再试');
     }
   }
 

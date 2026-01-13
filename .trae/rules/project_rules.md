@@ -15,7 +15,3 @@
 ## 5. 终端命令执行规范
 禁止使用会阻塞终端等待用户手动输入的命令（如 `curl -s http://localhost:3000/swagger | Select-String -Pattern "swagger" | Select-Object -First 5`）。所有终端命令必须能够自动执行完成，不需要用户手动输入任何值。
 
-## 6. 接口测试规范
-在测试接口时，需要区分是否需要token认证：
-- **不需要token的接口**：将接口路径添加到 `d:\MyDemo\nest-serve\src\config\whiteList.ts` 文件中的JWT白名单，确保接口可以直接访问
-- **需要token的接口**：将接口信息记录到 `d:\MyDemo\nest-serve\doc\需要手动测试接口.md` 文件中，包括接口路径、请求方法、参数说明等，后续进行手动测试

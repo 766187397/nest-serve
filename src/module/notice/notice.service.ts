@@ -1,28 +1,25 @@
-import { Injectable } from "@nestjs/common";
-import { BaseService } from "@/common/service/base";
+import { Injectable } from '@nestjs/common';
+import { BaseService } from '@/common/service/base';
 import {
   CreateNoticeDto,
   FindNoticeDtoByPage,
   FindNoticeDtoByPageByUserOrRole,
   UpdateNoticeDto,
-} from "./dto";
-import { ApiResult } from "@/common/utils/result";
-import { Notice } from "./entities/notice.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, In, IsNull, LessThan, Like, Not, Repository } from "typeorm";
-import { PageApiResult } from "@/types/public";
-import { JwtService } from "@nestjs/jwt";
-import { getPlatformJwtConfig, JwtConfig } from "@/config/jwt";
-import {
-  NoticeByPageByUserOrRole,
-  NoticeWsFindUserOrRole,
-} from "@/types/notice";
+} from './dto';
+import { ApiResult } from '@/common/utils/result';
+import { Notice } from './entities/notice.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ILike, In, IsNull, LessThan, Like, Not, Repository } from 'typeorm';
+import { PageApiResult } from '@/types/public';
+import { JwtService } from '@nestjs/jwt';
+import { getPlatformJwtConfig, JwtConfig } from '@/config/jwt';
+import { NoticeByPageByUserOrRole, NoticeWsFindUserOrRole } from '@/types/notice';
 @Injectable()
 export class NoticeService extends BaseService {
   constructor(
     @InjectRepository(Notice)
     private readonly noticeRepository: Repository<Notice>,
-    private readonly jwtService: JwtService,
+    private readonly jwtService: JwtService
   ) {
     super();
   }
@@ -35,7 +32,7 @@ export class NoticeService extends BaseService {
    */
   async create(
     createNoticeDto: CreateNoticeDto,
-    platform: string = "admin",
+    platform: string = 'admin'
   ): Promise<ApiResult<Notice | null>> {
     try {
       Object.assign(createNoticeDto, { platform });
@@ -55,21 +52,19 @@ export class NoticeService extends BaseService {
    */
   async findByPage(
     findNoticeDtoByPage: FindNoticeDtoByPage,
-    platform: string = "admin",
+    platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<Notice[]> | null>> {
     try {
       const { take, skip } = this.buildCommonPaging(
         findNoticeDtoByPage?.page,
-        findNoticeDtoByPage?.pageSize,
+        findNoticeDtoByPage?.pageSize
       );
       const where = this.buildCommonQuery(findNoticeDtoByPage);
       const order = this.buildCommonSort(findNoticeDtoByPage?.sort);
       const [data, total] = await this.noticeRepository.findAndCount({
         where: {
           ...where,
-          title: findNoticeDtoByPage?.title
-            ? ILike(`%${findNoticeDtoByPage.title}%`)
-            : undefined,
+          title: findNoticeDtoByPage?.title ? ILike(`%${findNoticeDtoByPage.title}%`) : undefined,
           platform,
         },
         order,
@@ -103,12 +98,12 @@ export class NoticeService extends BaseService {
     findNoticeDtoByPageByUserOrRole: FindNoticeDtoByPageByUserOrRole,
     platform: string,
     roleKeys: string[] | undefined,
-    userId: string,
+    userId: string
   ): Promise<ApiResult<PageApiResult<NoticeByPageByUserOrRole[]> | null>> {
     try {
       const { take, skip } = this.buildCommonPaging(
         findNoticeDtoByPageByUserOrRole?.page,
-        findNoticeDtoByPageByUserOrRole?.pageSize,
+        findNoticeDtoByPageByUserOrRole?.pageSize
       );
       const order = this.buildCommonSort();
       const where = {
@@ -120,13 +115,13 @@ export class NoticeService extends BaseService {
           {
             ...where,
             userIds: IsNull(),
-            roleKeys: "",
+            roleKeys: '',
             specifyTime: IsNull(), // 指定时间为空
           },
           {
             ...where,
             userIds: IsNull(),
-            roleKeys: "",
+            roleKeys: '',
             specifyTime: LessThan(new Date()), // 指定时间小于当前时间
           },
           {
@@ -147,15 +142,7 @@ export class NoticeService extends BaseService {
         },
         skip, // 跳过的条数
         take, // 每页条数
-        select: [
-          "id",
-          "content",
-          "title",
-          "status",
-          "createdAt",
-          "updatedAt",
-          "READUserIds",
-        ],
+        select: ['id', 'content', 'title', 'status', 'createdAt', 'updatedAt', 'READUserIds'],
       });
       // 计算总页数
       const totalPages = Math.ceil(total / take);
@@ -164,12 +151,8 @@ export class NoticeService extends BaseService {
           data: data.map((item) => {
             return {
               ...item,
-              createdAt: this.dayjs(item.createdAt).format(
-                "YYYY-MM-DD HH:mm:ss",
-              ),
-              updatedAt: this.dayjs(item.updatedAt).format(
-                "YYYY-MM-DD HH:mm:ss",
-              ),
+              createdAt: this.dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+              updatedAt: this.dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
               readStatus: item.READUserIds?.includes(userId) || false, // 添加状态字段
             };
           }),
@@ -204,16 +187,13 @@ export class NoticeService extends BaseService {
    * @param {UpdateNoticeDto} updateNoticeDto
    * @returns { Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(
-    id: string,
-    updateNoticeDto: UpdateNoticeDto,
-  ): Promise<ApiResult<null>> {
+  async update(id: string, updateNoticeDto: UpdateNoticeDto): Promise<ApiResult<null>> {
     try {
       const notice = await this.noticeRepository.findOne({
         where: { id },
       });
       if (!notice) {
-        return ApiResult.error<null>("通知不存在");
+        return ApiResult.error<null>('通知不存在');
       }
       Object.assign(notice, updateNoticeDto);
       await this.noticeRepository.save(notice);
@@ -245,10 +225,10 @@ export class NoticeService extends BaseService {
    */
   async handleWsFindUserOrRole(
     token: string,
-    platform: string = "admin",
+    platform: string = 'admin'
   ): Promise<ApiResult<NoticeWsFindUserOrRole[] | null>> {
     try {
-      token = token?.split(" ")[1]; // 获取 Bearer Token
+      token = token?.split(' ')[1]; // 获取 Bearer Token
       const options = getPlatformJwtConfig(platform) as JwtConfig;
       const userInfo = this.jwtService.verify(token, {
         secret: options.secret,
@@ -267,13 +247,13 @@ export class NoticeService extends BaseService {
           {
             ...where,
             userIds: IsNull(),
-            roleKeys: "",
+            roleKeys: '',
             specifyTime: IsNull(), // 指定时间为空
           },
           {
             ...where,
             userIds: IsNull(),
-            roleKeys: "",
+            roleKeys: '',
             specifyTime: LessThan(new Date()), // 获取当前时间之前的所有数据
           },
           {
@@ -294,7 +274,7 @@ export class NoticeService extends BaseService {
         },
         skip, // 跳过的条数
         take, // 每页条数
-        select: ["id", "content", "title", "status", "createdAt", "updatedAt"],
+        select: ['id', 'content', 'title', 'status', 'createdAt', 'updatedAt'],
       });
       // 计算总页数
       // const totalPages = Math.ceil(total / take);
@@ -302,8 +282,8 @@ export class NoticeService extends BaseService {
         data: data.map((item) => {
           return {
             ...item,
-            createdAt: this.dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss"),
-            updatedAt: this.dayjs(item.updatedAt).format("YYYY-MM-DD HH:mm:ss"),
+            createdAt: this.dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+            updatedAt: this.dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
           };
         }),
       });
@@ -318,22 +298,19 @@ export class NoticeService extends BaseService {
    * @param {string} noticeId 通知ID
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async handleMarkByUserId(
-    userId: string,
-    noticeId: string,
-  ): Promise<ApiResult<null>> {
+  async handleMarkByUserId(userId: string, noticeId: string): Promise<ApiResult<null>> {
     try {
       const notice = await this.noticeRepository.findOne({
         where: { id: noticeId },
       });
       if (!notice) {
-        return ApiResult.error<null>("通知不存在");
+        return ApiResult.error<null>('通知不存在');
       }
-      const READUserIds = notice.READUserIds?.split(",") || [];
+      const READUserIds = notice.READUserIds?.split(',') || [];
       if (!READUserIds.includes(userId)) {
         READUserIds.push(userId);
       }
-      notice.READUserIds = READUserIds.join(",");
+      notice.READUserIds = READUserIds.join(',');
       await this.noticeRepository.save(notice);
       return ApiResult.success<null>();
     } catch (error) {

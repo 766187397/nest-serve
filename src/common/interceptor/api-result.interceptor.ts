@@ -1,14 +1,14 @@
 // api-result.interceptor.ts
-import { ResultWhiteList } from "@/config/whiteList";
+import { ResultWhiteList } from '@/config/whiteList';
 import {
   Injectable,
   NestInterceptor,
   ExecutionContext,
   CallHandler,
   HttpStatus,
-} from "@nestjs/common";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ApiResultInterceptor implements NestInterceptor {
@@ -44,16 +44,16 @@ export class ApiResultInterceptor implements NestInterceptor {
           return data;
         }
         // 如果请求路径以 /api/v 开头，又不是自定义的请求格式，则包装响应格式
-        else if (request.url.startsWith("/api/v")) {
+        else if (request.url.startsWith('/api/v')) {
           return {
             code: HttpStatus.OK,
-            message: "操作成功",
+            message: '操作成功',
             data,
           };
         }
         // 其他格式响应不处理
         return data;
-      }),
+      })
     );
   }
 }
