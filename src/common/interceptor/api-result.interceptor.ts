@@ -37,6 +37,7 @@ export class ApiResultInterceptor implements NestInterceptor {
             code: data.code,
             message: data.message,
             data: data.data,
+            timestamp: data.timestamp,
           };
         }
         // 如果是白名单中的接口就不处理响应

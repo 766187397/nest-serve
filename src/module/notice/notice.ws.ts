@@ -19,7 +19,6 @@ export class NoticeWS implements OnGatewayConnection, OnGatewayDisconnect {
   // 客户端连接时触发
   async handleConnection(client: Socket) {
     console.log(`客户端连接时触发: ${client.id}`);
-    // console.log("query", client.handshake.query);
     const token = client.handshake.query.token as string;
     const { __isApiResult, ...data } = await this.noticeService.handleWsFindUserOrRole(
       token,

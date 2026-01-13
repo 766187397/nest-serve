@@ -32,8 +32,8 @@ export class ApiResult<T> {
 
   static success<T>({
     data = null,
-    message = '创建成功',
-    code = 201,
+    message = '操作成功',
+    code = 200,
     entities,
   }: Result<T> = {}): ApiResult<T> {
     if (entities) {

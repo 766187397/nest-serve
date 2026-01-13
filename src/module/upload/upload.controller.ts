@@ -67,7 +67,7 @@ export class UploadController {
   @ApiParam({ name: 'fileUrl', required: true, description: '文件 URL' })
   downloadFile(@Query('fileUrl') fileUrl: string, @Res() res: Response) {
     if (!fileUrl) {
-      return ApiResult.error('缺少 url 参数');
+      throw new Error('缺少 url 参数');
     }
 
     // 简单校验协议
@@ -76,7 +76,7 @@ export class UploadController {
       const u = new URL(fileUrl);
       client = u.protocol === 'https:' ? https : http;
     } catch {
-      return ApiResult.error('非法 url');
+      throw new Error('非法 url');
     }
 
     const filename = fileUrl.substring(fileUrl.lastIndexOf('/') + 1) || 'file';
@@ -99,7 +99,7 @@ export class UploadController {
         upstream.pipe(res);
       })
       .on('error', () => {
-        return ApiResult.error('下载失败');
+        throw new Error('下载失败');
       });
   }
 

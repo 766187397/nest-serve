@@ -320,7 +320,10 @@ export class UsersService extends BaseService {
           }
         ),
       };
-      return ApiResult.success<UserLogin>({ data: userInfo });
+      return ApiResult.success<UserLogin>({ 
+        data: userInfo,
+        message: '登录成功'
+      });
     } catch (error) {
       return ApiResult.error<null>((error as Error)?.message || '用户登录失败，请稍后再试');
     }
@@ -376,7 +379,10 @@ export class UsersService extends BaseService {
           }
         ),
       };
-      return ApiResult.success<UserLogin>({ data: userInfo });
+      return ApiResult.success<UserLogin>({ 
+        data: userInfo,
+        message: '登录成功'
+      });
     } catch (error) {
       return ApiResult.error<null>((error as Error)?.message || '用户登录失败，请稍后再试');
     }
@@ -483,7 +489,10 @@ export class UsersService extends BaseService {
           }
         ),
       };
-      return ApiResult.success<UserLogin>({ data: userInfo });
+      return ApiResult.success<UserLogin>({ 
+        data: userInfo,
+        message: '登录成功'
+      });
     } catch (error) {
       return ApiResult.error<null>((error as Error)?.message || '用户登录失败，请稍后再试');
     }
@@ -562,14 +571,10 @@ export class UsersService extends BaseService {
       };
 
       const { text, data } = svgCaptcha.create(options);
-      console.log('[验证码生成] 生成的验证码文本:', text);
       const base64 = Buffer.from(data).toString('base64');
       const url = `data:image/svg+xml;base64,${base64}`;
       const codeKey = uuidv4();
-      console.log('[验证码生成] 验证码Key:', codeKey);
-      console.log('[验证码生成] TTL:', CAPTCHA_TTL);
       await svgCache.set(codeKey, { text }, CAPTCHA_TTL);
-      console.log('[验证码生成] 已保存到缓存');
 
       return ApiResult.success<Captcha>({
         data: {
@@ -578,7 +583,6 @@ export class UsersService extends BaseService {
         },
       });
     } catch (error) {
-      console.error('[验证码生成] 生成失败:', error);
       return ApiResult.error<null>((error as Error)?.message || '生成验证码失败！');
     }
   }

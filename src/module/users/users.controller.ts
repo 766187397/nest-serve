@@ -14,6 +14,7 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { ApiResult } from '@/common/utils/result';
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -107,7 +108,7 @@ export class UsersController {
 
   @Post('login/set-cookie')
   @ApiOperation({ summary: '用户登录(设置Cookie)' })
-  async logInSetCookie(@Body() loginDto: LogInDto, @Res() res: Response) {
+  async logInSetCookie(@Body() loginDto: LogInDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.usersService.logIn(loginDto, 'admin');
     const data = result as { code: number; data: UserLogin };
     if (data.code == 200) {
@@ -118,10 +119,8 @@ export class UsersController {
       res.cookie('refresh_token', data.data.refresh_token, {
         maxAge: Number(options.jwt_refresh_expires_in),
       });
-      res.status(data.code).json(data);
-    } else {
-      res.status(data.code).json(data);
     }
+    return result;
   }
 
   @Post('login/verification-code')
@@ -132,7 +131,7 @@ export class UsersController {
 
   @Get('refresh-token')
   @ApiOperation({ summary: '刷新token' })
-  async refreshToken(@Req() req: Request, @Res() res: Response) {
+  async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     let refresh_token: string | undefined;
     if (req.cookies && req.cookies.refresh_token) {
       refresh_token = req.cookies.refresh_token;
@@ -141,12 +140,7 @@ export class UsersController {
       refresh_token = (req.headers['refresh_token'] as string)?.split(' ')[1];
     }
     if (!refresh_token) {
-      res.status(HttpStatusCodes.UNAUTHORIZED).json({
-        code: HttpStatusCodes.UNAUTHORIZED,
-        message: 'refreshToken不存在，请先登录！',
-        data: null,
-      });
-      return;
+      return ApiResult.error<null>('refreshToken不存在，请先登录！');
     }
     const result = await this.usersService.refreshToken(refresh_token, 'admin');
     if (result.code == BusinessStatusCodes.SUCCESS) {
@@ -155,16 +149,15 @@ export class UsersController {
         maxAge: Number(options.jwt_expires_in),
       });
     }
-    res.status(result.code).json(result);
+    return result;
   }
 
   @Post('logout')
   @ApiOperation({ summary: '退出登录清除Cookie' })
   @HttpCode(204)
-  logout(@Res() res: Response) {
+  logout(@Res({ passthrough: true }) res: Response) {
     res.cookie('token', '', { expires: new Date(0) });
     res.cookie('refresh_token', '', { expires: new Date(0) });
-    res.status(204).send();
   }
 
   @Get('export')
