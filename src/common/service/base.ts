@@ -89,11 +89,29 @@ export class BaseService {
    * @returns {Promise<boolean>} true 为正确, false 为错误
    */
   async buildVerify({ code, codeKey }: { codeKey: string; code: string }): Promise<boolean> {
+    console.log('[验证码验证] 开始验证:', { code, codeKey });
     const codeCache = await svgCache.get<{ text: string }>(codeKey);
-    if (!codeCache || codeCache.text.toLowerCase() != code.toLowerCase()) {
+    console.log('[验证码验证] 缓存中的数据:', codeCache);
+    
+    if (!codeCache) {
+      console.log('[验证码验证] 验证码不存在或已过期');
+      return false;
+    }
+    
+    console.log('[验证码验证] 比较验证码:', {
+      cacheText: codeCache.text,
+      inputCode: code,
+      cacheTextLower: codeCache.text.toLowerCase(),
+      inputCodeLower: code.toLowerCase(),
+      match: codeCache.text.toLowerCase() === code.toLowerCase()
+    });
+    
+    if (codeCache.text.toLowerCase() != code.toLowerCase()) {
+      console.log('[验证码验证] 验证码不匹配');
       return false;
     } else {
       await svgCache.del(codeKey);
+      console.log('[验证码验证] 验证成功，已删除缓存');
       return true;
     }
   }

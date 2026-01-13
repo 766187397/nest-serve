@@ -31,7 +31,28 @@ export class NodeCacheService {
   }
 }
 
-export const cacheTime = 5;
+/**
+ * 邮箱验证码发送冷却时间（分钟）
+ * @description 用于控制同一邮箱地址发送验证码的频率限制，防止频繁发送邮件
+ * @example 用户发送验证码后，需要等待1分钟才能再次发送
+ */
+export const cacheTime = 1;
+
+/**
+ * 图形验证码缓存过期时间（秒）
+ * @description 图形验证码在Redis中的存活时间，超过此时间后验证码自动失效
+ * @example 用户获取验证码后，需要在2分钟内完成验证，否则验证码失效
+ * @default 120秒（2分钟）
+ */
+export const CAPTCHA_TTL = 120;
+
+/**
+ * 邮箱验证码缓存过期时间（秒）
+ * @description 邮箱验证码在Redis中的存活时间，超过此时间后验证码自动失效
+ * @example 用户收到验证码邮件后，需要在5分钟内完成验证，否则验证码失效
+ * @default 300秒（5分钟）
+ */
+export const EMAIL_CODE_TTL = 300;
 
 export let emailCache: NodeCacheService;
 export let svgCache: NodeCacheService;

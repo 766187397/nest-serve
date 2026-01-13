@@ -11,7 +11,7 @@ import { ILike, Repository } from 'typeorm';
 import { PageApiResult } from '@/types/public';
 import { User } from '@/module/users/entities/user.entity';
 import { generateRandomString } from '@/common/utils/tool';
-import { emailCache, cacheTime } from '@/config/nodeCache';
+import { emailCache, cacheTime, EMAIL_CODE_TTL } from '@/config/nodeCache';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 
@@ -258,7 +258,7 @@ export class EmailService extends BaseService {
             state: true,
             time: time.format('YYYY-MM-DD HH:mm:ss'),
             code: code,
-          });
+          }, EMAIL_CODE_TTL);
           resolve(ApiResult.success({ data: info }));
         });
       });

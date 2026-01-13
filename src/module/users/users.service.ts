@@ -21,7 +21,7 @@ import { PageApiResult } from '@/types/public';
 import { Captcha, RefreshToken, UserLogin } from '@/types/user';
 import { Role } from '@/module/roles/entities/role.entity';
 import { EmailCahce } from '@/types/email';
-import { emailCache, svgCache } from '@/config/nodeCache';
+import { emailCache, svgCache, CAPTCHA_TTL } from '@/config/nodeCache';
 import { exportWithKeyValueHeader } from '@/common/utils/xlsx';
 import * as svgCaptcha from 'svg-captcha';
 import { v4 as uuidv4 } from 'uuid';
@@ -562,10 +562,14 @@ export class UsersService extends BaseService {
       };
 
       const { text, data } = svgCaptcha.create(options);
+      console.log('[验证码生成] 生成的验证码文本:', text);
       const base64 = Buffer.from(data).toString('base64');
       const url = `data:image/svg+xml;base64,${base64}`;
       const codeKey = uuidv4();
-      await svgCache.set(codeKey, { text });
+      console.log('[验证码生成] 验证码Key:', codeKey);
+      console.log('[验证码生成] TTL:', CAPTCHA_TTL);
+      await svgCache.set(codeKey, { text }, CAPTCHA_TTL);
+      console.log('[验证码生成] 已保存到缓存');
 
       return ApiResult.success<Captcha>({
         data: {
@@ -574,6 +578,7 @@ export class UsersService extends BaseService {
         },
       });
     } catch (error) {
+      console.error('[验证码生成] 生成失败:', error);
       return ApiResult.error<null>((error as Error)?.message || '生成验证码失败！');
     }
   }
