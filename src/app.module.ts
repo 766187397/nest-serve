@@ -20,6 +20,7 @@ import { ScheduleModule as CustomScheduleModule } from './module/schedule/schedu
 import DBConfig, { type MysqlConfig, type SqliteConfig, type PgConfig } from '@/config/db';
 import { CacheModule } from './common/module/cache.module';
 import { CacheInitModule } from './common/module/cache-init.module';
+import { DocModule } from './module/doc/doc.module';
 
 @Module({
   imports: [
@@ -136,6 +137,7 @@ import { CacheInitModule } from './common/module/cache-init.module';
     CustomScheduleModule,
     CacheModule,
     CacheInitModule,
+    DocModule,
   ],
   controllers: [],
   providers: [

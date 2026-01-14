@@ -55,22 +55,6 @@ async function bootstrap() {
   // 暴露静态文件服务
   app.use('/doc.html', knife4jDoc.serveExpress('/doc.html'), express.static(knife4jDocPath));
 
-  // 获取底层 Express 实例
-  const httpAdapter = app.getHttpAdapter();
-  const expressApp = httpAdapter.getInstance();
-
-  // 添加获取 Swagger JSON 的接口
-  expressApp.get('/json', (req, res) => {
-    res.json(document);
-  });
-
-  // 添加下载 Swagger JSON 的接口
-  expressApp.get('/download', (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', 'attachment; filename=swagger.json');
-    res.send(JSON.stringify(document, null, 2));
-  });
-
   // 启用全局校验管道
   app.useGlobalPipes(
     new ValidationPipe({
