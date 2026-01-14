@@ -82,7 +82,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     else if (exception instanceof HttpException) {
       console.log('http异常', exception.getResponse());
       status = exception.getStatus();
-      code = getHttpStatusByErrorCode(status.toString()).toString();
+      code = status.toString();
       const exceptionResponse = exception.getResponse();
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;

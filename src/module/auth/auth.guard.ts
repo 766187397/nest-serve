@@ -46,7 +46,6 @@ export class AuthGuard implements CanActivate {
       token = req.headers['authorization']?.split(' ')[1]; // 从请求头获取 Bearer Token
     }
     if (!token && !state) {
-      // let { __isApiResult, ...data } = ApiResult.error({ code: HttpStatusCodes.UNAUTHORIZED, message: "请登录后访问！", data: null });
       throw new HttpException('请登录后访问！', HttpStatus.UNAUTHORIZED);
       return false;
     }
