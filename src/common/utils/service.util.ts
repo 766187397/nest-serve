@@ -2,18 +2,6 @@ import { Between, FindOptionsOrderValue } from 'typeorm';
 import * as dayjs from 'dayjs';
 import { svgCache } from '@/config/nodeCache';
 
-interface QueryParams {
-  [key: string]: unknown;
-}
-
-interface WhereClause {
-  [key: string]: unknown;
-}
-
-interface SortClause {
-  [key: string]: FindOptionsOrderValue;
-}
-
 interface VerifyParams {
   code: string;
   codeKey: string;
@@ -33,11 +21,13 @@ interface CaptchaCache {
  * const where = buildCommonQuery(query);
  * // where = { status: 1, createdAt: Between(start, end) }
  */
-export function buildCommonQuery(query: QueryParams | undefined): WhereClause {
+export function buildCommonQuery(
+  query: Record<string, unknown> | undefined
+): Record<string, unknown> {
   if (typeof query === 'undefined') {
     return {};
   }
-  const where: WhereClause = {};
+  const where: Record<string, unknown> = {};
   if (query.status) {
     where.status = query.status;
   }
@@ -120,10 +110,7 @@ export function buildCommonPaging(
  * const isValid = await buildVerify({ code: '1234', codeKey: 'captcha_key' });
  * // 如果验证码正确返回true，否则返回false
  */
-export async function buildVerify({
-  code,
-  codeKey,
-}: VerifyParams): Promise<boolean> {
+export async function buildVerify({ code, codeKey }: VerifyParams): Promise<boolean> {
   const codeCache = await svgCache.get<CaptchaCache>(codeKey);
 
   if (!codeCache) {
@@ -149,9 +136,6 @@ export async function buildVerify({
  * const isValid = await buildCommonVerify({ code: '1234', codeKey: 'captcha_key' });
  * // 如果验证码正确返回true，否则返回false
  */
-export async function buildCommonVerify({
-  code,
-  codeKey,
-}: VerifyParams): Promise<boolean> {
+export async function buildCommonVerify({ code, codeKey }: VerifyParams): Promise<boolean> {
   return buildVerify({ code, codeKey });
 }

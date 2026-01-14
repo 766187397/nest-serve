@@ -1,13 +1,5 @@
 import * as XLSX from 'xlsx';
 
-interface ExcelRowData {
-  [key: string]: unknown;
-}
-
-interface HeaderMap {
-  [key: string]: string;
-}
-
 interface ExcelExportResult {
   buffer: Buffer;
   fileName: string;
@@ -22,8 +14,8 @@ interface ExcelExportResult {
  * @returns 包含文件名和Buffer的对象
  */
 export function exportWithKeyValueHeader(
-  data: ExcelRowData[],
-  headerMap: HeaderMap,
+  data: Record<string, unknown>[],
+  headerMap: Record<string, string>,
   fileName: string = 'export',
   sheetName: string = 'Sheet1'
 ): ExcelExportResult {
@@ -59,9 +51,9 @@ export function exportWithKeyValueHeader(
  */
 export function importWithKeyValueHeader(
   fileBuffer: Buffer,
-  headerMap: HeaderMap,
+  headerMap: Record<string, string>,
   sheetName?: string
-): ExcelRowData[] {
+): Record<string, unknown>[] {
   // 读取Excel
   const workbook = XLSX.read(fileBuffer);
   const targetSheetName = sheetName || workbook.SheetNames[0];
@@ -71,7 +63,7 @@ export function importWithKeyValueHeader(
   const rawData = XLSX.utils.sheet_to_json(worksheet);
 
   // 转换数据格式
-  return rawData.map((item: ExcelRowData) => {
+  return rawData.map((item: Record<string, unknown>) => {
     const newItem: Record<string, unknown> = {};
     Object.keys(item).forEach((key) => {
       // 提取原始字段名(去掉显示名称)

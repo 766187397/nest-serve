@@ -5,7 +5,12 @@ import { Repository, FindOptionsOrderValue } from 'typeorm';
 import * as dayjs from 'dayjs';
 import { Schedule } from './entities/schedule.entity';
 import { ScheduleLog } from './entities/schedule-log.entity';
-import { CreateScheduleDto, UpdateScheduleDto, FindScheduleDtoByPage, FindScheduleLogDtoByPage } from './dto/index';
+import {
+  CreateScheduleDto,
+  UpdateScheduleDto,
+  FindScheduleDtoByPage,
+  FindScheduleLogDtoByPage,
+} from './dto/index';
 import { ApiResult } from '@/common/utils/result';
 import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 import { PageApiResult } from '@/types/public';
@@ -107,7 +112,10 @@ export class ScheduleService {
    * @param {string} platform 平台标识
    * @returns {Promise<ApiResult<Schedule[] | null>>} 统一返回结果
    */
-  async findAll(query: FindScheduleDtoByPage, platform: string = 'admin'): Promise<ApiResult<Schedule[] | null>> {
+  async findAll(
+    query: FindScheduleDtoByPage,
+    platform: string = 'admin'
+  ): Promise<ApiResult<Schedule[] | null>> {
     try {
       const where = buildCommonQuery(query);
       const order = buildCommonSort(query?.sort);

@@ -233,12 +233,12 @@ export class NoticeService {
       const userInfo = this.jwtService.verify(token, {
         secret: options.secret,
       });
-      
+
       interface JwtUserInfo {
         id: string;
         roles?: Array<{ key: string }>;
       }
-      
+
       const typedUserInfo = userInfo as JwtUserInfo;
       const roleKeys = typedUserInfo?.roles?.map((item: { key: string }) => item.key) || [];
 

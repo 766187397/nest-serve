@@ -1,18 +1,6 @@
 import { FindByParameter, PageByParameter } from '@/common/dto/base';
 import { ApiProperty, IntersectionType, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-
-interface UploadedFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  destination: string;
-  filename: string;
-  path: string;
-  buffer: Buffer;
-}
+import { IsNotEmpty } from 'class-validator';
 
 /** 文件上传  */
 export class FileUploadDTO {
@@ -23,7 +11,7 @@ export class FileUploadDTO {
     description: '文件上传',
   })
   @IsNotEmpty({ message: '文件不能为空' })
-  file: UploadedFile;
+  file: Express.Multer.File;
 }
 /** 查询所有文件 */
 export class FindFileDto extends FindByParameter {

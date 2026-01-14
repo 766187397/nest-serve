@@ -12,14 +12,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { HttpStatusCodes } from '@/common/constants/http-status';
-
-interface JwtPayload {
-  account: string;
-  id: string;
-  nickName?: string;
-  platform?: string;
-  [key: string]: unknown;
-}
+import { JwtPayload } from '@/types/auth';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

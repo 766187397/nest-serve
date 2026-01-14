@@ -21,7 +21,11 @@ export class MulterConfigInterceptor implements NestInterceptor {
     this.upload = multer({
       storage: diskStorage({
         destination: config.rootPath,
-        filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+        filename: (
+          req: Request,
+          file: Express.Multer.File,
+          cb: (error: Error | null, filename: string) => void
+        ) => {
           const safeFileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
           cb(null, `${Date.now()}-${safeFileName}`);
         },

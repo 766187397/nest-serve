@@ -10,13 +10,6 @@ import { PageApiResult } from '@/types/public';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 
-interface UploadedFile {
-  path: string;
-  filename: string;
-  size: number;
-  mimetype: string;
-}
-
 @Injectable()
 export class UploadService {
   constructor(
@@ -29,7 +22,10 @@ export class UploadService {
    * @param file 文件
    * @returns {Promise<ApiResult<UploadFile | null>>} 统一返回结果
    */
-  async uploadFile(file: UploadedFile, hash?: string): Promise<ApiResult<UploadFile | null>> {
+  async uploadFile(
+    file: Express.Multer.File,
+    hash?: string
+  ): Promise<ApiResult<UploadFile | null>> {
     try {
       if (!file) {
         return ApiResult.error('文件不能为空！');

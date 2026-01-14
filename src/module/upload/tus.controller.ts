@@ -20,7 +20,7 @@ export class TusController implements OnModuleInit {
 
   constructor(
     private readonly uploadService: UploadService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   onModuleInit() {
@@ -47,11 +47,17 @@ export class TusController implements OnModuleInit {
       const newPath = path.join(this.uploadDir, `${event.file.id}${extension}`);
 
       fs.renameSync(oldPath, newPath);
-      const file = {
-        path: newPath,
-        filename: `${event.file.id}${extension}`,
-        size: event.file.upload_length,
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: originalName,
+        encoding: '7bit',
         mimetype: metadata.filetype,
+        size: event.file.upload_length,
+        destination: this.uploadDir,
+        filename: `${event.file.id}${extension}`,
+        path: newPath,
+        buffer: Buffer.alloc(0),
+        stream: null as any,
       };
       await this.uploadService.uploadFile(file, metadata.hash);
     });

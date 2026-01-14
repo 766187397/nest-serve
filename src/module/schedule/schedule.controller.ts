@@ -53,7 +53,10 @@ export class ScheduleController {
 
   @Get('all')
   @ApiOperation({ summary: '查询定时任务列表(不分页)' })
-  findAll(@Headers('x-platform') platform: string, @Query(new FilterEmptyPipe()) query: FindAllQueryParams) {
+  findAll(
+    @Headers('x-platform') platform: string,
+    @Query(new FilterEmptyPipe()) query: Record<string, unknown>
+  ) {
     return this.scheduleService.findAll(query, platform);
   }
 

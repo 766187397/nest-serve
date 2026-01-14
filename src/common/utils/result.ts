@@ -1,5 +1,6 @@
 import { HttpException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import { HttpStatusCodes } from '@/common/constants/http-status';
 
 interface Result<T> {
   code?: number;
@@ -9,22 +10,11 @@ interface Result<T> {
   timestamp?: string;
 }
 
-export const HttpStatusCodes = {
-  OK: 200,
-  CREATED: 201,
-  NO_CONTENT: 204,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  INTERNAL_SERVER_ERROR: 500,
-};
-
 export class ApiResult<T> {
   readonly __isApiResult = true;
 
   constructor(
-    public code: number = 200,
+    public code: number = HttpStatusCodes.OK,
     public message: string = '操作成功',
     public data: T | null = null,
     public timestamp: string = new Date().toISOString()
@@ -33,7 +23,7 @@ export class ApiResult<T> {
   static success<T>({
     data = null,
     message = '操作成功',
-    code = 200,
+    code = HttpStatusCodes.OK,
     entities,
   }: Result<T> = {}): ApiResult<T> {
     if (entities) {
@@ -44,7 +34,7 @@ export class ApiResult<T> {
 
   static error<T>(param: Error | string | Result<T> = {}): ApiResult<T> {
     let message = '操作失败',
-      code = 400,
+      code = HttpStatusCodes.BAD_REQUEST,
       data: T | null = null;
     if (param instanceof HttpException) {
       // 获取 HttpException 的响应内容和状态码

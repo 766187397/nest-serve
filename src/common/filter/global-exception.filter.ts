@@ -26,7 +26,7 @@ interface HttpExceptionResponse {
 export class GlobalExceptionFilter implements ExceptionFilter {
   constructor(
     private readonly loggerService: LoggerService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -66,7 +66,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       status = exception.getStatus();
       code = ErrorCodes.VALIDATION_ERROR;
       const exceptionResponse = exception.getResponse() as HttpExceptionResponse;
-      message = Array.isArray(exceptionResponse.message) ? exceptionResponse.message.join(',') : exceptionResponse.message;
+      message = Array.isArray(exceptionResponse.message)
+        ? exceptionResponse.message.join(',')
+        : exceptionResponse.message;
     }
     // 超出文件大小限制
     else if (exception instanceof PayloadTooLargeException) {
