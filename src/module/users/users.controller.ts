@@ -8,29 +8,21 @@ import {
   Delete,
   Query,
   Res,
-  Req,
-  Header,
   Headers,
   HttpCode,
+  Header,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { ApiResult } from '@/common/utils/result';
 import {
   CreateUserDto,
   UpdateUserDto,
   FindUserDto,
   FindUserDtoByPage,
-  LogInDto,
-  VerificationCodeLoginDto,
-  CaptchaDto,
-  SimpleLoginDto,
 } from './dto/index';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
-import { Request, Response } from 'express';
-import { getPlatformJwtConfig, JwtConfig } from '@/config/jwt';
-import { UserLogin } from '@/types/user';
-import { BusinessStatusCodes, HttpStatusCodes } from '@/common/constants/http-status';
+import { Response } from 'express';
+import { HttpStatusCodes } from '@/common/constants/http-status';
 
 @ApiTags('用户管理')
 // @ApiBearerAuth("Authorization")
@@ -41,7 +33,7 @@ import { BusinessStatusCodes, HttpStatusCodes } from '@/common/constants/http-st
 @ApiResponse({ status: 403, description: '权限不足' })
 @ApiResponse({ status: 404, description: '请求资源不存在' })
 @ApiResponse({ status: 500, description: '服务器异常，请联系管理员' })
-@Controller('api/v1/admin/users')
+@Controller('api/v1/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -69,12 +61,6 @@ export class UsersController {
     return this.usersService.findAll(findUserDto, platform);
   }
 
-  @Get('captcha')
-  @ApiOperation({ summary: '获取验证码' })
-  async captcha(@Query(new FilterEmptyPipe()) captchaDto: CaptchaDto) {
-    return await this.usersService.captcha(captchaDto);
-  }
-
   @Get(':id')
   @ApiOperation({ summary: '查询用户详情' })
   findOne(@Param('id') id: string) {
@@ -92,72 +78,6 @@ export class UsersController {
   @HttpCode(204)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
-  }
-
-  @Post('login')
-  @ApiOperation({ summary: '用户登录' })
-  logIn(@Body() loginDto: LogInDto) {
-    return this.usersService.logIn(loginDto, 'admin');
-  }
-
-  @Post('simple-login')
-  @ApiOperation({ summary: '简化登录（仅账号密码）' })
-  simpleLogin(@Body() simpleLoginDto: SimpleLoginDto) {
-    return this.usersService.simpleLogin(simpleLoginDto, 'admin');
-  }
-
-  @Post('login/set-cookie')
-  @ApiOperation({ summary: '用户登录(设置Cookie)' })
-  async logInSetCookie(@Body() loginDto: LogInDto, @Res({ passthrough: true }) res: Response) {
-    const result = await this.usersService.logIn(loginDto, 'admin');
-    const data = result as { code: number; data: UserLogin };
-    if (data.code == 200) {
-      const options = getPlatformJwtConfig('admin') as JwtConfig;
-      res.cookie('token', data.data.access_token, {
-        maxAge: Number(options.jwt_expires_in),
-      });
-      res.cookie('refresh_token', data.data.refresh_token, {
-        maxAge: Number(options.jwt_refresh_expires_in),
-      });
-    }
-    return result;
-  }
-
-  @Post('login/verification-code')
-  @ApiOperation({ summary: '邮箱验证码登录' })
-  async verificationCodeLogin(@Body() verificationCodeLogin: VerificationCodeLoginDto) {
-    return this.usersService.VerificationCodeLogin(verificationCodeLogin, 'admin');
-  }
-
-  @Get('refresh-token')
-  @ApiOperation({ summary: '刷新token' })
-  async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    let refresh_token: string | undefined;
-    if (req.cookies && req.cookies.refresh_token) {
-      refresh_token = req.cookies.refresh_token;
-    }
-    if (!refresh_token) {
-      refresh_token = (req.headers['refresh_token'] as string)?.split(' ')[1];
-    }
-    if (!refresh_token) {
-      return ApiResult.error<null>('refreshToken不存在，请先登录！');
-    }
-    const result = await this.usersService.refreshToken(refresh_token, 'admin');
-    if (result.code == BusinessStatusCodes.SUCCESS) {
-      const options = getPlatformJwtConfig('admin') as JwtConfig;
-      res.cookie('token', result.data?.access_token, {
-        maxAge: Number(options.jwt_expires_in),
-      });
-    }
-    return result;
-  }
-
-  @Post('logout')
-  @ApiOperation({ summary: '退出登录清除Cookie' })
-  @HttpCode(204)
-  logout(@Res({ passthrough: true }) res: Response) {
-    res.cookie('token', '', { expires: new Date(0) });
-    res.cookie('refresh_token', '', { expires: new Date(0) });
   }
 
   @Get('export')

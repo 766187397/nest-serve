@@ -14,11 +14,11 @@ import { Roles } from '@/common/decorator/roles.decorator';
 @ApiResponse({ status: 403, description: '权限不足' })
 @ApiResponse({ status: 404, description: '请求资源不存在' })
 @ApiResponse({ status: 500, description: '服务器异常，请联系管理员' })
-@Controller('api/v1/admin/logger')
+@Controller('api/v1/logger')
 export class LoggerController {
   constructor(private readonly loggerService: LoggerService) {}
   @Roles('admin', 'dev')
-  @Get('page')
+  @Get()
   @ApiOperation({ summary: '查询日志列表(分页)' })
   findByPage(
     @Headers('x-platform') platform: string,

@@ -28,7 +28,7 @@ import { HttpStatusCodes } from '@/common/constants/http-status';
 @ApiResponse({ status: 403, description: '权限不足' })
 @ApiResponse({ status: 404, description: '请求资源不存在' })
 @ApiResponse({ status: 500, description: '服务器异常，请联系管理员' })
-@Controller('api/v1/admin/email')
+@Controller('api/v1/email')
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}
 
@@ -38,7 +38,7 @@ export class EmailController {
     return this.emailService.create(createEmailDto, platform);
   }
 
-  @Get('page')
+  @Get()
   @ApiOperation({ summary: '查询邮箱列表(分页)' })
   findByPage(
     @Headers('x-platform') platform: string,
@@ -56,7 +56,7 @@ export class EmailController {
     return this.emailService.findAll(findEmailDto, platform);
   }
 
-  @Get('info/:id')
+  @Get(':id')
   @ApiOperation({ summary: '查询邮箱详情' })
   findOne(@Param('id') id: string) {
     return this.emailService.findOne(+id);
@@ -75,7 +75,7 @@ export class EmailController {
     return this.emailService.remove(+id);
   }
 
-  @Post('send/email')
+  @Post('send')
   @ApiOperation({ summary: '发送邮箱（自定义变量格式：验证码为{code}）' })
   sendEmail(@Body() sendEmail: SendEmail, @Req() req: Request) {
     const userInfo = req.userInfo as User;

@@ -28,7 +28,7 @@ import { HttpStatusCodes } from '@/common/constants/http-status';
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Post('file')
+  @Post()
   @ApiOperation({ summary: '文件上传' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file', FileUploadService.multerOptions))
@@ -56,7 +56,7 @@ export class UploadController {
     return this.uploadService.getFileAll(FindFileDto);
   }
 
-  @Get('page')
+  @Get()
   @ApiOperation({ summary: '分页查询文件' })
   getFileByPage(@Query(new FilterEmptyPipe()) findFileDtoByPage: FindFileDtoByPage) {
     return this.uploadService.getFileByPage(findFileDtoByPage);
@@ -103,14 +103,14 @@ export class UploadController {
       });
   }
 
-  @Get('info/:id')
+  @Get(':id')
   @ApiParam({ name: 'id', required: true, description: '文件 ID' })
   @ApiOperation({ summary: '根据id获取文件' })
-  getFileById(@Query('id') id: string) {
+  getFileById(@Param('id') id: string) {
     return this.uploadService.getFileById(id);
   }
 
-  @Delete('delete/:id')
+  @Delete(':id')
   @ApiOperation({ summary: '根据id删除文件' })
   @ApiParam({ name: 'id', required: true, description: '文件 ID' })
   @HttpCode(HttpStatusCodes.NO_CONTENT)

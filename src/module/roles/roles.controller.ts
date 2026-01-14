@@ -25,7 +25,7 @@ import { HttpStatusCodes } from '@/common/constants/http-status';
 @ApiResponse({ status: 403, description: '权限不足' })
 @ApiResponse({ status: 404, description: '请求资源不存在' })
 @ApiResponse({ status: 500, description: '服务器异常，请联系管理员' })
-@Controller('api/v1/admin/roles')
+@Controller('api/v1/roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
@@ -35,7 +35,7 @@ export class RolesController {
     return this.rolesService.create(createRoleDto, platform);
   }
 
-  @Get('page')
+  @Get()
   @ApiOperation({ summary: '查询角色列表(分页)' })
   findByPage(
     @Headers('x-platform') platform: string,
@@ -53,7 +53,7 @@ export class RolesController {
     return this.rolesService.findAll(findRoleDto, platform);
   }
 
-  @Get('info/:id')
+  @Get(':id')
   @ApiOperation({ summary: '查询角色详情' })
   findOne(@Param('id') id: string) {
     return this.rolesService.findOne(id);

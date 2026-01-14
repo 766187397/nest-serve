@@ -34,7 +34,7 @@ import { HttpStatusCodes, BusinessStatusCodes } from '@/common/constants/http-st
 @ApiResponse({ status: 403, description: '权限不足' })
 @ApiResponse({ status: 404, description: '请求资源不存在' })
 @ApiResponse({ status: 500, description: '服务器异常，请联系管理员' })
-@Controller('/api/v1/admin/notice')
+@Controller('/api/v1/notice')
 export class NoticeController {
   constructor(
     private readonly noticeService: NoticeService,
@@ -52,7 +52,7 @@ export class NoticeController {
     return data;
   }
 
-  @Get('page')
+  @Get()
   @ApiOperation({ summary: '查询公告列表(分页,后端编辑使用查询所有)' })
   findByPage(
     @Headers('x-platform') platform: string,
@@ -81,7 +81,7 @@ export class NoticeController {
     );
   }
 
-  @Get('info/:id')
+  @Get(':id')
   @ApiOperation({ summary: '获取公告' })
   findOne(@Param('id') id: string) {
     return this.noticeService.findOne(id);

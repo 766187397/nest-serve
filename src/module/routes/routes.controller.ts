@@ -36,7 +36,7 @@ import { HttpStatusCodes } from '@/common/constants/http-status';
 @ApiResponse({ status: 403, description: '权限不足' })
 @ApiResponse({ status: 404, description: '请求资源不存在' })
 @ApiResponse({ status: 500, description: '服务器异常，请联系管理员' })
-@Controller('api/v1/admin/routes')
+@Controller('api/v1/routes')
 export class RoutesController {
   constructor(private readonly routesService: RoutesService) {}
 
@@ -46,7 +46,7 @@ export class RoutesController {
     return this.routesService.create(createRouteDto, platform);
   }
 
-  @Get('all')
+  @Get()
   @ApiOperation({ summary: '查询所有路由' })
   findAll(
     @Headers('x-platform') platform: string,

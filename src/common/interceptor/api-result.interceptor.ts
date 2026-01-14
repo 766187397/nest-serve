@@ -30,6 +30,7 @@ export class ApiResultInterceptor implements NestInterceptor {
     }
     return next.handle().pipe(
       map((data) => {
+        const timestamp = new Date().toISOString();
         if (data?.__isApiResult) {
           delete data.__isApiResult;
           response.status(data.code);
@@ -37,7 +38,7 @@ export class ApiResultInterceptor implements NestInterceptor {
             code: data.code,
             message: data.message,
             data: data.data,
-            timestamp: data.timestamp,
+            timestamp: data.timestamp || timestamp,
           };
         }
         // 如果是白名单中的接口就不处理响应
@@ -50,6 +51,7 @@ export class ApiResultInterceptor implements NestInterceptor {
             code: HttpStatus.OK,
             message: '操作成功',
             data,
+            timestamp,
           };
         }
         // 其他格式响应不处理
