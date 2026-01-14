@@ -15,6 +15,7 @@ import { PageApiResult } from '@/types/public';
 import { Role } from '@/module/roles/entities/role.entity';
 import { exportWithKeyValueHeader } from '@/common/utils/xlsx';
 import { HttpStatusCodes } from '@/common/constants/http-status';
+import { handlePlatformQuery } from '@/common/utils/query.util';
 
 @Injectable()
 export class UsersService extends BaseService {
@@ -42,7 +43,9 @@ export class UsersService extends BaseService {
       const { account = null, phone = null, email = null, roleIds = [] } = createUserDto;
       // 构建查询条件
       const queryBuilder = this.userRepository.createQueryBuilder('user');
-      queryBuilder.andWhere('user.platform = :platform', { platform });
+      // 处理平台查询条件
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      queryBuilder.andWhere('user.platform = :platform', { platform: finalPlatform });
       if (account || phone || email) {
         // 使用Brackets，防止orWhere的优先级高于andWhere的platform 条件
         queryBuilder.andWhere(
@@ -95,7 +98,7 @@ export class UsersService extends BaseService {
       const [data, total] = await this.userRepository.findAndCount({
         where: {
           ...where,
-          platform: platform,
+          platform: handlePlatformQuery(platform, findUserDtoByPage?.platform),
           account: findUserDtoByPage?.account ? ILike(`%${findUserDtoByPage.account}%`) : undefined,
           nickName: findUserDtoByPage?.nickName
             ? ILike(`%${findUserDtoByPage.nickName}%`)
@@ -142,7 +145,7 @@ export class UsersService extends BaseService {
       const data = await this.userRepository.find({
         where: {
           ...where,
-          platform,
+          platform: handlePlatformQuery(platform, findUserDto?.platform),
           account: findUserDto?.account ? ILike(`%${findUserDto.account}%`) : undefined,
           nickName: findUserDto?.nickName ? ILike(`%${findUserDto.nickName}%`) : undefined,
           email: findUserDto?.email ? ILike(`%${findUserDto.email}%`) : undefined,
@@ -271,7 +274,7 @@ export class UsersService extends BaseService {
       const [data] = await this.userRepository.findAndCount({
         where: {
           ...where,
-          platform: platform,
+          platform: handlePlatformQuery(platform, findUserDtoByPage?.platform),
           account: findUserDtoByPage?.account ? ILike(`%${findUserDtoByPage.account}%`) : undefined,
           nickName: findUserDtoByPage?.nickName
             ? ILike(`%${findUserDtoByPage.nickName}%`)

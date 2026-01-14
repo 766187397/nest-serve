@@ -34,13 +34,24 @@ export class FindByParameter {
 
   @ApiProperty({
     type: 'string',
-    description: '状态；1 - 启用，2 - 禁用；根据模块业务定义',
+    description:
+      '状态；1 - 启用，2 - 禁用；根据模块业务定义',
     required: false,
     example: 1,
   })
   @IsOptional()
   @IsString({ message: '状态值必须为字符串' })
   status?: string;
+
+  @ApiProperty({
+    type: 'string',
+    description: '平台标识（仅admin平台可使用，用于查询任意平台数据）',
+    required: false,
+    example: 'web',
+  })
+  @IsOptional()
+  @IsString({ message: '平台标识必须为字符串' })
+  platform?: string;
 
   @ApiProperty({
     type: 'string',

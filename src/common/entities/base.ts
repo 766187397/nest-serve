@@ -58,3 +58,46 @@ export abstract class AutoIDBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ comment: 'ID' })
   id: number;
 }
+
+/** 无平台标识的基础实体（用于全平台共享的数据） */
+export abstract class NoPlatformBaseEntity {
+  @Column({ default: 1, comment: '排序' })
+  sort: number;
+
+  @Column({
+    default: 1,
+    comment: '状态；1 - 启用，2 - 禁用；根据业务定义，默认值为1，尽量将1作为保守值',
+  })
+  status: number;
+
+  @CreateDateColumn({ comment: '创建时间' })
+  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
+  createdAt: Date;
+
+  @UpdateDateColumn({ comment: '更新时间' })
+  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
+  updatedAt: Date;
+
+  @DeleteDateColumn({ comment: '删除时间' })
+  @Exclude({ toPlainOnly: true })
+  deletedAt: Date;
+}
+
+/** 无平台标识的UUID基础实体 */
+export abstract class NoPlatformUUIDBaseEntity extends NoPlatformBaseEntity {
+  @PrimaryColumn({ type: 'varchar', length: 36, comment: 'uuid' })
+  id: string;
+
+  @BeforeInsert()
+  generateId() {
+    if (!this.id) {
+      this.id = uuidv4();
+    }
+  }
+}
+
+/** 无平台标识的自增id基础实体 */
+export abstract class NoPlatformAutoIDBaseEntity extends NoPlatformBaseEntity {
+  @PrimaryGeneratedColumn({ comment: 'ID' })
+  id: number;
+}

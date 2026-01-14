@@ -16,6 +16,7 @@ import { emailCache, cacheTime, EMAIL_CODE_TTL } from '@/config/nodeCache';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import { Cron } from '@nestjs/schedule';
+import { handlePlatformQuery } from '@/common/utils/query.util';
 
 // 创建一个SMTP客户端配置对象
 const QQPostbox = nodemailer.createTransport({
@@ -92,7 +93,7 @@ export class EmailService extends BaseService {
       const [data, total] = await this.emailRepository.findAndCount({
         where: {
           ...where,
-          platform: platform,
+          platform: handlePlatformQuery(platform, findEmailtoByPage?.platform),
           title: findEmailtoByPage?.title ? ILike(`%${findEmailtoByPage.title}%`) : undefined,
         },
         order: {
@@ -134,7 +135,7 @@ export class EmailService extends BaseService {
       const data = await this.emailRepository.find({
         where: {
           ...where,
-          platform,
+          platform: handlePlatformQuery(platform, findEmailDto?.platform),
           title: findEmailDto?.title ? ILike(`%${findEmailDto.title}%`) : undefined,
         },
         order: {
@@ -245,7 +246,7 @@ export class EmailService extends BaseService {
         subject: title,
         content: html,
         sendStatus: false,
-        sender: userInfo?.account || 'system',
+        sender: userInfo?.account || '',
         templateId: emailTemplate.id.toString(),
       });
       await this.emailSendRecordRepository.save(emailSendRecord);

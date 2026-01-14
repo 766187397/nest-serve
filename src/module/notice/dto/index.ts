@@ -79,16 +79,6 @@ export class FindNoticeDto extends FindByParameter {
   @IsOptional()
   @IsString({ message: '标题必须是字符串' })
   title?: string;
-
-  @ApiProperty({
-    name: 'platform',
-    type: String,
-    required: false,
-    description: '指定的平台标识（如admin/web/app/mini）',
-  })
-  @IsOptional()
-  @IsString({ message: '平台标识必须是字符串' })
-  platform?: string;
 }
 
 /** 分页查询通知 */

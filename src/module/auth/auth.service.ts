@@ -24,6 +24,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import { Response, Request } from 'express';
 import { BaseService } from '@/common/service/base';
+import { handlePlatformQuery } from '@/common/utils/query.util';
 
 @Injectable()
 export class AuthService extends BaseService {
@@ -93,7 +94,7 @@ export class AuthService extends BaseService {
       }
 
       const data = await this.userRepository.findOne({
-        where: { account: logInDto.account, platform },
+        where: { account: logInDto.account, platform: handlePlatformQuery(platform, undefined) },
         relations: ['roles'],
       });
 
@@ -152,7 +153,7 @@ export class AuthService extends BaseService {
   ): Promise<ApiResult<UserLogin | null>> {
     try {
       const data = await this.userRepository.findOne({
-        where: { account: simpleLoginDto.account, platform },
+        where: { account: simpleLoginDto.account, platform: handlePlatformQuery(platform, undefined) },
         relations: ['roles'],
       });
 
@@ -254,7 +255,7 @@ export class AuthService extends BaseService {
         secret: options.secret,
       });
       const user = await this.userRepository.findOne({
-        where: { id, platform },
+        where: { id, platform: handlePlatformQuery(platform, undefined) },
         relations: ['roles'],
       });
       if (!user) {
@@ -305,7 +306,7 @@ export class AuthService extends BaseService {
   ): Promise<ApiResult<UserLogin | null>> {
     try {
       const data = await this.userRepository.findOne({
-        where: { email: verificationCodeLogin.email, platform },
+        where: { email: verificationCodeLogin.email, platform: handlePlatformQuery(platform, undefined) },
         relations: ['roles'],
       });
       if (!data) {

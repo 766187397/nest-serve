@@ -7,6 +7,7 @@ import { BaseService } from '@/common/service/base';
 import { ApiResult } from '@/common/utils/result';
 import { Role } from '@/module/roles/entities/role.entity';
 import { RoleRoutes, RouteInfo } from '@/types/routes';
+import { handlePlatformQuery } from '@/common/utils/query.util';
 
 @Injectable()
 export class RoutesService extends BaseService {
@@ -35,7 +36,7 @@ export class RoutesService extends BaseService {
       let parent: Route | null = null;
       if (createRouteDto.parentId) {
         parent = await this.routeRepository.findOne({
-          where: { id: createRouteDto.parentId, platform },
+          where: { id: createRouteDto.parentId, platform: handlePlatformQuery(platform, undefined) },
           relations: ['children'],
         });
         if (!parent) {
@@ -43,7 +44,7 @@ export class RoutesService extends BaseService {
         }
       }
       const routeInfo = await this.routeRepository.findOne({
-        where: { name: createRouteDto.name, platform },
+        where: { name: createRouteDto.name, platform: handlePlatformQuery(platform, undefined) },
       });
       if (routeInfo) {
         return ApiResult.error<null>(`路由${routeInfo.name}已存在`);
@@ -73,7 +74,7 @@ export class RoutesService extends BaseService {
       const order = this.buildCommonSort(findRouteDto?.sort);
       const data = await this.routeRepository.find({
         where: {
-          platform,
+          platform: handlePlatformQuery(platform, findRouteDto?.platform),
           type: findRouteDto.type,
         },
         order: { ...order },
@@ -235,7 +236,7 @@ export class RoutesService extends BaseService {
       const rootRoutes = await this.routeRepository.find({
         where: {
           id: In(routeIds),
-          platform,
+          platform: handlePlatformQuery(platform, undefined),
           type,
         },
         order: { ...order },

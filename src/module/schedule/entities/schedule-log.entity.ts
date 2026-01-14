@@ -1,0 +1,21 @@
+import { UUIDBaseEntity } from '@/common/entities/base';
+import { Column, Entity, Index } from 'typeorm';
+
+@Entity('schedule_log', { comment: '定时任务执行日志表' })
+@Index('IDX_schedule_log_id_deletedAt', ['id', 'deletedAt'])
+export class ScheduleLog extends UUIDBaseEntity {
+  @Column({ type: 'varchar', length: 36, comment: '关联的任务ID' })
+  scheduleId: string;
+
+  @Column({ type: 'timestamp', comment: '执行时间' })
+  executionTime: Date;
+
+  @Column({ type: 'varchar', length: 20, comment: '执行状态（success/failed）' })
+  executionStatus: string;
+
+  @Column({ type: 'bigint', comment: '执行耗时（毫秒）' })
+  duration: number;
+
+  @Column({ type: 'text', nullable: true, comment: '错误信息' })
+  errorMessage: string;
+}

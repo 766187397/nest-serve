@@ -14,6 +14,7 @@ import { PageApiResult } from '@/types/public';
 import { JwtService } from '@nestjs/jwt';
 import { getPlatformJwtConfig, JwtConfig } from '@/config/jwt';
 import { NoticeByPageByUserOrRole, NoticeWsFindUserOrRole } from '@/types/notice';
+import { handlePlatformQuery } from '@/common/utils/query.util';
 @Injectable()
 export class NoticeService extends BaseService {
   constructor(
@@ -35,7 +36,7 @@ export class NoticeService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<Notice | null>> {
     try {
-      Object.assign(createNoticeDto, { platform });
+      Object.assign(createNoticeDto, { platform: handlePlatformQuery(platform, undefined) });
       const notice = this.noticeRepository.create(createNoticeDto);
       const data = await this.noticeRepository.save(notice);
       return ApiResult.success<Notice>({ data });
@@ -65,7 +66,7 @@ export class NoticeService extends BaseService {
         where: {
           ...where,
           title: findNoticeDtoByPage?.title ? ILike(`%${findNoticeDtoByPage.title}%`) : undefined,
-          platform,
+          platform: handlePlatformQuery(platform, findNoticeDtoByPage?.platform),
         },
         order,
         take,
@@ -107,7 +108,7 @@ export class NoticeService extends BaseService {
       );
       const order = this.buildCommonSort();
       const where = {
-        platform,
+        platform: handlePlatformQuery(platform, undefined),
         status: 2,
       };
       const [data, total] = await this.noticeRepository.findAndCount({
@@ -238,7 +239,7 @@ export class NoticeService extends BaseService {
       const { take, skip } = this.buildCommonPaging(1, 3);
       const order = this.buildCommonSort();
       const where = {
-        platform,
+        platform: handlePlatformQuery(platform, undefined),
         READUserIds: Not(Like(`%${userInfo.id}%`)), // 未读通知
         status: 2,
       };

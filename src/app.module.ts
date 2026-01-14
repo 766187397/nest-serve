@@ -17,6 +17,7 @@ import { NoticeModule } from './module/notice/notice.module';
 import { DictionaryModule } from './module/dictionary/dictionary.module';
 import { EmailModule } from './module/email/email.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ScheduleModule as CustomScheduleModule } from './module/schedule/schedule.module';
 import DBConfig, { type MysqlConfig, type SqliteConfig, type PgConfig } from '@/config/db';
 import { CacheModule } from './common/module/cache.module';
 import { CacheInitModule } from './common/module/cache-init.module';
@@ -134,6 +135,7 @@ import { CacheInitModule } from './common/module/cache-init.module';
     NoticeModule,
     DictionaryModule,
     EmailModule,
+    CustomScheduleModule,
     CacheModule,
     CacheInitModule,
   ],

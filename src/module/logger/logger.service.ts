@@ -7,15 +7,12 @@ import { LessThan, Repository } from 'typeorm';
 import { FindLogDtoByPage } from './dto/index';
 import { PageApiResult } from '@/types/public';
 import { Request } from 'express';
-import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 
 @Injectable()
 export class LoggerService extends BaseService {
   constructor(
     @InjectRepository(Log, 'logger')
-    private logRepository: Repository<Log>,
-    @Inject(SchedulerRegistry)
-    private schedulerRegistry: SchedulerRegistry
+    private logRepository: Repository<Log>
   ) {
     super();
   }
@@ -126,21 +123,12 @@ export class LoggerService extends BaseService {
     }
   }
 
-  // 每天午夜执行
-  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-
   /**
-   * cron 规则
-   * 第1位：秒（0）
-   * 第2位：分钟（0）
-   * 第3位：小时（0）
-   * 第4位：日（1）
-   * 第5位：月（任意）
-   * 第6位：星期（任意）
+   * 删除30天前的日志
+   * @description 该方法用于删除30天前的日志记录，由定时任务模块调用
+   * @returns {Promise<void>}
    */
-  // 自定义 cron 表达式：每月01日0时0分执行
-  @Cron('0 0 0 1 * *')
-  async deleteLogs() {
+  async deleteLogs(): Promise<void> {
     try {
       console.log('定时任务删除日志');
       await this.logRepository.delete({
@@ -148,6 +136,7 @@ export class LoggerService extends BaseService {
       });
     } catch (error) {
       console.log('日志删除失败，请稍后再试', error);
+      throw error;
     }
   }
 }

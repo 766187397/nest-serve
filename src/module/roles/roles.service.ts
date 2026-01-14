@@ -7,6 +7,7 @@ import { Brackets, ILike, In, Not, Repository, UpdateResult } from 'typeorm';
 import { ApiResult } from '@/common/utils/result';
 import { PageApiResult } from '@/types/public';
 import { Route } from '@/module/routes/entities/route.entity';
+import { handlePlatformQuery } from '@/common/utils/query.util';
 
 @Injectable()
 export class RolesService extends BaseService {
@@ -33,7 +34,9 @@ export class RolesService extends BaseService {
       const { name, roleKey } = createRoleDto;
       // 构建查询条件
       const queryBuilder = this.roleRepository.createQueryBuilder('role');
-      queryBuilder.andWhere('role.platform = :platform', { platform });
+      // 处理平台查询条件
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      queryBuilder.andWhere('role.platform = :platform', { platform: finalPlatform });
       if (name || roleKey) {
         queryBuilder.andWhere(
           new Brackets((qb) => {
@@ -80,7 +83,7 @@ export class RolesService extends BaseService {
       const [data, total] = await this.roleRepository.findAndCount({
         where: {
           ...where,
-          platform: platform,
+          platform: handlePlatformQuery(platform, findRoleDtoByPage?.platform),
           name: findRoleDtoByPage?.name ? ILike(`%${findRoleDtoByPage.name}%`) : undefined,
           roleKey: findRoleDtoByPage?.roleKey,
         },
@@ -123,7 +126,7 @@ export class RolesService extends BaseService {
       const data = await this.roleRepository.find({
         where: {
           ...where,
-          platform,
+          platform: handlePlatformQuery(platform, findRoleDto?.platform),
           name: findRoleDto?.name ? ILike(`%${findRoleDto.name}%`) : undefined,
           roleKey: findRoleDto?.roleKey,
         },
@@ -146,7 +149,7 @@ export class RolesService extends BaseService {
   async findOne(id: string, platform: string = 'admin'): Promise<ApiResult<Role | null>> {
     try {
       const data = await this.roleRepository.findOne({
-        where: { id, platform },
+        where: { id, platform: handlePlatformQuery(platform, undefined) },
         relations: ['routes'],
       });
       if (!data) {
