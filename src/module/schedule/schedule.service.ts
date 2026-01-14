@@ -1,11 +1,11 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
-import { Repository } from 'typeorm';
+import { Repository, FindOptionsOrderValue } from 'typeorm';
 import * as dayjs from 'dayjs';
 import { Schedule } from './entities/schedule.entity';
 import { ScheduleLog } from './entities/schedule-log.entity';
-import { CreateScheduleDto, UpdateScheduleDto } from './dto/index';
+import { CreateScheduleDto, UpdateScheduleDto, FindScheduleDtoByPage, FindScheduleLogDtoByPage } from './dto/index';
 import { ApiResult } from '@/common/utils/result';
 import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 import { PageApiResult } from '@/types/public';
@@ -60,12 +60,12 @@ export class ScheduleService {
 
   /**
    * 分页查询定时任务
-   * @param {any} query 查询条件
+   * @param {FindScheduleDtoByPage} query 查询条件
    * @param {string} platform 平台标识
    * @returns {Promise<ApiResult<PageApiResult<Schedule[]> | null>>} 统一返回结果
    */
   async findByPage(
-    query: any,
+    query: FindScheduleDtoByPage,
     platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<Schedule[]> | null>> {
     try {
@@ -103,11 +103,11 @@ export class ScheduleService {
 
   /**
    * 查询所有定时任务
-   * @param {any} query 查询条件
+   * @param {FindScheduleDtoByPage} query 查询条件
    * @param {string} platform 平台标识
    * @returns {Promise<ApiResult<Schedule[] | null>>} 统一返回结果
    */
-  async findAll(query: any, platform: string = 'admin'): Promise<ApiResult<Schedule[] | null>> {
+  async findAll(query: FindScheduleDtoByPage, platform: string = 'admin'): Promise<ApiResult<Schedule[] | null>> {
     try {
       const where = buildCommonQuery(query);
       const order = buildCommonSort(query?.sort);
@@ -275,12 +275,12 @@ export class ScheduleService {
 
   /**
    * 分页查询任务执行日志
-   * @param {any} query 查询条件
+   * @param {FindScheduleLogDtoByPage} query 查询条件
    * @param {string} platform 平台标识
    * @returns {Promise<ApiResult<PageApiResult<ScheduleLog[]> | null>>} 统一返回结果
    */
   async findLogsByPage(
-    query: any,
+    query: FindScheduleLogDtoByPage,
     platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<ScheduleLog[]> | null>> {
     try {
@@ -303,7 +303,7 @@ export class ScheduleService {
         where: {
           ...where,
           scheduleId: query.scheduleId || (scheduleIds.length > 0 ? undefined : undefined),
-          executionStatus: query.status,
+          executionStatus: query.status !== undefined ? String(query.status) : undefined,
         },
         order: {
           ...order,

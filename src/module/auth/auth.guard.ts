@@ -13,6 +13,14 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 
+interface JwtPayload {
+  account: string;
+  id: string;
+  nickName?: string;
+  platform?: string;
+  [key: string]: unknown;
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
@@ -53,8 +61,8 @@ export class AuthGuard implements CanActivate {
     try {
       const options = getPlatformJwtConfig(url.split('/')[3]);
       if (options && token) {
-        let user: any;
-        user = this.jwtService.verify(token, {
+        let user: JwtPayload;
+        user = this.jwtService.verify<JwtPayload>(token, {
           secret: options.secret,
         });
         req.userInfo = user; // 将用户信息附加到请求对象上

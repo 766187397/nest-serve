@@ -5,7 +5,7 @@ interface Result<T> {
   code?: number;
   message?: string;
   data?: T | null;
-  entities?: any;
+  entities?: new (...args: unknown[]) => T;
   timestamp?: string;
 }
 

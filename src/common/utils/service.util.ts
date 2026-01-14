@@ -2,23 +2,42 @@ import { Between, FindOptionsOrderValue } from 'typeorm';
 import * as dayjs from 'dayjs';
 import { svgCache } from '@/config/nodeCache';
 
+interface QueryParams {
+  [key: string]: unknown;
+}
+
+interface WhereClause {
+  [key: string]: unknown;
+}
+
+interface SortClause {
+  [key: string]: FindOptionsOrderValue;
+}
+
+interface VerifyParams {
+  code: string;
+  codeKey: string;
+}
+
+interface CaptchaCache {
+  text: string;
+}
+
 /**
  * 通用的处理查询条件
  * @param {object} query 查询条件
- * @returns {{ [key: string]: any }} 处理后的查询条件
+ * @returns {{ [key: string]: unknown }} 处理后的查询条件
  * @description 该函数用于处理通用的查询条件，包括状态筛选和时间范围筛选
  * @example
  * const query = { status: 1, time: '2024-01-01,2024-01-31' };
  * const where = buildCommonQuery(query);
  * // where = { status: 1, createdAt: Between(start, end) }
  */
-export function buildCommonQuery(query: { [key: string]: any } | undefined): {
-  [key: string]: any;
-} {
+export function buildCommonQuery(query: QueryParams | undefined): WhereClause {
   if (typeof query === 'undefined') {
     return {};
   }
-  const where: { [key: string]: any } = {};
+  const where: WhereClause = {};
   if (query.status) {
     where.status = query.status;
   }
@@ -26,7 +45,7 @@ export function buildCommonQuery(query: { [key: string]: any } | undefined): {
   if (typeof query.time === 'string') {
     time = query.time.split(/[,，、到至]+/);
   } else if (Array.isArray(query.time)) {
-    time = query.time;
+    time = query.time as string[];
   }
   if (time.length == 2) {
     const start = dayjs(time[0]).startOf('day').toDate();
@@ -92,7 +111,7 @@ export function buildCommonPaging(
 
 /**
  * 校验验证码是否正确
- * @param param
+ * @param {VerifyParams} param 验证码参数
  * @param {string} param.code 验证码
  * @param {string} param.codeKey 验证码KEY
  * @returns {Promise<boolean>} true 为正确, false 为错误
@@ -104,11 +123,8 @@ export function buildCommonPaging(
 export async function buildVerify({
   code,
   codeKey,
-}: {
-  codeKey: string;
-  code: string;
-}): Promise<boolean> {
-  const codeCache = await svgCache.get<{ text: string }>(codeKey);
+}: VerifyParams): Promise<boolean> {
+  const codeCache = await svgCache.get<CaptchaCache>(codeKey);
 
   if (!codeCache) {
     return false;
@@ -124,7 +140,7 @@ export async function buildVerify({
 
 /**
  * 校验验证码是否正确（别名）
- * @param param
+ * @param {VerifyParams} param 验证码参数
  * @param {string} param.code 验证码
  * @param {string} param.codeKey 验证码KEY
  * @returns {Promise<boolean>} true 为正确, false 为错误
@@ -136,9 +152,6 @@ export async function buildVerify({
 export async function buildCommonVerify({
   code,
   codeKey,
-}: {
-  codeKey: string;
-  code: string;
-}): Promise<boolean> {
+}: VerifyParams): Promise<boolean> {
   return buildVerify({ code, codeKey });
 }

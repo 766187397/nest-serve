@@ -8,6 +8,10 @@ import {
 import { Server, Socket } from 'socket.io';
 import { NoticeService } from './notice.service';
 
+interface WsMessagePayload {
+  token: string;
+}
+
 @WebSocketGateway({
   cors: true, // 允许跨域
   namespace: '/api/v1/admin/notice/ws', // 命名空间（可选）
@@ -34,7 +38,7 @@ export class NoticeWS implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 处理前端发送的 "message" 事件
   @SubscribeMessage('message')
-  async handleMessage(client: Socket, payload: any) {
+  async handleMessage(client: Socket, payload: WsMessagePayload) {
     console.log('payload', payload);
     const token = payload.token;
 
@@ -56,12 +60,12 @@ export class NoticeWS implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   // 2. 推送给特定房间
-  notifyRoom(roomId: string, data: any) {
+  notifyRoom(roomId: string, data: unknown) {
     this.server.to(roomId).emit('room_msg', data);
   }
 
   // 3. 推送给单个客户端 (通过SocketID)
-  notifyUser(socketId: string, data: any) {
+  notifyUser(socketId: string, data: unknown) {
     this.server.to(socketId).emit('private', data);
   }
 }

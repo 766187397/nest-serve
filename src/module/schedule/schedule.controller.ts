@@ -20,6 +20,10 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 
+interface FindAllQueryParams {
+  [key: string]: unknown;
+}
+
 @ApiTags('定时任务管理')
 @ApiResponse({ status: 200, description: '操作成功' })
 @ApiResponse({ status: 201, description: '操作成功，无返回内容' })
@@ -49,7 +53,7 @@ export class ScheduleController {
 
   @Get('all')
   @ApiOperation({ summary: '查询定时任务列表(不分页)' })
-  findAll(@Headers('x-platform') platform: string, @Query(new FilterEmptyPipe()) query: any) {
+  findAll(@Headers('x-platform') platform: string, @Query(new FilterEmptyPipe()) query: FindAllQueryParams) {
     return this.scheduleService.findAll(query, platform);
   }
 

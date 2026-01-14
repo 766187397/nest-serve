@@ -22,6 +22,8 @@ export class CreateBaseDto {
 
 /** 查询参数 */
 export class FindByParameter {
+  [key: string]: unknown;
+
   @ApiProperty({
     description: '排序: ASC - 升序，DESC - 降序',
     required: false,

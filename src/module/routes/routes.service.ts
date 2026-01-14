@@ -9,6 +9,15 @@ import { Role } from '@/module/roles/entities/role.entity';
 import { RoleRoutes, RouteInfo } from '@/types/routes';
 import { handlePlatformQuery } from '@/common/utils/query.util';
 
+interface RouteMeta {
+  title?: string;
+  icon?: string;
+  externalLinks?: boolean;
+  type?: string;
+  status?: boolean;
+  [key: string]: unknown;
+}
+
 @Injectable()
 export class RoutesService {
   constructor(
@@ -57,7 +66,7 @@ export class RoutesService {
       await this.routeRepository.save(route);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || '路由创建失败，请稍后再试');
+      return ApiResult.error<null>((error as Error)?.message || '路由创建失败，请稍后再试');
     }
   }
 
@@ -85,7 +94,7 @@ export class RoutesService {
 
       return ApiResult.success<Route[]>({ data: trees });
     } catch (error) {
-      return ApiResult.error<null>(error || '路由查询失败，请稍后再试');
+      return ApiResult.error<null>((error as Error)?.message || '路由查询失败，请稍后再试');
     }
   }
 
@@ -131,7 +140,7 @@ export class RoutesService {
       }
       return ApiResult.success<Route>({ data });
     } catch (error) {
-      return ApiResult.error<null>(error || '路由查询失败，请稍后再试');
+      return ApiResult.error<null>((error as Error)?.message || '路由查询失败，请稍后再试');
     }
   }
 
@@ -185,7 +194,7 @@ export class RoutesService {
       await this.routeRepository.save(route);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || '路由更新失败，请稍后再试');
+      return ApiResult.error<null>((error as Error)?.message || '路由更新失败，请稍后再试');
     }
   }
 
@@ -199,7 +208,7 @@ export class RoutesService {
       await this.routeRepository.softDelete(id);
       return ApiResult.success<null>();
     } catch (error) {
-      return ApiResult.error<null>(error || '路由删除失败，请稍后再试');
+      return ApiResult.error<null>((error as Error)?.message || '路由删除失败，请稍后再试');
     }
   }
 
@@ -254,7 +263,7 @@ export class RoutesService {
 
       return ApiResult.success<RoleRoutes[]>({ data: routeList });
     } catch (error) {
-      return ApiResult.error<null>(error || '获取路由失败，请稍后再试');
+      return ApiResult.error<null>((error as Error)?.message || '获取路由失败，请稍后再试');
     }
   }
 
@@ -263,9 +272,9 @@ export class RoutesService {
       if (route.children) {
         route.children = this.handleRoutes(route.children);
       }
-      let meta: any = {};
+      let meta: RouteMeta = {};
       try {
-        meta = JSON.parse(route.meta as string);
+        meta = JSON.parse(route.meta as string) as RouteMeta;
       } catch (error) {
         meta = {};
       }

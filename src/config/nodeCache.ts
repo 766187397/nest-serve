@@ -10,7 +10,7 @@ export class NodeCacheService {
     return value || undefined;
   }
 
-  async set(key: string, value: any, ttl?: number): Promise<boolean> {
+  async set<T>(key: string, value: T, ttl?: number): Promise<boolean> {
     return await this.cacheService.set(key, value, ttl);
   }
 

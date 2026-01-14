@@ -48,7 +48,7 @@ export class LoggerService {
       '';
 
     const resData = JSON.stringify(data);
-    const responseTime = Date.now() - request['startTime'] || 0; // 计算响应时间(毫秒)
+    const responseTime = request['startTime'] ? Date.now() - request['startTime'] : 0; // 计算响应时间(毫秒)
     try {
       const data = {
         account,

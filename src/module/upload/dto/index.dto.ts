@@ -2,6 +2,18 @@ import { FindByParameter, PageByParameter } from '@/common/dto/base';
 import { ApiProperty, IntersectionType, PartialType } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
+interface UploadedFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  destination: string;
+  filename: string;
+  path: string;
+  buffer: Buffer;
+}
+
 /** 文件上传  */
 export class FileUploadDTO {
   @ApiProperty({
@@ -11,7 +23,7 @@ export class FileUploadDTO {
     description: '文件上传',
   })
   @IsNotEmpty({ message: '文件不能为空' })
-  file: any;
+  file: UploadedFile;
 }
 /** 查询所有文件 */
 export class FindFileDto extends FindByParameter {
@@ -29,7 +41,7 @@ export class FileHashDTO {
   @IsNotEmpty({ message: '文件hash值不能为空' })
   hash: string;
 
-  @ApiProperty({ type: 'string', required: true, description: '文件大小' })
+  @ApiProperty({ type: 'number', required: true, description: '文件大小' })
   @IsNotEmpty({ message: '文件大小不能为空' })
-  size: string;
+  size: number;
 }

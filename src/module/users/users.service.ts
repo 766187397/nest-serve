@@ -9,24 +9,16 @@ import { bcryptService } from '@/common/utils/bcrypt-hash';
 import { PageApiResult } from '@/types/public';
 import { Role } from '@/module/roles/entities/role.entity';
 import { exportWithKeyValueHeader } from '@/common/utils/xlsx';
-import { HttpStatusCodes } from '@/common/constants/http-status';
 import { handlePlatformQuery } from '@/common/utils/query.util';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) // NestJS 会根据这个装饰器将 UserRepository 自动注入到 userRepository 变量中。
-    private userRepository: Repository<User>, // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>
   ) {}
-
-  /**
-   * 创建用户
-   * @param {CreateUserDto} createUserDto  创建用户DTO
-   * @param {string} platform  平台(admin/web/app/mini)
-   * @returns {Promise<ApiResult<User | null>>} 统一返回结果
-   */
   async create(
     createUserDto: CreateUserDto,
     platform: string = 'admin'
@@ -85,13 +77,9 @@ export class UsersService {
         findUserDtoByPage?.page,
         findUserDtoByPage?.pageSize
       );
-      const where = buildCommonQuery(findUserDtoByPage);
       const order = buildCommonSort(findUserDtoByPage?.sort);
-      // 查询符合条件的用户
       const [data, total] = await this.userRepository.findAndCount({
         where: {
-          ...where,
-          platform: handlePlatformQuery(platform, findUserDtoByPage?.platform),
           account: findUserDtoByPage?.account ? ILike(`%${findUserDtoByPage.account}%`) : undefined,
           nickName: findUserDtoByPage?.nickName
             ? ILike(`%${findUserDtoByPage.nickName}%`)
@@ -102,8 +90,8 @@ export class UsersService {
         order: {
           ...order,
         },
-        skip, // 跳过的条数
-        take, // 每页条数
+        skip,
+        take,
       });
 
       // 计算总页数
@@ -133,13 +121,9 @@ export class UsersService {
     platform: string = 'admin'
   ): Promise<ApiResult<User[] | null>> {
     try {
-      const where = buildCommonQuery(findUserDto);
       const order = buildCommonSort(findUserDto?.sort);
       const data = await this.userRepository.find({
         where: {
-          ...where,
-          platform: handlePlatformQuery(platform, findUserDto?.platform),
-          account: findUserDto?.account ? ILike(`%${findUserDto.account}%`) : undefined,
           nickName: findUserDto?.nickName ? ILike(`%${findUserDto.nickName}%`) : undefined,
           email: findUserDto?.email ? ILike(`%${findUserDto.email}%`) : undefined,
           phone: findUserDto?.phone ? ILike(`%${findUserDto.phone}%`) : undefined,
@@ -147,7 +131,7 @@ export class UsersService {
         order: {
           ...order,
         },
-      }); // 查询所有用户并返回;});
+      });
       return ApiResult.success<User[]>({ data });
     } catch (error) {
       return ApiResult.error<null>((error as Error)?.message || '用户查询失败，请稍后再试');
@@ -257,17 +241,9 @@ export class UsersService {
     platform: string = 'admin'
   ): Promise<{ buffer: Buffer; fileName: string } | ApiResult<null>> {
     try {
-      const { take, skip } = buildCommonPaging(
-        findUserDtoByPage?.page,
-        findUserDtoByPage?.pageSize
-      );
-      const where = buildCommonQuery(findUserDtoByPage);
       const order = buildCommonSort(findUserDtoByPage?.sort);
-      // 查询符合条件的用户
       const [data] = await this.userRepository.findAndCount({
         where: {
-          ...where,
-          platform: handlePlatformQuery(platform, findUserDtoByPage?.platform),
           account: findUserDtoByPage?.account ? ILike(`%${findUserDtoByPage.account}%`) : undefined,
           nickName: findUserDtoByPage?.nickName
             ? ILike(`%${findUserDtoByPage.nickName}%`)
@@ -278,8 +254,6 @@ export class UsersService {
         order: {
           ...order,
         },
-        skip, // 跳过的条数
-        take, // 每页条数
       });
       return exportWithKeyValueHeader(
         data,

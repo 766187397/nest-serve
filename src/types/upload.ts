@@ -1,8 +1,8 @@
 export interface UploadFile {
   completePath: string;
   url?: string;
-  fileName: any;
-  size: any;
+  fileName: string;
+  size: number;
   id: string;
   sort: number;
   status: number;

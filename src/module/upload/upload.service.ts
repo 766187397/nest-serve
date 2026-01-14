@@ -10,6 +10,13 @@ import { PageApiResult } from '@/types/public';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 
+interface UploadedFile {
+  path: string;
+  filename: string;
+  size: number;
+  mimetype: string;
+}
+
 @Injectable()
 export class UploadService {
   constructor(
@@ -22,7 +29,7 @@ export class UploadService {
    * @param file 文件
    * @returns {Promise<ApiResult<UploadFile | null>>} 统一返回结果
    */
-  async uploadFile(file: any, hash?: string): Promise<ApiResult<UploadFile | null>> {
+  async uploadFile(file: UploadedFile, hash?: string): Promise<ApiResult<UploadFile | null>> {
     try {
       if (!file) {
         return ApiResult.error('文件不能为空！');
@@ -42,10 +49,9 @@ export class UploadService {
         },
         message: '上传成功',
         code: HttpStatusCodes.OK,
-        entities: Upload,
       });
     } catch (error) {
-      return ApiResult.error<null>(error || '上传失败');
+      return ApiResult.error<null>((error as Error)?.message || '上传失败');
     }
   }
 
@@ -73,10 +79,9 @@ export class UploadService {
       });
       return ApiResult.success<UploadFile[]>({
         data: resultData,
-        entities: Upload,
       });
     } catch (error) {
-      return ApiResult.error<null>(error || '查询失败');
+      return ApiResult.error<null>((error as Error)?.message || '查询失败');
     }
   }
 
@@ -124,10 +129,9 @@ export class UploadService {
         },
         message: '查询成功',
         code: HttpStatusCodes.OK,
-        entities: Upload,
       });
     } catch (error) {
-      return ApiResult.error<null>(error || '查询失败');
+      return ApiResult.error<null>((error as Error)?.message || '查询失败');
     }
   }
 
@@ -148,7 +152,6 @@ export class UploadService {
           completePath: global.url + file.url,
         },
         message: '查询成功',
-        entities: Upload,
       });
     } catch (error) {
       return ApiResult.error<null>(error || '查询失败');
@@ -166,7 +169,6 @@ export class UploadService {
       return ApiResult.success<null>({
         data: null,
         message: '删除成功',
-        entities: Upload,
       });
     } catch (error) {
       return ApiResult.error<null>(error || '删除失败');
@@ -198,7 +200,6 @@ export class UploadService {
       return ApiResult.success<UploadFile | null>({
         data: data,
         message: '操作成功',
-        entities: Upload,
       });
     } catch (error) {
       return ApiResult.error<null>(error || '操作失败');

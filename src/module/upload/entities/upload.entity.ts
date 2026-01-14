@@ -11,8 +11,8 @@ export class Upload extends UUIDBaseEntity {
   @Column({ type: 'varchar', length: 255, comment: '文件路径' })
   url: string;
 
-  @Column({ type: 'varchar', length: 255, comment: '文件大小' })
-  size: string;
+  @Column({ type: 'int', comment: '文件大小' })
+  size: number;
 
   @Column({ type: 'varchar', length: 255, comment: '文件类型' })
   mimetype: string;

@@ -16,6 +16,12 @@ import { ApiResult } from '@/common/utils/result';
 import { ConfigService } from '@nestjs/config';
 import { ErrorCodes, getHttpStatusByErrorCode } from '@/common/constants/error-codes';
 
+interface HttpExceptionResponse {
+  message: string | string[];
+  error?: string;
+  statusCode?: number;
+}
+
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   constructor(
@@ -59,7 +65,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (exception instanceof BadRequestException) {
       status = exception.getStatus();
       code = ErrorCodes.VALIDATION_ERROR;
-      message = (exception.getResponse() as any).message.join(',');
+      const exceptionResponse = exception.getResponse() as HttpExceptionResponse;
+      message = Array.isArray(exceptionResponse.message) ? exceptionResponse.message.join(',') : exceptionResponse.message;
     }
     // 超出文件大小限制
     else if (exception instanceof PayloadTooLargeException) {
@@ -73,11 +80,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     else if (exception instanceof HttpException) {
       console.log('http异常', exception.getResponse());
       status = exception.getStatus();
-      code = getHttpStatusByErrorCode(status.toString()) as any;
-      message =
-        typeof exception.getResponse() === 'string'
-          ? exception.getResponse()
-          : (exception.getResponse() as any).message;
+      code = getHttpStatusByErrorCode(status.toString()).toString();
+      const exceptionResponse = exception.getResponse();
+      if (typeof exceptionResponse === 'string') {
+        message = exceptionResponse;
+      } else {
+        const responseMessage = (exceptionResponse as HttpExceptionResponse).message;
+        message = Array.isArray(responseMessage) ? responseMessage.join(',') : responseMessage;
+      }
     }
     // 处理数据库异常
     else if (exception instanceof QueryFailedError) {

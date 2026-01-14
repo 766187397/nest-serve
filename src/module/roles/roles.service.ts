@@ -56,7 +56,7 @@ export class RolesService {
       return ApiResult.success<Role>({ data });
     } catch (error) {
       const errorMessage = typeof error === 'string' ? error : JSON.stringify(error);
-      return ApiResult.error<any>(errorMessage || '创建角色失败，请稍后重试');
+      return ApiResult.error<null>(errorMessage || '创建角色失败，请稍后重试');
     }
   }
 

@@ -9,6 +9,10 @@ export class FindScheduleDtoByPage extends PartialType(
 
 export class FindScheduleLogDtoByPage extends PartialType(
   IntersectionType(FindByParameter, PageByParameter)
-) {}
+) {
+  scheduleName?: string;
+  scheduleId?: string;
+  status?: string;
+}
 
 export { CreateScheduleDto, UpdateScheduleDto };

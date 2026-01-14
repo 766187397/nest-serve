@@ -11,7 +11,7 @@ export class DocController {
   @ApiOperation({ summary: '获取Swagger JSON文档' })
   @ApiResponse({ status: 200, description: '成功获取Swagger JSON文档' })
   getSwaggerJson(@Res() res: Response) {
-    const document = (global as any).swaggerDocument;
+    const document = global.swaggerDocument;
     res.json(document);
   }
 
@@ -19,7 +19,7 @@ export class DocController {
   @ApiOperation({ summary: '下载Swagger JSON文档' })
   @ApiResponse({ status: 200, description: '成功下载Swagger JSON文件' })
   downloadSwaggerJson(@Res() res: Response) {
-    const document = (global as any).swaggerDocument;
+    const document = global.swaggerDocument;
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Content-Disposition', 'attachment; filename=swagger.json');
     res.send(JSON.stringify(document, null, 2));

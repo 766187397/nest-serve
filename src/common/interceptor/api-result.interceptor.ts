@@ -12,7 +12,7 @@ import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ApiResultInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse();

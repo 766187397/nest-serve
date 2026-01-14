@@ -72,7 +72,7 @@ export class EmailService {
       const data = await this.emailRepository.save(email);
       return ApiResult.success<Email>({ data });
     } catch (error) {
-      return ApiResult.error<null>(error);
+      return ApiResult.error<null>((error as Error)?.message);
     }
   }
 
@@ -119,7 +119,7 @@ export class EmailService {
         },
       });
     } catch (error) {
-      return ApiResult.error(error);
+      return ApiResult.error<null>((error as Error)?.message);
     }
   }
 
@@ -148,7 +148,7 @@ export class EmailService {
       }); // 查询所有用户并返回;
       return ApiResult.success<Email[]>({ data });
     } catch (error) {
-      return ApiResult.error(error);
+      return ApiResult.error<null>((error as Error)?.message);
     }
   }
 
@@ -162,7 +162,7 @@ export class EmailService {
       const email = await this.emailRepository.findOneBy({ id });
       return ApiResult.success<Email>({ data: email });
     } catch (error) {
-      return ApiResult.error<null>(error);
+      return ApiResult.error<null>((error as Error)?.message);
     }
   }
 
@@ -185,7 +185,7 @@ export class EmailService {
       await this.emailRepository.save(email);
       return ApiResult.success();
     } catch (error) {
-      return ApiResult.error(error);
+      return ApiResult.error<null>((error as Error)?.message);
     }
   }
 
@@ -199,7 +199,7 @@ export class EmailService {
       const data = await this.emailRepository.softDelete(id);
       return ApiResult.success();
     } catch (error) {
-      return ApiResult.error(error);
+      return ApiResult.error<null>((error as Error)?.message);
     }
   }
 
@@ -207,9 +207,12 @@ export class EmailService {
    * 发送邮件
    * @param {SendEmail} sendEmail
    * @param {User} userInfo 请求用户信息
-   * @returns {ApiResult<any> | Promise<ApiResult<any>>} 统一返回结果
+   * @returns {Promise<ApiResult<SMTPTransport.SentMessageInfo | null>>} 统一返回结果
    */
-  async sendEmail(sendEmail: SendEmail, userInfo?: User): Promise<ApiResult<any>> {
+  async sendEmail(
+    sendEmail: SendEmail,
+    userInfo?: User
+  ): Promise<ApiResult<SMTPTransport.SentMessageInfo | null | string>> {
     let emailSendRecord: EmailSendRecord | undefined;
     try {
       if (
@@ -262,7 +265,7 @@ export class EmailService {
         html,
         headers: { 'Content-Type': 'text/html; charset=utf-8' },
       };
-      return new Promise((resolve, reject) => {
+      return new Promise<ApiResult<SMTPTransport.SentMessageInfo | null>>((resolve, reject) => {
         QQPostbox.sendMail(mailOptions, async (error, info) => {
           if (error) {
             // 更新发送记录为失败
@@ -296,7 +299,8 @@ export class EmailService {
               },
               EMAIL_CODE_TTL
             );
-            resolve(ApiResult.success({ data: info }));
+
+            resolve(ApiResult.success<SMTPTransport.SentMessageInfo>({ data: info }));
           }
         });
       });
@@ -326,13 +330,13 @@ export class EmailService {
     const reg = new RegExp('\{(\w+)\}', 'g');
     const createdAt = dayjs().format('YYYY-MM-DD HH:mm:ss');
     return {
-      text: text.replace(reg, (match, key) => {
+      text: text.replace(reg, (match: string, key: string): string => {
         if (key === 'code') {
           return code; // 如果是code变量，直接返回生成的验证码
         } else if (key === 'createdAt') {
           return createdAt; // 如果是createdAt变量，直接返回当前时间
         }
-        return userInfo ? userInfo[key] : '';
+        return userInfo ? (userInfo[key] as string) : '';
       }),
       code,
     };

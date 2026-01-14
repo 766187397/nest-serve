@@ -233,13 +233,20 @@ export class NoticeService {
       const userInfo = this.jwtService.verify(token, {
         secret: options.secret,
       });
-      const roleKeys = userInfo?.roles?.map((item: any) => item.key) || [];
+      
+      interface JwtUserInfo {
+        id: string;
+        roles?: Array<{ key: string }>;
+      }
+      
+      const typedUserInfo = userInfo as JwtUserInfo;
+      const roleKeys = typedUserInfo?.roles?.map((item: { key: string }) => item.key) || [];
 
       const { take, skip } = buildCommonPaging(1, 3);
       const order = buildCommonSort();
       const where = {
         platform: handlePlatformQuery(platform, undefined),
-        READUserIds: Not(Like(`%${userInfo.id}%`)), // 未读通知
+        READUserIds: Not(Like(`%${typedUserInfo.id}%`)), // 未读通知
         status: 2,
       };
       const [data, total] = await this.noticeRepository.findAndCount({
@@ -258,13 +265,13 @@ export class NoticeService {
           },
           {
             ...where,
-            userIds: Like(`%${userInfo.id}%`),
+            userIds: Like(`%${typedUserInfo.id}%`),
             roleKeys: roleKeys ? In(roleKeys) : undefined,
             specifyTime: IsNull(), // 指定时间为空
           },
           {
             ...where,
-            userIds: Like(`%${userInfo.id}%`),
+            userIds: Like(`%${typedUserInfo.id}%`),
             roleKeys: roleKeys ? In(roleKeys) : undefined,
             specifyTime: LessThan(new Date()), // 获取当前时间之前的所有数据
           },

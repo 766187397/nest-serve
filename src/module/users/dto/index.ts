@@ -10,6 +10,8 @@ import { IsArray, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } fro
 
 /** 用户创建Dto */
 export class CreateUserDto extends CreateBaseDto {
+  [key: string]: unknown;
+
   @ApiProperty({ description: '账号', example: 'admin' })
   @IsString({ message: '账号必须是字符串' })
   @IsNotEmpty({ message: '账号是必填项' }) // 必填校验

@@ -10,7 +10,7 @@ export function IsStringOrNumber(validationOptions?: ValidationOptions) {
       constraints: [],
       options: validationOptions,
       validator: {
-        validate(value: any) {
+        validate(value: unknown) {
           return typeof value === 'string' || typeof value === 'number';
         },
         defaultMessage(validationArguments?: ValidationArguments): string {

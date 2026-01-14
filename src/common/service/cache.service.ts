@@ -111,7 +111,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     return null;
   }
 
-  async set(key: string, value: any, ttl?: number): Promise<boolean> {
+  async set<T>(key: string, value: T, ttl?: number): Promise<boolean> {
     const fullKey = this.getKey(key);
     const serializedValue = JSON.stringify(value);
 

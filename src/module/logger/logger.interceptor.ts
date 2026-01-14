@@ -8,7 +8,7 @@ import { Request } from 'express';
 export class LoggerInterceptor implements NestInterceptor {
   constructor(private readonly loggerService: LoggerService) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     // 以什么开头
     const whiteListStartsWith: string[] = LoggerWhiteList.whiteListStartsWith;
     // 以什么全匹配

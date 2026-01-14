@@ -93,7 +93,7 @@ bootstrap();
  * 运行 app 判断是否被占用，根据环境变量判断是否自动加1
  * @param app NestFactory.create nestjs创建的实例
  */
-async function run(app: INestApplication<any>) {
+async function run(app: INestApplication) {
   url = `${baseUrl}`;
   global.url = url;
   await app
