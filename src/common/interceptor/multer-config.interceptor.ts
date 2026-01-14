@@ -58,10 +58,13 @@ export class MulterConfigInterceptor implements NestInterceptor {
         if (err) {
           observer.error(err);
         } else {
-          observer.next(null);
-          observer.complete();
+          next.handle().subscribe({
+            next: (value) => observer.next(value),
+            error: (error) => observer.error(error),
+            complete: () => observer.complete(),
+          });
         }
       });
-    }).pipe(() => next.handle());
+    });
   }
 }
