@@ -3,20 +3,19 @@ import { ApiResult } from '@/common/utils/result';
 import { Upload } from './entities/upload.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, ILike, Repository } from 'typeorm';
-import { BaseService } from '@/common/service/base';
+import * as dayjs from 'dayjs';
 import { FileHashDTO, FindFileDto, FindFileDtoByPage } from './dto/index.dto';
 import { UploadFile } from '@/types/upload';
 import { PageApiResult } from '@/types/public';
 import { HttpStatusCodes } from '@/common/constants/http-status';
+import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 
 @Injectable()
-export class UploadService extends BaseService {
+export class UploadService {
   constructor(
     @InjectRepository(Upload)
     private upload: Repository<Upload>
-  ) {
-    super();
-  }
+  ) {}
 
   /**
    * 文件上传
@@ -57,8 +56,8 @@ export class UploadService extends BaseService {
    */
   async getFileAll(findFileDto: FindFileDto): Promise<ApiResult<UploadFile[] | null>> {
     try {
-      const where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDto);
-      const order = this.buildCommonSort(findFileDto?.sort);
+      const where: FindOptionsWhere<Upload> = buildCommonQuery(findFileDto);
+      const order = buildCommonSort(findFileDto?.sort);
       const files = await this.upload.find({
         where: {
           ...where,
@@ -90,9 +89,9 @@ export class UploadService extends BaseService {
     findFileDtoByPage: FindFileDtoByPage
   ): Promise<ApiResult<PageApiResult<UploadFile[]> | null>> {
     try {
-      const where: FindOptionsWhere<Upload> = this.buildCommonQuery(findFileDtoByPage);
-      const order = this.buildCommonSort(findFileDtoByPage?.sort);
-      const { take, skip } = this.buildCommonPaging(
+      const where: FindOptionsWhere<Upload> = buildCommonQuery(findFileDtoByPage);
+      const order = buildCommonSort(findFileDtoByPage?.sort);
+      const { take, skip } = buildCommonPaging(
         findFileDtoByPage.page,
         findFileDtoByPage.pageSize
       );
@@ -111,8 +110,8 @@ export class UploadService extends BaseService {
         const { deletedAt, platform, ...item } = file;
         return {
           ...item,
-          createdAt: this.dayjs(file.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-          updatedAt: this.dayjs(file.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
+          createdAt: dayjs(file.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+          updatedAt: dayjs(file.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
           completePath: global.url + file.url,
         };
       });

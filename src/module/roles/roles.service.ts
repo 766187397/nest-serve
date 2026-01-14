@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from './dto';
-import { BaseService } from '@/common/service/base';
+import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 import { Role } from './entities/role.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, ILike, In, Not, Repository, UpdateResult } from 'typeorm';
@@ -10,16 +10,14 @@ import { Route } from '@/module/routes/entities/route.entity';
 import { handlePlatformQuery } from '@/common/utils/query.util';
 
 @Injectable()
-export class RolesService extends BaseService {
+export class RolesService {
   constructor(
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
 
     @InjectRepository(Route)
     private routeRepository: Repository<Route>
-  ) {
-    super();
-  }
+  ) {}
   /**
    * 创建角色
    * @param {CreateRoleDto} createRoleDto 角色信息
@@ -73,12 +71,12 @@ export class RolesService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<Role[]> | null>> {
     try {
-      const { take, skip } = this.buildCommonPaging(
+      const { take, skip } = buildCommonPaging(
         findRoleDtoByPage?.page,
         findRoleDtoByPage?.pageSize
       );
-      const where = this.buildCommonQuery(findRoleDtoByPage);
-      const order = this.buildCommonSort(findRoleDtoByPage?.sort);
+      const where = buildCommonQuery(findRoleDtoByPage);
+      const order = buildCommonSort(findRoleDtoByPage?.sort);
       // 查询符合条件的用户
       const [data, total] = await this.roleRepository.findAndCount({
         where: {
@@ -121,8 +119,8 @@ export class RolesService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<Role[] | null>> {
     try {
-      const where = this.buildCommonQuery(findRoleDto);
-      const order = this.buildCommonSort(findRoleDto?.sort);
+      const where = buildCommonQuery(findRoleDto);
+      const order = buildCommonSort(findRoleDto?.sort);
       const data = await this.roleRepository.find({
         where: {
           ...where,

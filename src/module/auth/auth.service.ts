@@ -13,7 +13,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '@/module/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { bcryptService } from '@/common/utils/bcrypt-hash';
 import { getPlatformJwtConfig, JwtConfig } from '@/config/jwt';
 import { Captcha, RefreshToken, UserLogin } from '@/types/user';
 import { Role } from '@/module/roles/entities/role.entity';
@@ -23,20 +22,20 @@ import * as svgCaptcha from 'svg-captcha';
 import { v4 as uuidv4 } from 'uuid';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import { Response, Request } from 'express';
-import { BaseService } from '@/common/service/base';
 import { handlePlatformQuery } from '@/common/utils/query.util';
+import * as dayjs from 'dayjs';
+import { buildCommonVerify } from '@/common/utils/service.util';
+import { bcryptService } from '@/common/utils/bcrypt-hash';
 
 @Injectable()
-export class AuthService extends BaseService {
+export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
-    private readonly jwtService: JwtService
-  ) {
-    super();
-  }
+    private readonly jwtService: JwtService,
+  ) {}
 
   /**
    * 人机校验
@@ -85,7 +84,7 @@ export class AuthService extends BaseService {
   ): Promise<ApiResult<UserLogin | null>> {
     try {
       if (
-        !(await this.buildVerify({
+        !(await buildCommonVerify({
           code: logInDto.code,
           codeKey: logInDto.codeKey,
         }))
@@ -116,8 +115,8 @@ export class AuthService extends BaseService {
       const userInfo = {
         userInfo: {
           ...info,
-          createdAt: this.dayjs(info.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-          updatedAt: this.dayjs(info.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
+          createdAt: dayjs(info.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+          updatedAt: dayjs(info.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
         },
         token_type: 'Bearer ',
         access_token: this.jwtService.sign(info, {
@@ -175,8 +174,8 @@ export class AuthService extends BaseService {
       const userInfo = {
         userInfo: {
           ...info,
-          createdAt: this.dayjs(info.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-          updatedAt: this.dayjs(info.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
+          createdAt: dayjs(info.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+          updatedAt: dayjs(info.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
         },
         token_type: 'Bearer ',
         access_token: this.jwtService.sign(info, {
@@ -329,8 +328,8 @@ export class AuthService extends BaseService {
       const userInfo = {
         userInfo: {
           ...info,
-          createdAt: this.dayjs(info.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-          updatedAt: this.dayjs(info.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
+          createdAt: dayjs(info.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+          updatedAt: dayjs(info.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
         },
         token_type: 'Bearer ',
         access_token: this.jwtService.sign(info, {

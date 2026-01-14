@@ -7,12 +7,12 @@ import { Schedule } from './entities/schedule.entity';
 import { ScheduleLog } from './entities/schedule-log.entity';
 import { CreateScheduleDto, UpdateScheduleDto } from './dto/index';
 import { ApiResult } from '@/common/utils/result';
-import { BaseService } from '@/common/service/base';
+import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 import { PageApiResult } from '@/types/public';
 import { handlePlatformQuery } from '@/common/utils/query.util';
 
 @Injectable()
-export class ScheduleService extends BaseService {
+export class ScheduleService {
   constructor(
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
@@ -20,9 +20,7 @@ export class ScheduleService extends BaseService {
     private scheduleLogRepository: Repository<ScheduleLog>,
     @Inject(SchedulerRegistry)
     private schedulerRegistry: SchedulerRegistry
-  ) {
-    super();
-  }
+  ) {}
 
   /**
    * 创建定时任务
@@ -71,9 +69,9 @@ export class ScheduleService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<Schedule[]> | null>> {
     try {
-      const { take, skip } = this.buildCommonPaging(query?.page, query?.pageSize);
-      const where = this.buildCommonQuery(query);
-      const order = this.buildCommonSort(query?.sort);
+      const { take, skip } = buildCommonPaging(query?.page, query?.pageSize);
+      const where = buildCommonQuery(query);
+      const order = buildCommonSort(query?.sort);
 
       const [data, total] = await this.scheduleRepository.findAndCount({
         where: {
@@ -114,8 +112,8 @@ export class ScheduleService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<Schedule[] | null>> {
     try {
-      const where = this.buildCommonQuery(query);
-      const order = this.buildCommonSort(query?.sort);
+      const where = buildCommonQuery(query);
+      const order = buildCommonSort(query?.sort);
 
       const data = await this.scheduleRepository.find({
         where: {
@@ -282,9 +280,9 @@ export class ScheduleService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<ScheduleLog[]> | null>> {
     try {
-      const { take, skip } = this.buildCommonPaging(query?.page, query?.pageSize);
-      const where = this.buildCommonQuery(query);
-      const order = this.buildCommonSort(query?.sort);
+      const { take, skip } = buildCommonPaging(query?.page, query?.pageSize);
+      const where = buildCommonQuery(query);
+      const order = buildCommonSort(query?.sort);
 
       let scheduleIds: string[] = [];
       if (query.scheduleName) {
@@ -451,7 +449,7 @@ export class ScheduleService extends BaseService {
     const { LessThan } = require('typeorm');
     const logRepository = this.scheduleRepository.manager.getRepository('Log');
     await logRepository.delete({
-      createdAt: LessThan(this.dayjs().subtract(30, 'day').toDate()),
+      createdAt: LessThan(dayjs().subtract(30, 'day').toDate()),
     });
   }
 

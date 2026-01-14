@@ -1,21 +1,20 @@
 import { ApiResult } from '@/common/utils/result';
 import { Inject, Injectable } from '@nestjs/common';
-import { BaseService } from '@/common/service/base';
+import * as dayjs from 'dayjs';
 import { Log } from './entities/logger.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
 import { FindLogDtoByPage } from './dto/index';
 import { PageApiResult } from '@/types/public';
 import { Request } from 'express';
+import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 
 @Injectable()
-export class LoggerService extends BaseService {
+export class LoggerService {
   constructor(
     @InjectRepository(Log, 'logger')
     private logRepository: Repository<Log>
-  ) {
-    super();
-  }
+  ) {}
 
   /**
    * 创建日志
@@ -88,12 +87,12 @@ export class LoggerService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<Log[]> | null>> {
     try {
-      const { take, skip } = this.buildCommonPaging(
+      const { take, skip } = buildCommonPaging(
         findLogDtoByPage?.page,
         findLogDtoByPage?.pageSize
       );
-      const where = this.buildCommonQuery(findLogDtoByPage);
-      const order = this.buildCommonSort(findLogDtoByPage?.sort);
+      const where = buildCommonQuery(findLogDtoByPage);
+      const order = buildCommonSort(findLogDtoByPage?.sort);
       // 查询符合条件的用户
       const [data, total] = await this.logRepository.findAndCount({
         where: {
@@ -132,7 +131,7 @@ export class LoggerService extends BaseService {
     try {
       console.log('定时任务删除日志');
       await this.logRepository.delete({
-        createdAt: LessThan(this.dayjs().subtract(30, 'day').toDate()),
+        createdAt: LessThan(dayjs().subtract(30, 'day').toDate()),
       });
     } catch (error) {
       console.log('日志删除失败，请稍后再试', error);

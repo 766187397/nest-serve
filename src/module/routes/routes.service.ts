@@ -3,14 +3,14 @@ import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Route } from './entities/route.entity';
 import { In, IsNull, Not, Repository, TreeRepository } from 'typeorm';
-import { BaseService } from '@/common/service/base';
+import { buildCommonSort } from '@/common/utils/service.util';
 import { ApiResult } from '@/common/utils/result';
 import { Role } from '@/module/roles/entities/role.entity';
 import { RoleRoutes, RouteInfo } from '@/types/routes';
 import { handlePlatformQuery } from '@/common/utils/query.util';
 
 @Injectable()
-export class RoutesService extends BaseService {
+export class RoutesService {
   constructor(
     @InjectRepository(Route)
     private readonly routeRepository: Repository<Route>,
@@ -18,9 +18,7 @@ export class RoutesService extends BaseService {
     private readonly treeRouteRepository: TreeRepository<Route>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>
-  ) {
-    super();
-  }
+  ) {}
 
   /**
    * 创建路由
@@ -71,7 +69,7 @@ export class RoutesService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<Route[] | null>> {
     try {
-      const order = this.buildCommonSort(findRouteDto?.sort);
+      const order = buildCommonSort(findRouteDto?.sort);
       const data = await this.routeRepository.find({
         where: {
           platform: handlePlatformQuery(platform, findRouteDto?.platform),
@@ -231,7 +229,7 @@ export class RoutesService extends BaseService {
         return ApiResult.success<RoleRoutes[]>({ data: [] }); // 无权限
       }
 
-      const order = this.buildCommonSort();
+      const order = buildCommonSort();
       // 2. 获取顶层路由节点
       const rootRoutes = await this.routeRepository.find({
         where: {

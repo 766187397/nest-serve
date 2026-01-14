@@ -9,24 +9,22 @@ import {
   UpdateDictionaryDto,
   UpdateDictionaryItemDto,
 } from './dto';
-import { BaseService } from '@/common/service/base';
 import { Dictionary } from './entities/dictionary.entity';
 import { DictionaryItem } from './entities/dictionaryItem.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Not, Repository } from 'typeorm';
 import { ApiResult } from '@/common/utils/result';
 import { PageApiResult } from '@/types/public';
+import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 
 @Injectable()
-export class DictionaryService extends BaseService {
+export class DictionaryService {
   constructor(
     @InjectRepository(Dictionary)
     private readonly dictionaryRepository: Repository<Dictionary>,
     @InjectRepository(DictionaryItem)
     private readonly dictionaryItemRepository: Repository<DictionaryItem>
-  ) {
-    super();
-  }
+  ) {}
 
   /**
    * 创建字典分类
@@ -57,9 +55,9 @@ export class DictionaryService extends BaseService {
     findDictionaryDtoByPage: FindDictionaryDtoByPage
   ): Promise<ApiResult<PageApiResult<Dictionary[]> | null>> {
     try {
-      const where = this.buildCommonQuery(findDictionaryDtoByPage);
-      const order = this.buildCommonSort(findDictionaryDtoByPage?.sort);
-      const { skip, take } = this.buildCommonPaging(
+      const where = buildCommonQuery(findDictionaryDtoByPage);
+      const order = buildCommonSort(findDictionaryDtoByPage?.sort);
+      const { skip, take } = buildCommonPaging(
         findDictionaryDtoByPage.page,
         findDictionaryDtoByPage.pageSize
       );
@@ -97,8 +95,8 @@ export class DictionaryService extends BaseService {
    */
   async findAll(findDictionaryDto: FindDictionaryDto): Promise<ApiResult<Dictionary[] | null>> {
     try {
-      const where = this.buildCommonQuery(findDictionaryDto);
-      const order = this.buildCommonSort(findDictionaryDto?.sort);
+      const where = buildCommonQuery(findDictionaryDto);
+      const order = buildCommonSort(findDictionaryDto?.sort);
       const data = await this.dictionaryRepository.find({
         where: {
           ...where,
@@ -220,9 +218,9 @@ export class DictionaryService extends BaseService {
       if (!category) {
         return ApiResult.error<null>('字典分类不存在');
       }
-      const where = this.buildCommonQuery(findDictionaryItemDtoByPage);
-      const order = this.buildCommonSort(findDictionaryItemDtoByPage?.sort);
-      const { skip, take } = this.buildCommonPaging(
+      const where = buildCommonQuery(findDictionaryItemDtoByPage);
+      const order = buildCommonSort(findDictionaryItemDtoByPage?.sort);
+      const { skip, take } = buildCommonPaging(
         findDictionaryItemDtoByPage.page,
         findDictionaryItemDtoByPage.pageSize
       );
@@ -276,8 +274,8 @@ export class DictionaryService extends BaseService {
       if (!category) {
         return ApiResult.error<null>('字典分类不存在');
       }
-      const where = this.buildCommonQuery(findDictionaryItemDto);
-      const order = this.buildCommonSort(findDictionaryItemDto?.sort);
+      const where = buildCommonQuery(findDictionaryItemDto);
+      const order = buildCommonSort(findDictionaryItemDto?.sort);
       const data = await this.dictionaryItemRepository.find({
         where: {
           ...where,

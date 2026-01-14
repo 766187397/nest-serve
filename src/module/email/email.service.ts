@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEmailDto, FindEmailDto, FindEmailtoByPage, SendEmail, UpdateEmailDto } from './dto';
-import { BaseService } from '@/common/service/base';
+import * as dayjs from 'dayjs';
 import * as nodemailer from 'nodemailer';
 import { EmailConfig } from '@/config/email';
 import { EmailCahce } from '@/types/email';
@@ -17,6 +17,7 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import { Cron } from '@nestjs/schedule';
 import { handlePlatformQuery } from '@/common/utils/query.util';
+import { buildCommonQuery, buildCommonSort, buildCommonPaging, buildCommonVerify } from '@/common/utils/service.util';
 
 // 创建一个SMTP客户端配置对象
 const QQPostbox = nodemailer.createTransport({
@@ -30,15 +31,13 @@ const QQPostbox = nodemailer.createTransport({
 } as SMTPTransport.Options);
 
 @Injectable()
-export class EmailService extends BaseService {
+export class EmailService {
   constructor(
     @InjectRepository(Email)
     private emailRepository: Repository<Email>,
     @InjectRepository(EmailSendRecord)
     private emailSendRecordRepository: Repository<EmailSendRecord>
-  ) {
-    super();
-  }
+  ) {}
 
   /**
    * 创建邮箱模板
@@ -83,12 +82,12 @@ export class EmailService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<Email[]> | null>> {
     try {
-      const { take, skip } = this.buildCommonPaging(
+      const { take, skip } = buildCommonPaging(
         findEmailtoByPage?.page,
         findEmailtoByPage?.pageSize
       );
-      const where = this.buildCommonQuery(findEmailtoByPage);
-      const order = this.buildCommonSort(findEmailtoByPage?.sort);
+      const where = buildCommonQuery(findEmailtoByPage);
+      const order = buildCommonSort(findEmailtoByPage?.sort);
       // 查询符合条件的用户
       const [data, total] = await this.emailRepository.findAndCount({
         where: {
@@ -130,8 +129,8 @@ export class EmailService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<Email[] | null>> {
     try {
-      const where = this.buildCommonQuery(findEmailDto);
-      const order = this.buildCommonSort(findEmailDto?.sort);
+      const where = buildCommonQuery(findEmailDto);
+      const order = buildCommonSort(findEmailDto?.sort);
       const data = await this.emailRepository.find({
         where: {
           ...where,
@@ -209,7 +208,7 @@ export class EmailService extends BaseService {
     let emailSendRecord: EmailSendRecord | undefined;
     try {
       if (
-        !(await this.buildVerify({
+        !(await buildCommonVerify({
           code: sendEmail.code,
           codeKey: sendEmail.codeKey,
         }))
@@ -282,7 +281,7 @@ export class EmailService extends BaseService {
               await this.emailSendRecordRepository.save(emailSendRecord);
             }
             
-            const time = this.dayjs().add(cacheTime, 'm');
+            const time = dayjs().add(cacheTime, 'm');
             await emailCache.set(sendEmail.email, {
               state: true,
               time: time.format('YYYY-MM-DD HH:mm:ss'),
@@ -316,7 +315,7 @@ export class EmailService extends BaseService {
   handleTemplate(text: string, userInfo: User | undefined): { text: string; code: string } {
     const code = generateRandomString(6);
     const reg = new RegExp('\{(\w+)\}', 'g');
-    const createdAt = this.dayjs().format('YYYY-MM-DD HH:mm:ss');
+    const createdAt = dayjs().format('YYYY-MM-DD HH:mm:ss');
     return {
       text: text.replace(reg, (match, key) => {
         if (key === 'code') {
@@ -338,7 +337,7 @@ export class EmailService extends BaseService {
   async clearOldEmailSendRecords() {
     try {
       // 计算一个月前的时间
-      const oneMonthAgo = this.dayjs().subtract(1, 'month').toDate();
+      const oneMonthAgo = dayjs().subtract(1, 'month').toDate();
       
       // 删除超过一个月的记录
       const result = await this.emailSendRecordRepository.delete({

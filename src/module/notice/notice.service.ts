@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BaseService } from '@/common/service/base';
+import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 import {
   CreateNoticeDto,
   FindNoticeDtoByPage,
@@ -15,15 +15,14 @@ import { JwtService } from '@nestjs/jwt';
 import { getPlatformJwtConfig, JwtConfig } from '@/config/jwt';
 import { NoticeByPageByUserOrRole, NoticeWsFindUserOrRole } from '@/types/notice';
 import { handlePlatformQuery } from '@/common/utils/query.util';
+import * as dayjs from 'dayjs';
 @Injectable()
-export class NoticeService extends BaseService {
+export class NoticeService {
   constructor(
     @InjectRepository(Notice)
     private readonly noticeRepository: Repository<Notice>,
     private readonly jwtService: JwtService
-  ) {
-    super();
-  }
+  ) {}
 
   /**
    * 创建通知
@@ -56,12 +55,12 @@ export class NoticeService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<Notice[]> | null>> {
     try {
-      const { take, skip } = this.buildCommonPaging(
+      const { take, skip } = buildCommonPaging(
         findNoticeDtoByPage?.page,
         findNoticeDtoByPage?.pageSize
       );
-      const where = this.buildCommonQuery(findNoticeDtoByPage);
-      const order = this.buildCommonSort(findNoticeDtoByPage?.sort);
+      const where = buildCommonQuery(findNoticeDtoByPage);
+      const order = buildCommonSort(findNoticeDtoByPage?.sort);
       const [data, total] = await this.noticeRepository.findAndCount({
         where: {
           ...where,
@@ -102,11 +101,11 @@ export class NoticeService extends BaseService {
     userId: string
   ): Promise<ApiResult<PageApiResult<NoticeByPageByUserOrRole[]> | null>> {
     try {
-      const { take, skip } = this.buildCommonPaging(
+      const { take, skip } = buildCommonPaging(
         findNoticeDtoByPageByUserOrRole?.page,
         findNoticeDtoByPageByUserOrRole?.pageSize
       );
-      const order = this.buildCommonSort();
+      const order = buildCommonSort();
       const where = {
         platform: handlePlatformQuery(platform, undefined),
         status: 2,
@@ -152,8 +151,8 @@ export class NoticeService extends BaseService {
           data: data.map((item) => {
             return {
               ...item,
-              createdAt: this.dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-              updatedAt: this.dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
+              createdAt: dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+              updatedAt: dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
               readStatus: item.READUserIds?.includes(userId) || false, // 添加状态字段
             };
           }),
@@ -236,8 +235,8 @@ export class NoticeService extends BaseService {
       });
       const roleKeys = userInfo?.roles?.map((item: any) => item.key) || [];
 
-      const { take, skip } = this.buildCommonPaging(1, 3);
-      const order = this.buildCommonSort();
+      const { take, skip } = buildCommonPaging(1, 3);
+      const order = buildCommonSort();
       const where = {
         platform: handlePlatformQuery(platform, undefined),
         READUserIds: Not(Like(`%${userInfo.id}%`)), // 未读通知
@@ -283,8 +282,8 @@ export class NoticeService extends BaseService {
         data: data.map((item) => {
           return {
             ...item,
-            createdAt: this.dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-            updatedAt: this.dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
+            createdAt: dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+            updatedAt: dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
           };
         }),
       });

@@ -9,7 +9,7 @@ import { ApiResult } from '@/common/utils/result';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Brackets, ILike, In, Not, Repository, UpdateResult } from 'typeorm';
-import { BaseService } from '@/common/service/base';
+import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 import { bcryptService } from '@/common/utils/bcrypt-hash';
 import { PageApiResult } from '@/types/public';
 import { Role } from '@/module/roles/entities/role.entity';
@@ -18,15 +18,13 @@ import { HttpStatusCodes } from '@/common/constants/http-status';
 import { handlePlatformQuery } from '@/common/utils/query.util';
 
 @Injectable()
-export class UsersService extends BaseService {
+export class UsersService {
   constructor(
     @InjectRepository(User) // NestJS 会根据这个装饰器将 UserRepository 自动注入到 userRepository 变量中。
     private userRepository: Repository<User>, // 这是一个 TypeORM 提供的 Repository 对象，封装了对 User 实体的所有数据库操作方法
     @InjectRepository(Role)
     private roleRepository: Repository<Role>
-  ) {
-    super();
-  }
+  ) {}
 
   /**
    * 创建用户
@@ -88,12 +86,12 @@ export class UsersService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<User[]> | null>> {
     try {
-      const { take, skip } = this.buildCommonPaging(
+      const { take, skip } = buildCommonPaging(
         findUserDtoByPage?.page,
         findUserDtoByPage?.pageSize
       );
-      const where = this.buildCommonQuery(findUserDtoByPage);
-      const order = this.buildCommonSort(findUserDtoByPage?.sort);
+      const where = buildCommonQuery(findUserDtoByPage);
+      const order = buildCommonSort(findUserDtoByPage?.sort);
       // 查询符合条件的用户
       const [data, total] = await this.userRepository.findAndCount({
         where: {
@@ -140,8 +138,8 @@ export class UsersService extends BaseService {
     platform: string = 'admin'
   ): Promise<ApiResult<User[] | null>> {
     try {
-      const where = this.buildCommonQuery(findUserDto);
-      const order = this.buildCommonSort(findUserDto?.sort);
+      const where = buildCommonQuery(findUserDto);
+      const order = buildCommonSort(findUserDto?.sort);
       const data = await this.userRepository.find({
         where: {
           ...where,
@@ -264,12 +262,12 @@ export class UsersService extends BaseService {
     platform: string = 'admin'
   ): Promise<{ buffer: Buffer; fileName: string } | ApiResult<null>> {
     try {
-      const { take, skip } = this.buildCommonPaging(
+      const { take, skip } = buildCommonPaging(
         findUserDtoByPage?.page,
         findUserDtoByPage?.pageSize
       );
-      const where = this.buildCommonQuery(findUserDtoByPage);
-      const order = this.buildCommonSort(findUserDtoByPage?.sort);
+      const where = buildCommonQuery(findUserDtoByPage);
+      const order = buildCommonSort(findUserDtoByPage?.sort);
       // 查询符合条件的用户
       const [data] = await this.userRepository.findAndCount({
         where: {
