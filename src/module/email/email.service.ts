@@ -6,14 +6,16 @@ import { EmailConfig } from '@/config/email';
 import { EmailCahce } from '@/types/email';
 import { ApiResult } from '@/common/utils/result';
 import { Email } from './entities/email.entity';
+import { EmailSendRecord } from './entities/email-send-record.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike, LessThan, Repository } from 'typeorm';
 import { PageApiResult } from '@/types/public';
 import { User } from '@/module/users/entities/user.entity';
 import { generateRandomString } from '@/common/utils/tool';
 import { emailCache, cacheTime, EMAIL_CODE_TTL } from '@/config/nodeCache';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { HttpStatusCodes } from '@/common/constants/http-status';
+import { Cron } from '@nestjs/schedule';
 
 // 创建一个SMTP客户端配置对象
 const QQPostbox = nodemailer.createTransport({
@@ -30,7 +32,9 @@ const QQPostbox = nodemailer.createTransport({
 export class EmailService extends BaseService {
   constructor(
     @InjectRepository(Email)
-    private emailRepository: Repository<Email>
+    private emailRepository: Repository<Email>,
+    @InjectRepository(EmailSendRecord)
+    private emailSendRecordRepository: Repository<EmailSendRecord>
   ) {
     super();
   }
@@ -201,6 +205,7 @@ export class EmailService extends BaseService {
    * @returns {ApiResult<any> | Promise<ApiResult<any>>} 统一返回结果
    */
   async sendEmail(sendEmail: SendEmail, userInfo?: User): Promise<ApiResult<any>> {
+    let emailSendRecord: EmailSendRecord | undefined;
     try {
       if (
         !(await this.buildVerify({
@@ -234,6 +239,17 @@ export class EmailService extends BaseService {
         });
       }
 
+      // 创建发送记录
+      emailSendRecord = this.emailSendRecordRepository.create({
+        email: sendEmail.email,
+        subject: title,
+        content: html,
+        sendStatus: false,
+        sender: userInfo?.account || 'system',
+        templateId: emailTemplate.id.toString(),
+      });
+      await this.emailSendRecordRepository.save(emailSendRecord);
+
       const mailOptions = {
         from: EmailConfig.QQ.auth.user,
         to: sendEmail.email,
@@ -244,6 +260,13 @@ export class EmailService extends BaseService {
       return new Promise((resolve, reject) => {
         QQPostbox.sendMail(mailOptions, async (error, info) => {
           if (error) {
+            // 更新发送记录为失败
+            if (emailSendRecord) {
+              emailSendRecord.sendStatus = false;
+              emailSendRecord.errorMessage = `${error}`;
+              await this.emailSendRecordRepository.save(emailSendRecord);
+            }
+            
             reject(
               ApiResult.error({
                 code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
@@ -251,18 +274,30 @@ export class EmailService extends BaseService {
                 data: `${error}`,
               })
             );
+          } else {
+            // 更新发送记录为成功
+            if (emailSendRecord) {
+              emailSendRecord.sendStatus = true;
+              await this.emailSendRecordRepository.save(emailSendRecord);
+            }
+            
+            const time = this.dayjs().add(cacheTime, 'm');
+            await emailCache.set(sendEmail.email, {
+              state: true,
+              time: time.format('YYYY-MM-DD HH:mm:ss'),
+              code: code,
+            }, EMAIL_CODE_TTL);
+            resolve(ApiResult.success({ data: info }));
           }
-
-          const time = this.dayjs().add(cacheTime, 'm');
-          await emailCache.set(sendEmail.email, {
-            state: true,
-            time: time.format('YYYY-MM-DD HH:mm:ss'),
-            code: code,
-          }, EMAIL_CODE_TTL);
-          resolve(ApiResult.success({ data: info }));
         });
       });
     } catch (error) {
+      // 如果在创建记录前出错，确保记录也被保存
+      if (emailSendRecord) {
+        emailSendRecord.sendStatus = false;
+        emailSendRecord.errorMessage = `${error}`;
+        await this.emailSendRecordRepository.save(emailSendRecord);
+      }
       return ApiResult.error({
         code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
         message: '发送失败',
@@ -279,7 +314,7 @@ export class EmailService extends BaseService {
    */
   handleTemplate(text: string, userInfo: User | undefined): { text: string; code: string } {
     const code = generateRandomString(6);
-    const reg = new RegExp('\\{(\\w+)\\}', 'g');
+    const reg = new RegExp('\{(\w+)\}', 'g');
     const createdAt = this.dayjs().format('YYYY-MM-DD HH:mm:ss');
     return {
       text: text.replace(reg, (match, key) => {
@@ -292,5 +327,26 @@ export class EmailService extends BaseService {
       }),
       code,
     };
+  }
+
+  /**
+   * 定时清理超过一个月的邮箱发送记录
+   * 每天凌晨1点执行
+   */
+  @Cron('0 0 1 * * *')
+  async clearOldEmailSendRecords() {
+    try {
+      // 计算一个月前的时间
+      const oneMonthAgo = this.dayjs().subtract(1, 'month').toDate();
+      
+      // 删除超过一个月的记录
+      const result = await this.emailSendRecordRepository.delete({
+        createdAt: LessThan(oneMonthAgo),
+      });
+      
+      console.log(`清理了 ${result.affected || 0} 条超过一个月的邮箱发送记录`);
+    } catch (error) {
+      console.error('清理邮箱发送记录失败:', error);
+    }
   }
 }

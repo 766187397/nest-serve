@@ -16,6 +16,7 @@ import { LoggerModule } from './module/logger/logger.module';
 import { NoticeModule } from './module/notice/notice.module';
 import { DictionaryModule } from './module/dictionary/dictionary.module';
 import { EmailModule } from './module/email/email.module';
+import { ScheduleModule } from '@nestjs/schedule';
 import DBConfig, { type MysqlConfig, type SqliteConfig, type PgConfig } from '@/config/db';
 import { CacheModule } from './common/module/cache.module';
 import { CacheInitModule } from './common/module/cache-init.module';
@@ -27,6 +28,8 @@ import { CacheInitModule } from './common/module/cache-init.module';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'dev'}`,
     }),
+    // 配置定时任务模块
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
