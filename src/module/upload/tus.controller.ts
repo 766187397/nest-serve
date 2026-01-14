@@ -7,45 +7,42 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { ApiResult } from '@/common/utils/result';
 import { UploadService } from './upload.service';
-import { FileUploadService } from '@/config/multer';
+import { ConfigService } from '@nestjs/config';
+import { getMulterConfig } from '@/config/multer';
 import { FileHashDTO } from './dto/index.dto';
 import { UploadFile } from '@/types/upload';
-
-const uploadDir = FileUploadService.rootPath;
 
 @ApiTags('大文件切片上传')
 @Controller('api/v1/large/files')
 export class TusController implements OnModuleInit {
-  constructor(private readonly uploadService: UploadService) {}
-
   private tusServer: Server;
   private uploadDir: string;
 
+  constructor(
+    private readonly uploadService: UploadService,
+    private readonly configService: ConfigService,
+  ) {}
+
   onModuleInit() {
-    // 设置上传存储目录为项目根目录下的 uploads 文件夹
-    // 假设项目结构：project-root/src/... ；uploads 文件夹在 project-root/uploads
-    // this.uploadDir = path.join(__dirname, "..", "..", "uploads");
-    this.uploadDir = uploadDir;
+    const multerConfig = getMulterConfig(this.configService);
+    this.uploadDir = multerConfig.rootPath;
     if (!fs.existsSync(this.uploadDir)) {
       fs.mkdirSync(this.uploadDir, { recursive: true });
     }
 
-    // 创建 tus server 实例并传入配置项
     this.tusServer = new Server({
-      path: '/api/v1/large/files', // 必须和前端的 endpoint 保持一致
-      relativeLocation: true, // 表示将 FileStore 的 path 作为相对路径
+      path: '/api/v1/large/files',
+      relativeLocation: true,
     });
 
-    // 配置 FileStore，指定文件存储目录
     this.tusServer.datastore = new FileStore({
       directory: this.uploadDir,
     });
 
-    // 监听上传完成事件，并基于 metadata 重命名文件（添加原始扩展名）
     this.tusServer.on(EVENTS.EVENT_UPLOAD_COMPLETE, async (event) => {
       const metadata = this.parseMetadata(event.file.upload_metadata || '');
       const originalName = metadata.filename || 'unnamed';
-      const extension = path.extname(originalName); // 获取原始文件的扩展名
+      const extension = path.extname(originalName);
       const oldPath = path.join(this.uploadDir, event.file.id);
       const newPath = path.join(this.uploadDir, `${event.file.id}${extension}`);
 

@@ -8,16 +8,20 @@ import {
   BadRequestException,
   PayloadTooLargeException,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { QueryFailedError } from 'typeorm';
 import { ApiResult } from '@/common/utils/result';
-import { FileUploadService } from '@/config/multer';
+import { ConfigService } from '@nestjs/config';
 import { ErrorCodes, getHttpStatusByErrorCode } from '@/common/constants/error-codes';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
-  constructor(private readonly loggerService: LoggerService) {}
+  constructor(
+    private readonly loggerService: LoggerService,
+    private readonly configService: ConfigService,
+  ) {}
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -61,7 +65,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     else if (exception instanceof PayloadTooLargeException) {
       status = exception.getStatus();
       code = ErrorCodes.FILE_TOO_LARGE;
-      message = `上传的文件超出了允许的大小限制！最大文件限制为 ${FileUploadService.MB}MB`;
+      const maxSize = this.configService.get<number>('UPLOAD_MAX_SIZE') || 10 * 1024 * 1024;
+      const maxSizeMB = Math.round(maxSize / (1024 * 1024));
+      message = `上传的文件超出了允许的大小限制！最大文件限制为 ${maxSizeMB}MB`;
     }
     // http异常
     else if (exception instanceof HttpException) {

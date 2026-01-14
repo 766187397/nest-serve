@@ -9,11 +9,11 @@ import {
   UploadedFile,
   UseInterceptors,
   HttpCode,
+  Inject,
 } from '@nestjs/common';
 import { UploadService } from './upload.service';
 import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { FileUploadService } from '@/config/multer';
+import { MulterConfigInterceptor } from '@/common/interceptor/multer-config.interceptor';
 import { FindFileDto, FindFileDtoByPage } from './dto/index.dto';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { ApiResult } from '@/common/utils/result';
@@ -31,7 +31,7 @@ export class UploadController {
   @Post()
   @ApiOperation({ summary: '文件上传' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', FileUploadService.multerOptions))
+  @UseInterceptors(MulterConfigInterceptor)
   @ApiBody({
     description: '文件上传',
     type: 'multipart/form-data',

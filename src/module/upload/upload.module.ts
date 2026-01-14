@@ -6,15 +6,25 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Upload } from './entities/upload.entity';
-import { FileUploadService } from '@/config/multer';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { getMulterConfig } from '@/config/multer';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../../../', FileUploadService.rootPath),
-      serveRoot: FileUploadService.serveRoot, // 主文件访问路径
-      serveStaticOptions: {
-        maxAge: '1y', // 设置缓存时间
+    ServeStaticModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const multerConfig = getMulterConfig(configService);
+        return [
+          {
+            rootPath: join(__dirname, '../../../', multerConfig.rootPath),
+            serveRoot: multerConfig.serveRoot,
+            serveStaticOptions: {
+              maxAge: '1y',
+            },
+          },
+        ];
       },
     }),
     TypeOrmModule.forFeature([Upload]),

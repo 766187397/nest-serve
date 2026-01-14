@@ -22,6 +22,7 @@ import { LoggerInterceptor } from './module/logger/logger.interceptor';
 import { ApiResultInterceptor } from './common/interceptor/api-result.interceptor';
 import { GlobalExceptionFilter } from './common/filter/global-exception.filter';
 import { RouteNotFoundFilter } from './common/filter/route-not-found.filter';
+import { ConfigService } from '@nestjs/config';
 import Knife4jDoc from 'node-knife4j-ui';
 import * as express from 'express';
 
@@ -65,10 +66,11 @@ async function bootstrap() {
   );
 
   const loggerService = app.get(LoggerService); // 从 DI 容器中获取 LoggerService
+  const configService = app.get(ConfigService); // 从 DI 容器中获取 ConfigService
   // 全局过滤器
   app.useGlobalFilters(
     // 全局的异常过滤器
-    new GlobalExceptionFilter(loggerService),
+    new GlobalExceptionFilter(loggerService, configService),
     // 404过滤器
     new RouteNotFoundFilter()
   );
