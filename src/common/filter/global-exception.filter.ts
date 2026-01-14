@@ -8,13 +8,12 @@ import {
   BadRequestException,
   PayloadTooLargeException,
   HttpStatus,
-  Inject,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { QueryFailedError } from 'typeorm';
 import { ApiResult } from '@/common/utils/result';
 import { ConfigService } from '@nestjs/config';
-import { ErrorCodes, getHttpStatusByErrorCode } from '@/common/constants/error-codes';
+import { ErrorCodes } from '@/common/constants/error-codes';
 
 interface HttpExceptionResponse {
   message: string | string[];
@@ -36,31 +35,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
     let code: string = ErrorCodes.INTERNAL_SERVER_ERROR;
-    const url: string = request.url || '';
-    const apiPlatform: string = url.split('/')[3] || '';
-    const { account = '', nickName = '' } = request.userInfo || {};
-    const method = request.method || '';
-    let {
-      referer = '',
-      'sec-ch-ua-platform': platform = '',
-      'sec-ch-ua': browser = '',
-    } = request.headers;
-    try {
-      browser = (browser as string).replace(/"/g, '');
-      platform = (platform as string).replace(/"/g, '');
-    } catch (error) {
-      platform = '';
-      browser = '';
-    }
 
-    // 获取客户端的 IP 地址
-    const IP =
-      (request.headers['x-forwarded-for'] as string)?.split(',')[0] ||
-      request.connection.remoteAddress ||
-      request.ip ||
-      '';
-
-    const statusCode = response.statusCode || '';
     // 表单校验异常
     if (exception instanceof BadRequestException) {
       status = exception.getStatus();

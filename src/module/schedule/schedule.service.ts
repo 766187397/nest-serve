@@ -1,8 +1,9 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
-import { Repository, FindOptionsOrderValue } from 'typeorm';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { Repository, LessThan } from 'typeorm';
 import * as dayjs from 'dayjs';
+import { CronJob } from 'cron';
 import { Schedule } from './entities/schedule.entity';
 import { ScheduleLog } from './entities/schedule-log.entity';
 import {
@@ -377,7 +378,7 @@ export class ScheduleService {
       errorMessage = (error as Error).message;
 
       if (schedule.retryCount > 0) {
-        await this.retryJob(schedule, error as Error);
+        await this.retryJob(schedule);
       }
     } finally {
       const duration = Date.now() - startTime;
@@ -402,9 +403,8 @@ export class ScheduleService {
   /**
    * 重试任务
    * @param {Schedule} schedule 定时任务实体
-   * @param {Error} error 错误信息
    */
-  private async retryJob(schedule: Schedule, error: Error): Promise<void> {
+  private async retryJob(schedule: Schedule): Promise<void> {
     for (let i = 0; i < schedule.retryCount; i++) {
       await new Promise((resolve) => setTimeout(resolve, schedule.retryInterval * 1000));
       try {
@@ -449,16 +449,14 @@ export class ScheduleService {
    * @returns {Date} 下次执行时间
    */
   private getNextExecutionTime(cronExpression: string): Date {
-    const { CronJob } = require('cron');
     const job = new CronJob(cronExpression, () => {});
-    return job.nextDate().toDate();
+    return job.nextDate().toJSDate();
   }
 
   /**
    * 删除旧日志
    */
   private async deleteOldLogs(): Promise<void> {
-    const { LessThan } = require('typeorm');
     const logRepository = this.scheduleRepository.manager.getRepository('Log');
     await logRepository.delete({
       createdAt: LessThan(dayjs().subtract(30, 'day').toDate()),

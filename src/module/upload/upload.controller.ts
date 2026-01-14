@@ -9,14 +9,12 @@ import {
   UploadedFile,
   UseInterceptors,
   HttpCode,
-  Inject,
 } from '@nestjs/common';
 import { UploadService } from './upload.service';
-import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { MulterConfigInterceptor } from '@/common/interceptor/multer-config.interceptor';
 import { FindFileDto, FindFileDtoByPage } from './dto/index.dto';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
-import { ApiResult } from '@/common/utils/result';
 import * as https from 'https';
 import * as http from 'http';
 import { URL } from 'url';

@@ -14,14 +14,7 @@ import {
 } from '@nestjs/common';
 import { RoutesService } from './routes.service';
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from './dto';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { User } from '@/module/users/entities/user.entity';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
@@ -87,11 +80,7 @@ export class RoutesController {
     const type = req.query.type as string;
     const userInfo = req.userInfo as User;
     const rolesIds = userInfo.roles.map((item) => item.id);
-    const { __isApiResult, ...data } = await this.routesService.getRoutesByRoleId(
-      rolesIds,
-      userInfo.platform,
-      type
-    );
+    const data = await this.routesService.getRoutesByRoleId(rolesIds, userInfo.platform, type);
     res.status(data.code).json(data);
     return data;
   }

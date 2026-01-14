@@ -105,7 +105,7 @@ export class UploadService {
         take,
       });
       const resultData = data.map((file) => {
-        const { deletedAt, platform, ...item } = file;
+        const { ...item } = file;
         return {
           ...item,
           createdAt: dayjs(file.createdAt).format('YYYY-MM-DD HH:mm:ss'),

@@ -1,8 +1,8 @@
 // src/tus.controller.ts
-import { Controller, All, Delete, Param, Req, Res, OnModuleInit, Query, Get } from '@nestjs/common';
+import { Controller, All, Req, Res, OnModuleInit, Query, Get } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Server, FileStore, EVENTS } from 'tus-node-server';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ApiResult } from '@/common/utils/result';
@@ -40,34 +40,39 @@ export class TusController implements OnModuleInit {
     });
 
     this.tusServer.on(EVENTS.EVENT_UPLOAD_COMPLETE, async (event) => {
-      const metadata = this.parseMetadata(event.file.upload_metadata || '');
+      const file = event.file as {
+        id: string;
+        upload_metadata: string;
+        upload_length: number;
+      };
+      const metadata = this.parseMetadata(file.upload_metadata || '');
       const originalName = metadata.filename || 'unnamed';
       const extension = path.extname(originalName);
-      const oldPath = path.join(this.uploadDir, event.file.id);
-      const newPath = path.join(this.uploadDir, `${event.file.id}${extension}`);
+      const oldPath = path.join(this.uploadDir, file.id);
+      const newPath = path.join(this.uploadDir, `${file.id}${extension}`);
 
       fs.renameSync(oldPath, newPath);
-      const file: Express.Multer.File = {
+      const uploadFile: Express.Multer.File = {
         fieldname: 'file',
         originalname: originalName,
         encoding: '7bit',
         mimetype: metadata.filetype,
-        size: event.file.upload_length,
+        size: file.upload_length,
         destination: this.uploadDir,
-        filename: `${event.file.id}${extension}`,
+        filename: `${file.id}${extension}`,
         path: newPath,
         buffer: Buffer.alloc(0),
         stream: null as any,
       };
-      await this.uploadService.uploadFile(file, metadata.hash);
+      await this.uploadService.uploadFile(uploadFile, metadata.hash);
     });
   }
 
   // 用于处理除了 DELETE 之外的所有请求，将请求交给 tus-node-server 处理
   @All('*')
   @ApiOperation({ summary: '大文件切片上传，前端也得使用tus' })
-  async handleTus(@Req() req: Request, @Res() res: Response) {
-    this.tusServer.handle(req, res);
+  async handleTus(@Req() req: Request, @Res() res: Response): Promise<void> {
+    await this.tusServer.handle(req, res);
   }
 
   // 解析 tus metadata，格式类似 "filename base64encodedValue,filetype base64encodedValue"

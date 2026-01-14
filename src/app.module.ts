@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './module/users/users.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { APP_GUARD } from '@nestjs/core';
@@ -17,7 +17,7 @@ import { DictionaryModule } from './module/dictionary/dictionary.module';
 import { EmailModule } from './module/email/email.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ScheduleModule as CustomScheduleModule } from './module/schedule/schedule.module';
-import DBConfig, { type MysqlConfig, type SqliteConfig, type PgConfig } from '@/config/db';
+import DBConfig, { type MysqlConfig, type PgConfig } from '@/config/db';
 import { CacheModule } from './common/module/cache.module';
 import { CacheInitModule } from './common/module/cache-init.module';
 import { DocModule } from './module/doc/doc.module';
@@ -33,7 +33,7 @@ import { DocModule } from './module/doc/doc.module';
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
+      useFactory: () => {
         const dbType = DBConfig.dbConfig.DB_TYPE as 'mysql' | 'sqlite' | 'postgres';
         if (dbType === 'sqlite') {
           const config = DBConfig.dbConfig;
@@ -75,12 +75,11 @@ import { DocModule } from './module/doc/doc.module';
           };
         }
       },
-      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       name: 'logger',
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
+      useFactory: () => {
         const dbType = DBConfig.dbLogger.DB_TYPE as 'mysql' | 'sqlite' | 'postgres';
         if (dbType === 'sqlite') {
           const config = DBConfig.dbLogger;
@@ -122,7 +121,6 @@ import { DocModule } from './module/doc/doc.module';
           };
         }
       },
-      inject: [ConfigService],
     }),
     UploadModule,
     AuthModule,

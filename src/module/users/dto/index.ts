@@ -10,8 +10,6 @@ import { IsArray, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } fro
 
 /** 用户创建Dto */
 export class CreateUserDto extends CreateBaseDto {
-  [key: string]: unknown;
-
   @ApiProperty({ description: '账号', example: 'admin' })
   @IsString({ message: '账号必须是字符串' })
   @IsNotEmpty({ message: '账号是必填项' }) // 必填校验
@@ -111,7 +109,7 @@ export class FindUserDto extends FindByParameter {
     required: false,
     example: '13800138000',
   })
-  @Transform(({ value }) => (value === '' ? undefined : value))
+  @Transform(({ value }: { value: string }) => (value === '' ? undefined : value))
   @IsOptional()
   @Matches(/^1[3456789]\d{9}$/, { message: '手机号格式错误' })
   phone?: string | undefined;

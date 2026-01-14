@@ -26,7 +26,7 @@ export class Log extends UUIDBaseEntity {
   @Column({ type: 'varchar', comment: '浏览器' })
   browser: string;
 
-  @Column({ type: 'varchar', comment: '响应时间' })
+  @Column({ type: 'int', nullable: true, comment: '响应时间(毫秒)' })
   responseTime: number;
 
   @Column({ type: 'text', nullable: false, comment: '响应内容' })

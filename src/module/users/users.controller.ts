@@ -44,7 +44,7 @@ export class UsersController {
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage
   ) {
-    return this.usersService.findByPage(findUserDtoByPage, platform);
+    return this.usersService.findByPage(findUserDtoByPage);
   }
 
   @Get('all')
@@ -53,7 +53,7 @@ export class UsersController {
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findUserDto: FindUserDto
   ) {
-    return this.usersService.findAll(findUserDto, platform);
+    return this.usersService.findAll(findUserDto);
   }
 
   @Get(':id')
@@ -83,7 +83,7 @@ export class UsersController {
     @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage,
     @Res() res: Response
   ) {
-    const data = await this.usersService.exportUserList(findUserDtoByPage, platform);
+    const data = await this.usersService.exportUserList(findUserDtoByPage);
     if ('buffer' in data) {
       res.setHeader(
         'Content-Disposition',

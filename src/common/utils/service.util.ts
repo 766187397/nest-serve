@@ -22,20 +22,21 @@ interface CaptchaCache {
  * // where = { status: 1, createdAt: Between(start, end) }
  */
 export function buildCommonQuery(
-  query: Record<string, unknown> | undefined
+  query: unknown
 ): Record<string, unknown> {
-  if (typeof query === 'undefined') {
+  if (typeof query === 'undefined' || query === null) {
     return {};
   }
+  const queryObj = query as Record<string, unknown>;
   const where: Record<string, unknown> = {};
-  if (query.status) {
-    where.status = query.status;
+  if (queryObj.status) {
+    where.status = queryObj.status;
   }
   let time: string[] = [];
-  if (typeof query.time === 'string') {
-    time = query.time.split(/[,，、到至]+/);
-  } else if (Array.isArray(query.time)) {
-    time = query.time as string[];
+  if (typeof queryObj.time === 'string') {
+    time = queryObj.time.split(/[,，、到至]+/);
+  } else if (Array.isArray(queryObj.time)) {
+    time = queryObj.time as string[];
   }
   if (time.length == 2) {
     const start = dayjs(time[0]).startOf('day').toDate();

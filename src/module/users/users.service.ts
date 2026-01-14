@@ -4,7 +4,7 @@ import { ApiResult } from '@/common/utils/result';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Brackets, ILike, In, Not, Repository, UpdateResult } from 'typeorm';
-import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
+import { buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 import { bcryptService } from '@/common/utils/bcrypt-hash';
 import { PageApiResult } from '@/types/public';
 import { Role } from '@/module/roles/entities/role.entity';
@@ -65,12 +65,10 @@ export class UsersService {
   /**
    * 分页查询
    * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
-   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<PageApiResult<User[]> | null>>} 统一返回结果
    */
   async findByPage(
-    findUserDtoByPage?: FindUserDtoByPage,
-    platform: string = 'admin'
+    findUserDtoByPage?: FindUserDtoByPage
   ): Promise<ApiResult<PageApiResult<User[]> | null>> {
     try {
       const { take, skip } = buildCommonPaging(
@@ -113,13 +111,9 @@ export class UsersService {
   /**
    * 查询所有用户
    * @param {FindUserDto} findUserDto 查询条件
-   * @param {string} platform  平台(admin/web/app/mini)
    * @returns {Promise<ApiResult<User[] | null>>} 统一返回结果
    */
-  async findAll(
-    findUserDto?: FindUserDto,
-    platform: string = 'admin'
-  ): Promise<ApiResult<User[] | null>> {
+  async findAll(findUserDto?: FindUserDto): Promise<ApiResult<User[] | null>> {
     try {
       const order = buildCommonSort(findUserDto?.sort);
       const data = await this.userRepository.find({
@@ -233,12 +227,10 @@ export class UsersService {
    * 导出用户列表
 
    * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
-   * @param {string} platform 平台(admin/web/app/mini)
    * @returns {Promise<{buffer: Buffer; fileName: string} | ApiResult<null>>} 成功Excel文件和名称，失败统一返回结果
    */
   async exportUserList(
-    findUserDtoByPage?: FindUserDtoByPage,
-    platform: string = 'admin'
+    findUserDtoByPage?: FindUserDtoByPage
   ): Promise<{ buffer: Buffer; fileName: string } | ApiResult<null>> {
     try {
       const order = buildCommonSort(findUserDtoByPage?.sort);
@@ -256,7 +248,7 @@ export class UsersService {
         },
       });
       return exportWithKeyValueHeader(
-        data,
+        data as unknown as Record<string, unknown>[],
         {
           account: '账号',
           nickName: '昵称',

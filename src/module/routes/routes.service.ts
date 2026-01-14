@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Route } from './entities/route.entity';
-import { In, IsNull, Not, Repository, TreeRepository } from 'typeorm';
+import { In, Not, Repository, TreeRepository } from 'typeorm';
 import { buildCommonSort } from '@/common/utils/service.util';
 import { ApiResult } from '@/common/utils/result';
 import { Role } from '@/module/roles/entities/role.entity';
@@ -235,7 +235,9 @@ export class RoutesService {
         .where('role.id  IN (:...ids)', { ids: rolesIds })
         .groupBy('route.id');
 
-      const routeIds = (await queryBuilderRole.getRawMany()).map((item) => item.routeId);
+      const routeIds = (await queryBuilderRole.getRawMany()).map(
+        (item: { routeId: string }) => item.routeId
+      );
       // 没有绑定路由
       if (routeIds.length === 0) {
         return ApiResult.success<RoleRoutes[]>({ data: [] }); // 无权限
@@ -275,7 +277,7 @@ export class RoutesService {
       let meta: RouteMeta = {};
       try {
         meta = JSON.parse(route.meta as string) as RouteMeta;
-      } catch (error) {
+      } catch {
         meta = {};
       }
       return {

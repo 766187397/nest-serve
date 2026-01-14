@@ -1,5 +1,5 @@
 import { ApiResult } from '@/common/utils/result';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as dayjs from 'dayjs';
 import { Log } from './entities/logger.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -27,17 +27,19 @@ export class LoggerService {
     const platform: string = url.split('/')[3] || '';
     const { account = '', nickName = '' } = request.userInfo || {};
     const method = request.method || '';
-    let {
+    const {
       referer = '',
       'sec-ch-ua-platform': apiPlatform = '',
       'sec-ch-ua': browser = '',
     } = request.headers;
+    let processedBrowser = browser as string;
+    let processedApiPlatform = apiPlatform as string;
     try {
-      browser = (browser as string).replace(/"/g, '');
-      apiPlatform = (apiPlatform as string).replace(/"/g, '');
-    } catch (error) {
-      apiPlatform = '';
-      browser = '';
+      processedBrowser = processedBrowser.replace(/"/g, '');
+      processedApiPlatform = processedApiPlatform.replace(/"/g, '');
+    } catch {
+      processedApiPlatform = '';
+      processedBrowser = '';
     }
 
     // 获取客户端的 IP 地址
@@ -56,9 +58,9 @@ export class LoggerService {
         url,
         method,
         referer,
-        apiPlatform,
+        apiPlatform: processedApiPlatform,
         platform,
-        browser,
+        browser: processedBrowser,
         responseTime,
         resData,
         statusCode,
@@ -115,7 +117,7 @@ export class LoggerService {
         },
       });
     } catch (error) {
-      return ApiResult.error<null>(error || '查询日志失败，请稍后重试');
+      return ApiResult.error<null>((error as Error).message || '查询日志失败，请稍后重试');
     }
   }
 

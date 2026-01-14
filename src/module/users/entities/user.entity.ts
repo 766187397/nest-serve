@@ -7,8 +7,6 @@ import { Role } from '@/module/roles/entities/role.entity';
 // 复合索引 优化同时查询id和deletedAt的情况
 @Index('IDX_users_id_deletedAt', ['id', 'deletedAt'])
 export class User extends UUIDBaseEntity {
-  [key: string]: unknown;
-
   @Column({
     type: 'varchar',
     name: 'account',

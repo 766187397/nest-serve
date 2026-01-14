@@ -5,7 +5,9 @@ import { UpdateScheduleDto } from './update-schedule.dto';
 
 export class FindScheduleDtoByPage extends PartialType(
   IntersectionType(FindByParameter, PageByParameter)
-) {}
+) {
+  name?: string;
+}
 
 export class FindScheduleLogDtoByPage extends PartialType(
   IntersectionType(FindByParameter, PageByParameter)

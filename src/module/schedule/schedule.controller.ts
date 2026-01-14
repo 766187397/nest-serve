@@ -20,10 +20,6 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 
-interface FindAllQueryParams {
-  [key: string]: unknown;
-}
-
 @ApiTags('定时任务管理')
 @ApiResponse({ status: 200, description: '操作成功' })
 @ApiResponse({ status: 201, description: '操作成功，无返回内容' })

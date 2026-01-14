@@ -1,15 +1,5 @@
 import { UUIDBaseEntity } from '@/common/entities/base';
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  Tree,
-  TreeChildren,
-  TreeParent,
-} from 'typeorm';
+import { Column, Entity, Index, Tree, TreeChildren, TreeParent } from 'typeorm';
 
 @Entity('route', { comment: '路由表' })
 // 复合索引 优化同时查询id和deletedAt的情况

@@ -1,6 +1,6 @@
 import { CreateBaseDto, FindByParameter } from '@/common/dto/base';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 /** 创建路由信息 */
 export class CreateRouteDto extends CreateBaseDto {

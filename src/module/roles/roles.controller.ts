@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from './dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 

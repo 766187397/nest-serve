@@ -22,8 +22,6 @@ export class CreateBaseDto {
 
 /** 查询参数 */
 export class FindByParameter {
-  [key: string]: unknown;
-
   @ApiProperty({
     description: '排序: ASC - 升序，DESC - 降序',
     required: false,
@@ -67,10 +65,9 @@ export class FindByParameter {
     /^(\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2})[,，至到](\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2})$/,
     {
       message:
-        '日期范围格式错误，应为“YYYY-M-D HH:MM:SS,YYYY-M-D HH:MM:SS”或使用中文分隔符“，”、“至”、“到”',
+        '日期范围格式错误，应为"YYYY-M-D HH:MM:SS,YYYY-M-D HH:MM:SS"或使用中文分隔符"，"、"至"、"到"',
     }
   )
-  // @IsString({ message: "时间范围必须为字符串，并且需要使用逗号隔开" })
   time?: string | string[];
 }
 
