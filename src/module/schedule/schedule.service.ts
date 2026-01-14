@@ -107,10 +107,7 @@ export class ScheduleService {
    * @param {string} platform 平台标识
    * @returns {Promise<ApiResult<Schedule[] | null>>} 统一返回结果
    */
-  async findAll(
-    query: any,
-    platform: string = 'admin'
-  ): Promise<ApiResult<Schedule[] | null>> {
+  async findAll(query: any, platform: string = 'admin'): Promise<ApiResult<Schedule[] | null>> {
     try {
       const where = buildCommonQuery(query);
       const order = buildCommonSort(query?.sort);
@@ -155,7 +152,11 @@ export class ScheduleService {
    * @param {UpdateScheduleDto} updateScheduleDto 更新DTO
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(id: string, updateScheduleDto: UpdateScheduleDto, platform: string = 'admin'): Promise<ApiResult<null>> {
+  async update(
+    id: string,
+    updateScheduleDto: UpdateScheduleDto,
+    platform: string = 'admin'
+  ): Promise<ApiResult<null>> {
     try {
       const schedule = await this.scheduleRepository.findOne({ where: { id } });
       if (!schedule) {
@@ -164,7 +165,10 @@ export class ScheduleService {
 
       if (updateScheduleDto.jobName && updateScheduleDto.jobName !== schedule.jobName) {
         const existingSchedule = await this.scheduleRepository.findOne({
-          where: { jobName: updateScheduleDto.jobName, platform: handlePlatformQuery(platform, schedule.platform) },
+          where: {
+            jobName: updateScheduleDto.jobName,
+            platform: handlePlatformQuery(platform, schedule.platform),
+          },
         });
         if (existingSchedule) {
           return ApiResult.error<null>('任务标识已存在');

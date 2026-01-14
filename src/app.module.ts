@@ -3,7 +3,6 @@ import { UsersModule } from './module/users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
-import { Knife4jModule } from './module/knife4j/knife4j.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './module/auth/auth.module';
 import { DefaultDataModule } from './module/defaultData/defaultData.module';
@@ -124,7 +123,6 @@ import { CacheInitModule } from './common/module/cache-init.module';
       },
       inject: [ConfigService],
     }),
-    Knife4jModule,
     UploadModule,
     AuthModule,
     DefaultDataModule,

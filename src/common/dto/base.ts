@@ -34,8 +34,7 @@ export class FindByParameter {
 
   @ApiProperty({
     type: 'string',
-    description:
-      '状态；1 - 启用，2 - 禁用；根据模块业务定义',
+    description: '状态；1 - 启用，2 - 禁用；根据模块业务定义',
     required: false,
     example: 1,
   })

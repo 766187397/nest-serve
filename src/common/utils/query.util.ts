@@ -14,12 +14,12 @@
 export function handlePlatformQuery(requestPlatform: string, queryPlatform?: string): string {
   // 定义管理员平台标识，可根据需要修改
   const ADMIN_PLATFORM = 'admin';
-  
+
   // 如果请求平台是admin且提供了查询平台参数，则使用查询平台参数
   if (requestPlatform === ADMIN_PLATFORM && queryPlatform) {
     return queryPlatform;
   }
-  
+
   // 否则使用请求头中的平台标识
   return requestPlatform;
 }

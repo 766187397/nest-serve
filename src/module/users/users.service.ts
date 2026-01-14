@@ -1,10 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  CreateUserDto,
-  FindUserDto,
-  FindUserDtoByPage,
-  UpdateUserDto,
-} from './dto/index';
+import { CreateUserDto, FindUserDto, FindUserDtoByPage, UpdateUserDto } from './dto/index';
 import { ApiResult } from '@/common/utils/result';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
@@ -303,6 +298,4 @@ export class UsersService {
       return ApiResult.error<null>((error as Error)?.message || '用户查询失败，请稍后再试');
     }
   }
-
-
 }

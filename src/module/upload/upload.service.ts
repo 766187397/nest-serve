@@ -91,10 +91,7 @@ export class UploadService {
     try {
       const where: FindOptionsWhere<Upload> = buildCommonQuery(findFileDtoByPage);
       const order = buildCommonSort(findFileDtoByPage?.sort);
-      const { take, skip } = buildCommonPaging(
-        findFileDtoByPage.page,
-        findFileDtoByPage.pageSize
-      );
+      const { take, skip } = buildCommonPaging(findFileDtoByPage.page, findFileDtoByPage.pageSize);
       const [data, total] = await this.upload.findAndCount({
         where: {
           ...where,

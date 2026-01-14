@@ -14,6 +14,8 @@ export class JWTWhiteList {
   static whiteListExact: string[] = [
     '/favicon.ico', // 网站图标
     '/v3/api-docs/swagger-config', // knife4j 请求配置
+    '/json', // 获取 Swagger JSON
+    '/download', // 下载 Swagger JSON
     '/api/v1/auth/login', // 账号密码登录接口
     '/api/v1/auth/login/set-cookie', // 账号密码登录接口，设置cookie
     '/api/v1/auth/verification-code-login', // 邮箱验证码登录接口

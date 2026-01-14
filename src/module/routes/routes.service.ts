@@ -34,7 +34,10 @@ export class RoutesService {
       let parent: Route | null = null;
       if (createRouteDto.parentId) {
         parent = await this.routeRepository.findOne({
-          where: { id: createRouteDto.parentId, platform: handlePlatformQuery(platform, undefined) },
+          where: {
+            id: createRouteDto.parentId,
+            platform: handlePlatformQuery(platform, undefined),
+          },
           relations: ['children'],
         });
         if (!parent) {

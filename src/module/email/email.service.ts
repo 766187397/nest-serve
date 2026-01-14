@@ -17,7 +17,12 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import { Cron } from '@nestjs/schedule';
 import { handlePlatformQuery } from '@/common/utils/query.util';
-import { buildCommonQuery, buildCommonSort, buildCommonPaging, buildCommonVerify } from '@/common/utils/service.util';
+import {
+  buildCommonQuery,
+  buildCommonSort,
+  buildCommonPaging,
+  buildCommonVerify,
+} from '@/common/utils/service.util';
 
 // 创建一个SMTP客户端配置对象
 const QQPostbox = nodemailer.createTransport({
@@ -266,7 +271,7 @@ export class EmailService {
               emailSendRecord.errorMessage = `${error}`;
               await this.emailSendRecordRepository.save(emailSendRecord);
             }
-            
+
             reject(
               ApiResult.error({
                 code: HttpStatusCodes.INTERNAL_SERVER_ERROR,
@@ -280,13 +285,17 @@ export class EmailService {
               emailSendRecord.sendStatus = true;
               await this.emailSendRecordRepository.save(emailSendRecord);
             }
-            
+
             const time = dayjs().add(cacheTime, 'm');
-            await emailCache.set(sendEmail.email, {
-              state: true,
-              time: time.format('YYYY-MM-DD HH:mm:ss'),
-              code: code,
-            }, EMAIL_CODE_TTL);
+            await emailCache.set(
+              sendEmail.email,
+              {
+                state: true,
+                time: time.format('YYYY-MM-DD HH:mm:ss'),
+                code: code,
+              },
+              EMAIL_CODE_TTL
+            );
             resolve(ApiResult.success({ data: info }));
           }
         });
@@ -338,12 +347,12 @@ export class EmailService {
     try {
       // 计算一个月前的时间
       const oneMonthAgo = dayjs().subtract(1, 'month').toDate();
-      
+
       // 删除超过一个月的记录
       const result = await this.emailSendRecordRepository.delete({
         createdAt: LessThan(oneMonthAgo),
       });
-      
+
       console.log(`清理了 ${result.affected || 0} 条超过一个月的邮箱发送记录`);
     } catch (error) {
       console.error('清理邮箱发送记录失败:', error);

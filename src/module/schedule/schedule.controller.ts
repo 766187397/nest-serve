@@ -34,10 +34,7 @@ export class ScheduleController {
 
   @Post()
   @ApiOperation({ summary: '创建定时任务' })
-  create(
-    @Headers('x-platform') platform: string,
-    @Body() createScheduleDto: CreateScheduleDto
-  ) {
+  create(@Headers('x-platform') platform: string, @Body() createScheduleDto: CreateScheduleDto) {
     return this.scheduleService.create(createScheduleDto, platform);
   }
 
@@ -52,10 +49,7 @@ export class ScheduleController {
 
   @Get('all')
   @ApiOperation({ summary: '查询定时任务列表(不分页)' })
-  findAll(
-    @Headers('x-platform') platform: string,
-    @Query(new FilterEmptyPipe()) query: any
-  ) {
+  findAll(@Headers('x-platform') platform: string, @Query(new FilterEmptyPipe()) query: any) {
     return this.scheduleService.findAll(query, platform);
   }
 
@@ -80,10 +74,7 @@ export class ScheduleController {
 
   @Patch(':id/status')
   @ApiOperation({ summary: '启用/禁用定时任务' })
-  toggleStatus(
-    @Param('id') id: string,
-    @Body('status') status: number
-  ) {
+  toggleStatus(@Param('id') id: string, @Body('status') status: number) {
     return this.scheduleService.toggleStatus(id, status);
   }
 

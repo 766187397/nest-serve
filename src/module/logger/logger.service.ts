@@ -87,10 +87,7 @@ export class LoggerService {
     platform: string = 'admin'
   ): Promise<ApiResult<PageApiResult<Log[]> | null>> {
     try {
-      const { take, skip } = buildCommonPaging(
-        findLogDtoByPage?.page,
-        findLogDtoByPage?.pageSize
-      );
+      const { take, skip } = buildCommonPaging(findLogDtoByPage?.page, findLogDtoByPage?.pageSize);
       const where = buildCommonQuery(findLogDtoByPage);
       const order = buildCommonSort(findLogDtoByPage?.sort);
       // 查询符合条件的用户

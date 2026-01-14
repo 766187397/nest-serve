@@ -23,7 +23,12 @@ export class CreateScheduleDto extends CreateBaseDto {
   @IsString({ message: '内部任务标识必须为字符串' })
   jobName: string;
 
-  @ApiProperty({ description: '任务执行超时时间（秒）', required: false, default: 300, example: 300 })
+  @ApiProperty({
+    description: '任务执行超时时间（秒）',
+    required: false,
+    default: 300,
+    example: 300,
+  })
   @IsOptional()
   @IsNumber({}, { message: '超时时间必须为数字' })
   @Min(1, { message: '超时时间必须大于0' })

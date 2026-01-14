@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Query,
-  Req,
-  Res,
-  Headers,
-  HttpCode,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Req, Res, Headers, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   LogInDto,

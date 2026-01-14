@@ -101,7 +101,13 @@ export function buildCommonPaging(
  * const isValid = await buildVerify({ code: '1234', codeKey: 'captcha_key' });
  * // 如果验证码正确返回true，否则返回false
  */
-export async function buildVerify({ code, codeKey }: { codeKey: string; code: string }): Promise<boolean> {
+export async function buildVerify({
+  code,
+  codeKey,
+}: {
+  codeKey: string;
+  code: string;
+}): Promise<boolean> {
   const codeCache = await svgCache.get<{ text: string }>(codeKey);
 
   if (!codeCache) {
@@ -127,6 +133,12 @@ export async function buildVerify({ code, codeKey }: { codeKey: string; code: st
  * const isValid = await buildCommonVerify({ code: '1234', codeKey: 'captcha_key' });
  * // 如果验证码正确返回true，否则返回false
  */
-export async function buildCommonVerify({ code, codeKey }: { codeKey: string; code: string }): Promise<boolean> {
+export async function buildCommonVerify({
+  code,
+  codeKey,
+}: {
+  codeKey: string;
+  code: string;
+}): Promise<boolean> {
   return buildVerify({ code, codeKey });
 }

@@ -1,6 +1,4 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   CaptchaDto,
   LogInDto,
@@ -34,7 +32,7 @@ export class AuthService {
     private userRepository: Repository<User>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
-    private readonly jwtService: JwtService,
+    private readonly jwtService: JwtService
   ) {}
 
   /**
@@ -152,7 +150,10 @@ export class AuthService {
   ): Promise<ApiResult<UserLogin | null>> {
     try {
       const data = await this.userRepository.findOne({
-        where: { account: simpleLoginDto.account, platform: handlePlatformQuery(platform, undefined) },
+        where: {
+          account: simpleLoginDto.account,
+          platform: handlePlatformQuery(platform, undefined),
+        },
         relations: ['roles'],
       });
 
@@ -305,7 +306,10 @@ export class AuthService {
   ): Promise<ApiResult<UserLogin | null>> {
     try {
       const data = await this.userRepository.findOne({
-        where: { email: verificationCodeLogin.email, platform: handlePlatformQuery(platform, undefined) },
+        where: {
+          email: verificationCodeLogin.email,
+          platform: handlePlatformQuery(platform, undefined),
+        },
         relations: ['roles'],
       });
       if (!data) {

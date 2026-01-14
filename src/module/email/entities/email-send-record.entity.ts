@@ -14,7 +14,12 @@ export class EmailSendRecord extends AutoIDBaseEntity {
   @Column({ type: 'text', nullable: true, comment: '邮件内容' })
   content: string;
 
-  @Column({ type: 'boolean', nullable: false, default: false, comment: '发送状态：true成功，false失败' })
+  @Column({
+    type: 'boolean',
+    nullable: false,
+    default: false,
+    comment: '发送状态：true成功，false失败',
+  })
   sendStatus: boolean;
 
   @Column({ type: 'text', nullable: true, comment: '错误信息（如果发送失败）' })
