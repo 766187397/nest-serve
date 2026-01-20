@@ -9,6 +9,7 @@ export class JWTWhiteList {
     '/api/v1/large/files', // 大文件上传
     '/api/v1/large/tempFile', // 大文件上传取消
     '/api/v1/auth/captcha', // 验证码接口
+    '/health/pool', // 连接池监控接口
   ];
   // 全匹配
   static whiteListExact: string[] = [

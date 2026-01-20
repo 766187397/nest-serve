@@ -21,6 +21,7 @@ import DBConfig, { type MysqlConfig, type PgConfig } from '@/config/db';
 import { CacheModule } from './common/module/cache.module';
 import { CacheInitModule } from './common/module/cache-init.module';
 import { DocModule } from './module/doc/doc.module';
+import { ConnectionPoolMonitorModule } from './module/connection-pool-monitor/connection-pool-monitor.module';
 
 @Module({
   imports: [
@@ -58,6 +59,12 @@ import { DocModule } from './module/doc/doc.module';
             logging: process.env.NODE_ENV !== 'production',
             entities: [join(__dirname, 'module/**/!(*logger)*.entity.{ts,js}')],
             migrations: ['src/migrations/**/*{.ts,.js}'],
+            extra: {
+              max: config.DB_POOL_SIZE || 10,
+              min: config.DB_POOL_MIN || 2,
+              connectionTimeoutMillis: config.DB_CONNECTION_TIMEOUT || 30000,
+              idleTimeoutMillis: config.DB_IDLE_TIMEOUT || 300000,
+            },
           };
         } else {
           const config = DBConfig.dbConfig as MysqlConfig;
@@ -72,6 +79,15 @@ import { DocModule } from './module/doc/doc.module';
             logging: process.env.NODE_ENV !== 'production',
             entities: [join(__dirname, 'module/**/!(*logger)*.entity.{ts,js}')],
             migrations: ['src/migrations/**/*{.ts,.js}'],
+            extra: {
+              connectionLimit: config.DB_POOL_SIZE || 10,
+              waitForConnections: true,
+              queueLimit: 0,
+              connectTimeout: config.DB_CONNECTION_TIMEOUT || 30000,
+              acquireTimeout: config.DB_CONNECTION_TIMEOUT || 30000,
+              idleTimeout: config.DB_IDLE_TIMEOUT || 300000,
+              maxLifetime: config.DB_MAX_LIFETIME || 1800000,
+            },
           };
         }
       },
@@ -104,6 +120,12 @@ import { DocModule } from './module/doc/doc.module';
             logging: process.env.NODE_ENV !== 'production',
             entities: [join(__dirname, 'module/logger/**/*.entity.{ts,js}')],
             migrations: ['src/migrations/**/*{.ts,.js}'],
+            extra: {
+              max: config.DB_POOL_SIZE || 10,
+              min: config.DB_POOL_MIN || 2,
+              connectionTimeoutMillis: config.DB_CONNECTION_TIMEOUT || 30000,
+              idleTimeoutMillis: config.DB_IDLE_TIMEOUT || 300000,
+            },
           };
         } else {
           const config = DBConfig.dbLogger as MysqlConfig;
@@ -118,6 +140,15 @@ import { DocModule } from './module/doc/doc.module';
             logging: process.env.NODE_ENV !== 'production',
             entities: [join(__dirname, 'module/logger/**/*.entity.{ts,js}')],
             migrations: ['src/migrations/**/*{.ts,.js}'],
+            extra: {
+              connectionLimit: config.DB_POOL_SIZE || 10,
+              waitForConnections: true,
+              queueLimit: 0,
+              connectTimeout: config.DB_CONNECTION_TIMEOUT || 30000,
+              acquireTimeout: config.DB_CONNECTION_TIMEOUT || 30000,
+              idleTimeout: config.DB_IDLE_TIMEOUT || 300000,
+              maxLifetime: config.DB_MAX_LIFETIME || 1800000,
+            },
           };
         }
       },
@@ -136,6 +167,7 @@ import { DocModule } from './module/doc/doc.module';
     CacheModule,
     CacheInitModule,
     DocModule,
+    ConnectionPoolMonitorModule,
   ],
   controllers: [],
   providers: [
