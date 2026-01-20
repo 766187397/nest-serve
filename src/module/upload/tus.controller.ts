@@ -2,7 +2,7 @@
 import { Controller, All, Req, Res, OnModuleInit, Query, Get } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Server, FileStore, EVENTS } from 'tus-node-server';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ApiResult } from '@/common/utils/result';
@@ -100,6 +100,7 @@ export class CustomizeTusController {
     summary: '大文件秒传',
     description: '根据文件的hash值查询是否已上传',
   })
+  @ApiOkResponse({ type: ApiResult<UploadFile | null>, description: '大文件秒传成功' })
   async getFileByHash(@Query() fileHashDTO: FileHashDTO): Promise<ApiResult<UploadFile | null>> {
     return this.uploadService.getFileByHash(fileHashDTO);
   }

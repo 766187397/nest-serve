@@ -14,11 +14,14 @@ import {
 } from '@nestjs/common';
 import { RoutesService } from './routes.service';
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from './dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { User } from '@/module/users/entities/user.entity';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { HttpStatusCodes } from '@/common/constants/http-status';
+import { Route } from './entities/route.entity';
+import { ApiResult } from '@/common/utils/result';
+import { RoleRoutes } from '@/types/routes';
 
 @ApiTags('路由管理')
 // @ApiBearerAuth("Authorization")
@@ -35,12 +38,14 @@ export class RoutesController {
 
   @Post()
   @ApiOperation({ summary: '创建路由' })
+  @ApiOkResponse({ type: ApiResult<Route>, description: '创建路由成功' })
   create(@Headers('x-platform') platform: string, @Body() createRouteDto: CreateRouteDto) {
     return this.routesService.create(createRouteDto, platform);
   }
 
   @Get()
   @ApiOperation({ summary: '查询所有路由' })
+  @ApiOkResponse({ type: ApiResult<Route[]>, description: '查询所有路由成功' })
   findAll(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findRouteDto: FindRouteDto
@@ -50,12 +55,14 @@ export class RoutesController {
 
   @Get(':id')
   @ApiOperation({ summary: '获取路由详情' })
+  @ApiOkResponse({ type: ApiResult<Route>, description: '获取路由详情成功' })
   findOne(@Param('id') id: string) {
     return this.routesService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '修改路由信息' })
+  @ApiOkResponse({ type: ApiResult<Route>, description: '修改路由信息成功' })
   update(@Param('id') id: string, @Body() updateRouteDto: UpdateRouteDto) {
     return this.routesService.update(id, updateRouteDto);
   }
@@ -76,6 +83,7 @@ export class RoutesController {
     example: 'menu',
   })
   @ApiOperation({ summary: '根据登录用户的角色ids获取路由' })
+  @ApiOkResponse({ type: ApiResult<RoleRoutes[]>, description: '根据登录用户的角色ids获取路由成功' })
   async getRoutesByRoleId(@Req() req: Request, @Res() res: Response) {
     const type = req.query.type as string;
     const userInfo = req.userInfo as User;

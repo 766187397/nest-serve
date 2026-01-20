@@ -13,11 +13,13 @@ import {
 } from '@nestjs/common';
 import { EmailService } from './email.service';
 import { CreateEmailDto, FindEmailDto, FindEmailtoByPage, SendEmail, UpdateEmailDto } from './dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { Request } from 'express';
 import { User } from '@/module/users/entities/user.entity';
 import { HttpStatusCodes } from '@/common/constants/http-status';
+import { Email } from './entities/email.entity';
+import { ApiResult } from '@/common/utils/result';
 
 @ApiTags('邮箱管理')
 // @ApiBearerAuth("Authorization")
@@ -34,12 +36,14 @@ export class EmailController {
 
   @Post()
   @ApiOperation({ summary: '创建邮箱模板' })
+  @ApiOkResponse({ type: ApiResult<Email>, description: '创建邮箱模板成功' })
   create(@Headers('x-platform') platform: string, @Body() createEmailDto: CreateEmailDto) {
     return this.emailService.create(createEmailDto, platform);
   }
 
   @Get()
   @ApiOperation({ summary: '查询邮箱列表(分页)' })
+  @ApiOkResponse({ type: ApiResult<Email[]>, description: '查询邮箱列表成功' })
   findByPage(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findEmailtoByPage: FindEmailtoByPage
@@ -49,6 +53,7 @@ export class EmailController {
 
   @Get('all')
   @ApiOperation({ summary: '查询邮箱列表(不分页)' })
+  @ApiOkResponse({ type: ApiResult<Email[]>, description: '查询邮箱列表成功' })
   findAll(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findEmailDto: FindEmailDto
@@ -58,14 +63,24 @@ export class EmailController {
 
   @Get(':id')
   @ApiOperation({ summary: '查询邮箱详情' })
+  @ApiOkResponse({ type: ApiResult<Email>, description: '查询邮箱详情成功' })
   findOne(@Param('id') id: string) {
     return this.emailService.findOne(+id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '更新邮箱模板' })
+  @ApiOkResponse({ type: ApiResult<Email>, description: '更新邮箱模板成功' })
   update(@Param('id') id: string, @Body() updateEmailDto: UpdateEmailDto) {
     return this.emailService.update(+id, updateEmailDto);
+  }
+
+  @Post('send')
+  @ApiOperation({ summary: '发送邮箱（自定义变量格式：验证码为{code}）' })
+  @ApiOkResponse({ type: ApiResult<unknown>, description: '发送邮箱成功' })
+  sendEmail(@Body() sendEmail: SendEmail, @Req() req: Request) {
+    const userInfo = req.userInfo as User;
+    return this.emailService.sendEmail(sendEmail, userInfo);
   }
 
   @Delete(':id')
@@ -73,12 +88,5 @@ export class EmailController {
   @HttpCode(HttpStatusCodes.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.emailService.remove(+id);
-  }
-
-  @Post('send')
-  @ApiOperation({ summary: '发送邮箱（自定义变量格式：验证码为{code}）' })
-  sendEmail(@Body() sendEmail: SendEmail, @Req() req: Request) {
-    const userInfo = req.userInfo as User;
-    return this.emailService.sendEmail(sendEmail, userInfo);
   }
 }

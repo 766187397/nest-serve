@@ -11,7 +11,7 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { UploadService } from './upload.service';
-import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { MulterConfigInterceptor } from '@/common/interceptor/multer-config.interceptor';
 import { FindFileDto, FindFileDtoByPage } from './dto/index.dto';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
@@ -20,6 +20,8 @@ import * as http from 'http';
 import { URL } from 'url';
 import { Response } from 'express';
 import { HttpStatusCodes } from '@/common/constants/http-status';
+import { Upload } from './entities/upload.entity';
+import { ApiResult } from '@/common/utils/result';
 
 @ApiTags('文件上传')
 @Controller('api/v1/upload')
@@ -44,18 +46,21 @@ export class UploadController {
       required: ['file'],
     },
   })
+  @ApiOkResponse({ type: ApiResult<Upload>, description: '文件上传成功' })
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return this.uploadService.uploadFile(file);
   }
 
   @Get('all')
   @ApiOperation({ summary: '获取所有文件列表' })
+  @ApiOkResponse({ type: ApiResult<Upload[]>, description: '获取所有文件列表成功' })
   getFileAll(@Query(new FilterEmptyPipe()) FindFileDto: FindFileDto) {
     return this.uploadService.getFileAll(FindFileDto);
   }
 
   @Get()
   @ApiOperation({ summary: '分页查询文件' })
+  @ApiOkResponse({ type: ApiResult<Upload[]>, description: '分页查询文件成功' })
   getFileByPage(@Query(new FilterEmptyPipe()) findFileDtoByPage: FindFileDtoByPage) {
     return this.uploadService.getFileByPage(findFileDtoByPage);
   }
@@ -63,6 +68,7 @@ export class UploadController {
   @Get('download')
   @ApiOperation({ summary: '下载文件' })
   @ApiParam({ name: 'fileUrl', required: true, description: '文件 URL' })
+  @ApiOkResponse({ description: '下载文件成功，返回文件流' })
   downloadFile(@Query('fileUrl') fileUrl: string, @Res() res: Response) {
     if (!fileUrl) {
       throw new Error('缺少 url 参数');
@@ -104,6 +110,7 @@ export class UploadController {
   @Get(':id')
   @ApiParam({ name: 'id', required: true, description: '文件 ID' })
   @ApiOperation({ summary: '根据id获取文件' })
+  @ApiOkResponse({ type: ApiResult<Upload>, description: '根据id获取文件成功' })
   getFileById(@Param('id') id: string) {
     return this.uploadService.getFileById(id);
   }

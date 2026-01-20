@@ -12,9 +12,11 @@ import {
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from './dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { HttpStatusCodes } from '@/common/constants/http-status';
+import { Role } from './entities/role.entity';
+import { ApiResult } from '@/common/utils/result';
 
 @ApiTags('角色管理')
 // @ApiBearerAuth("Authorization")
@@ -31,12 +33,14 @@ export class RolesController {
 
   @Post()
   @ApiOperation({ summary: '创建角色' })
+  @ApiOkResponse({ type: ApiResult<Role>, description: '创建角色成功' })
   create(@Headers('x-platform') platform: string, @Body() createRoleDto: CreateRoleDto) {
     return this.rolesService.create(createRoleDto, platform);
   }
 
   @Get()
   @ApiOperation({ summary: '查询角色列表(分页)' })
+  @ApiOkResponse({ type: ApiResult<Role[]>, description: '查询角色列表成功' })
   findByPage(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findRoleDtoByPage: FindRoleDtoByPage
@@ -46,6 +50,7 @@ export class RolesController {
 
   @Get('all')
   @ApiOperation({ summary: '查询角色列表(不分页)' })
+  @ApiOkResponse({ type: ApiResult<Role[]>, description: '查询角色列表成功' })
   findAll(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findRoleDto: FindRoleDto
@@ -55,12 +60,14 @@ export class RolesController {
 
   @Get(':id')
   @ApiOperation({ summary: '查询角色详情' })
+  @ApiOkResponse({ type: ApiResult<Role>, description: '查询角色详情成功' })
   findOne(@Param('id') id: string) {
     return this.rolesService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '更新角色' })
+  @ApiOkResponse({ type: ApiResult<Role>, description: '更新角色成功' })
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     return this.rolesService.update(id, updateRoleDto);
   }
