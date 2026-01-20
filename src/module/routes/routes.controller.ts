@@ -83,7 +83,10 @@ export class RoutesController {
     example: 'menu',
   })
   @ApiOperation({ summary: '根据登录用户的角色ids获取路由' })
-  @ApiOkResponse({ type: ApiResult<RoleRoutes[]>, description: '根据登录用户的角色ids获取路由成功' })
+  @ApiOkResponse({
+    type: ApiResult<RoleRoutes[]>,
+    description: '根据登录用户的角色ids获取路由成功',
+  })
   async getRoutesByRoleId(@Req() req: Request, @Res() res: Response) {
     const type = req.query.type as string;
     const userInfo = req.userInfo as User;

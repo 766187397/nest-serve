@@ -80,7 +80,7 @@ const mysqlConfig: MysqlConfig = {
   /** 数据库名称 */
   DB_DATABASE: env.DB_DATABASE || 'nest-serve',
   /** 连接池大小: 建议值为 (CPU核心数 * 2) + 有效磁盘数 */
-  DB_POOL_SIZE: Number(env.DB_POOL_SIZE) || (cpuCores * 2 + 1),
+  DB_POOL_SIZE: Number(env.DB_POOL_SIZE) || cpuCores * 2 + 1,
   /** 最小连接数: 保持连接池中至少有这些数量的连接 */
   DB_POOL_MIN: Number(env.DB_POOL_MIN) || Math.max(2, Math.floor((cpuCores * 2 + 1) / 4)),
   /** 连接超时: 等待获取连接的最大时间(毫秒) */
@@ -112,7 +112,9 @@ const mysqlLogger: MysqlConfig = {
   /** 连接池大小 */
   DB_POOL_SIZE: Number(env.LOG_DB_POOL_SIZE) || Math.max(2, Math.floor((cpuCores * 2 + 1) / 2)),
   /** 最小连接数 */
-  DB_POOL_MIN: Number(env.LOG_DB_POOL_MIN) || Math.max(1, Math.floor(Math.max(2, Math.floor((cpuCores * 2 + 1) / 2)) / 4)),
+  DB_POOL_MIN:
+    Number(env.LOG_DB_POOL_MIN) ||
+    Math.max(1, Math.floor(Math.max(2, Math.floor((cpuCores * 2 + 1) / 2)) / 4)),
   /** 连接超时 */
   DB_CONNECTION_TIMEOUT: Number(env.LOG_DB_CONNECTION_TIMEOUT) || 30000,
   /** 空闲超时 */
@@ -140,7 +142,7 @@ const pgConfig: PgConfig = {
   /** 数据库名称 */
   DB_DATABASE: env.DB_DATABASE || 'nest-serve',
   /** 连接池大小: 建议值为 (CPU核心数 * 2) + 有效磁盘数 */
-  DB_POOL_SIZE: Number(env.DB_POOL_SIZE) || (cpuCores * 2 + 1),
+  DB_POOL_SIZE: Number(env.DB_POOL_SIZE) || cpuCores * 2 + 1,
   /** 最小连接数: 保持连接池中至少有这些数量的连接 */
   DB_POOL_MIN: Number(env.DB_POOL_MIN) || Math.max(2, Math.floor((cpuCores * 2 + 1) / 4)),
   /** 连接超时: 等待获取连接的最大时间(毫秒) */
@@ -172,7 +174,9 @@ const pgLogger: PgConfig = {
   /** 连接池大小 */
   DB_POOL_SIZE: Number(env.LOG_DB_POOL_SIZE) || Math.max(2, Math.floor((cpuCores * 2 + 1) / 2)),
   /** 最小连接数 */
-  DB_POOL_MIN: Number(env.LOG_DB_POOL_MIN) || Math.max(1, Math.floor(Math.max(2, Math.floor((cpuCores * 2 + 1) / 2)) / 4)),
+  DB_POOL_MIN:
+    Number(env.LOG_DB_POOL_MIN) ||
+    Math.max(1, Math.floor(Math.max(2, Math.floor((cpuCores * 2 + 1) / 2)) / 4)),
   /** 连接超时 */
   DB_CONNECTION_TIMEOUT: Number(env.LOG_DB_CONNECTION_TIMEOUT) || 30000,
   /** 空闲超时 */

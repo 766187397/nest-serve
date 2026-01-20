@@ -21,9 +21,7 @@ interface CaptchaCache {
  * const where = buildCommonQuery(query);
  * // where = { status: 1, createdAt: Between(start, end) }
  */
-export function buildCommonQuery(
-  query: unknown
-): Record<string, unknown> {
+export function buildCommonQuery(query: unknown): Record<string, unknown> {
   if (typeof query === 'undefined' || query === null) {
     return {};
   }

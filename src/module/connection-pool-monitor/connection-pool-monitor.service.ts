@@ -6,12 +6,13 @@ import { PoolStats, MysqlPool, PostgresPool, MysqlDriver, PostgresDriver } from 
 @Injectable()
 export class ConnectionPoolMonitorService {
   private readonly logger = new Logger(ConnectionPoolMonitorService.name);
-  private readonly statsHistory: Map<string, Array<{ timestamp: number; stats: PoolStats }>> = new Map();
+  private readonly statsHistory: Map<string, Array<{ timestamp: number; stats: PoolStats }>> =
+    new Map();
   private readonly MAX_HISTORY_SIZE = 100;
 
   constructor(
     @InjectDataSource() private readonly mainDataSource: DataSource,
-    @InjectDataSource('logger') private readonly loggerDataSource: DataSource,
+    @InjectDataSource('logger') private readonly loggerDataSource: DataSource
   ) {}
 
   async getMainPoolStats(): Promise<PoolStats> {
@@ -63,19 +64,13 @@ export class ConnectionPoolMonitorService {
 
   private isMysqlDriver(driver: unknown): driver is MysqlDriver {
     const mysqlDriver = driver as MysqlDriver;
-    return (
-      typeof mysqlDriver === 'object' &&
-      mysqlDriver !== null &&
-      'master' in mysqlDriver
-    );
+    return typeof mysqlDriver === 'object' && mysqlDriver !== null && 'master' in mysqlDriver;
   }
 
   private isPostgresDriver(driver: unknown): driver is PostgresDriver {
     const postgresDriver = driver as PostgresDriver;
     return (
-      typeof postgresDriver === 'object' &&
-      postgresDriver !== null &&
-      'pool' in postgresDriver
+      typeof postgresDriver === 'object' && postgresDriver !== null && 'pool' in postgresDriver
     );
   }
 
@@ -147,7 +142,10 @@ export class ConnectionPoolMonitorService {
     }
   }
 
-  getStatsHistory(poolName: string, limit: number = 10): Array<{ timestamp: number; stats: PoolStats }> {
+  getStatsHistory(
+    poolName: string,
+    limit: number = 10
+  ): Array<{ timestamp: number; stats: PoolStats }> {
     const history = this.statsHistory.get(poolName) || [];
     return history.slice(-limit);
   }
@@ -156,7 +154,10 @@ export class ConnectionPoolMonitorService {
     main: { healthy: boolean; issues: string[] };
     logger: { healthy: boolean; issues: string[] };
   }> {
-    const [mainStats, loggerStats] = await Promise.all([this.getMainPoolStats(), this.getLoggerPoolStats()]);
+    const [mainStats, loggerStats] = await Promise.all([
+      this.getMainPoolStats(),
+      this.getLoggerPoolStats(),
+    ]);
 
     return {
       main: this.checkHealth(mainStats, 'main'),
@@ -168,7 +169,9 @@ export class ConnectionPoolMonitorService {
     const issues: string[] = [];
 
     if (stats.activeConnections / stats.maxConnections > 0.9) {
-      issues.push(`${poolName}: 连接池使用率超过90% (${stats.activeConnections}/${stats.maxConnections})`);
+      issues.push(
+        `${poolName}: 连接池使用率超过90% (${stats.activeConnections}/${stats.maxConnections})`
+      );
     }
 
     if (stats.waitingRequests > 10) {

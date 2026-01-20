@@ -36,7 +36,9 @@ export class ConnectionPoolMonitorController {
   @ApiOkResponse({ type: Object, description: '所有数据库连接池状态' })
   async getAllPoolStats() {
     const stats = await this.poolMonitorService.getAllPoolStats();
-    return ApiResult.success<{ main: PoolStatsDto; logger: PoolStatsDto }>({ data: stats as unknown as { main: PoolStatsDto; logger: PoolStatsDto } });
+    return ApiResult.success<{ main: PoolStatsDto; logger: PoolStatsDto }>({
+      data: stats as unknown as { main: PoolStatsDto; logger: PoolStatsDto },
+    });
   }
 
   @Get('health')
@@ -44,7 +46,9 @@ export class ConnectionPoolMonitorController {
   @ApiOkResponse({ type: Object, description: '连接池健康状态' })
   async getPoolHealth() {
     const health = await this.poolMonitorService.getPoolHealthStatus();
-    return ApiResult.success<{ main: PoolHealthDto; logger: PoolHealthDto }>({ data: health as unknown as { main: PoolHealthDto; logger: PoolHealthDto } });
+    return ApiResult.success<{ main: PoolHealthDto; logger: PoolHealthDto }>({
+      data: health as unknown as { main: PoolHealthDto; logger: PoolHealthDto },
+    });
   }
 
   @Get('history/main')
@@ -52,7 +56,9 @@ export class ConnectionPoolMonitorController {
   @ApiOkResponse({ type: [PoolHistoryItemDto], description: '主数据库连接池历史数据' })
   async getMainPoolHistory() {
     const history = this.poolMonitorService.getStatsHistory('main', 20);
-    return ApiResult.success<Array<PoolHistoryItemDto>>({ data: history as unknown as Array<PoolHistoryItemDto> });
+    return ApiResult.success<Array<PoolHistoryItemDto>>({
+      data: history as unknown as Array<PoolHistoryItemDto>,
+    });
   }
 
   @Get('history/logger')
@@ -60,6 +66,8 @@ export class ConnectionPoolMonitorController {
   @ApiOkResponse({ type: [PoolHistoryItemDto], description: '日志数据库连接池历史数据' })
   async getLoggerPoolHistory() {
     const history = this.poolMonitorService.getStatsHistory('logger', 20);
-    return ApiResult.success<Array<PoolHistoryItemDto>>({ data: history as unknown as Array<PoolHistoryItemDto> });
+    return ApiResult.success<Array<PoolHistoryItemDto>>({
+      data: history as unknown as Array<PoolHistoryItemDto>,
+    });
   }
 }
