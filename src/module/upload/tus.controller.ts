@@ -5,12 +5,11 @@ import { Server, FileStore, EVENTS } from 'tus-node-server';
 import { ApiOperation, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import * as path from 'path';
 import * as fs from 'fs';
-import { ApiResult } from '@/common/utils/result';
 import { UploadService } from './upload.service';
 import { ConfigService } from '@nestjs/config';
 import { getMulterConfig } from '@/config/multer';
-import { FileHashDTO } from './dto/index.dto';
-import { UploadFile } from '@/types/upload';
+import { FileHashDTO, UploadFileDto } from './dto/index.dto';
+import { ApiResult } from '@/common/utils/result';
 
 @ApiTags('大文件切片上传')
 @Controller('api/v1/large/files')
@@ -100,8 +99,8 @@ export class CustomizeTusController {
     summary: '大文件秒传',
     description: '根据文件的hash值查询是否已上传',
   })
-  @ApiOkResponse({ type: ApiResult<UploadFile | null>, description: '大文件秒传成功' })
-  async getFileByHash(@Query() fileHashDTO: FileHashDTO): Promise<ApiResult<UploadFile | null>> {
+  @ApiOkResponse({ type: UploadFileDto, description: '大文件秒传成功' })
+  async getFileByHash(@Query() fileHashDTO: FileHashDTO) {
     return this.uploadService.getFileByHash(fileHashDTO);
   }
 }

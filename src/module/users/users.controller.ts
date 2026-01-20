@@ -19,7 +19,6 @@ import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { Response } from 'express';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import { User } from './entities/user.entity';
-import { ApiResult } from '@/common/utils/result';
 
 @ApiTags('用户管理')
 // @ApiBearerAuth("Authorization")
@@ -36,14 +35,14 @@ export class UsersController {
 
   @Post()
   @ApiOperation({ summary: '创建用户' })
-  @ApiOkResponse({ type: ApiResult<User>, description: '创建用户成功' })
+  @ApiOkResponse({ type: User, description: '创建用户成功' })
   create(@Headers('x-platform') platform: string, @Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto, platform);
   }
 
   @Get()
   @ApiOperation({ summary: '查询用户列表(分页)' })
-  @ApiOkResponse({ type: ApiResult<User[]>, description: '查询用户列表成功' })
+  @ApiOkResponse({ type: [User], description: '查询用户列表成功' })
   findByPage(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage
@@ -53,7 +52,7 @@ export class UsersController {
 
   @Get('all')
   @ApiOperation({ summary: '查询用户列表(不分页)' })
-  @ApiOkResponse({ type: ApiResult<User[]>, description: '查询用户列表成功' })
+  @ApiOkResponse({ type: [User], description: '查询用户列表成功' })
   findAll(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findUserDto: FindUserDto
@@ -63,14 +62,14 @@ export class UsersController {
 
   @Get(':id')
   @ApiOperation({ summary: '查询用户详情' })
-  @ApiOkResponse({ type: ApiResult<User>, description: '查询用户详情成功' })
+  @ApiOkResponse({ type: User, description: '查询用户详情成功' })
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '更新用户信息' })
-  @ApiOkResponse({ type: ApiResult<User>, description: '更新用户信息成功' })
+  @ApiOkResponse({ type: User, description: '更新用户信息成功' })
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }

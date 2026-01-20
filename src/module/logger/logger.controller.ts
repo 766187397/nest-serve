@@ -22,7 +22,7 @@ export class LoggerController {
   @Roles('admin', 'dev')
   @Get()
   @ApiOperation({ summary: '查询日志列表(分页)' })
-  @ApiOkResponse({ type: ApiResult<Log[]>, description: '查询日志列表成功' })
+  @ApiOkResponse({ type: [Log], description: '查询日志列表成功' })
   findByPage(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findLogDtoByPage: FindLogDtoByPage

@@ -38,14 +38,14 @@ export class RoutesController {
 
   @Post()
   @ApiOperation({ summary: '创建路由' })
-  @ApiOkResponse({ type: ApiResult<Route>, description: '创建路由成功' })
+  @ApiOkResponse({ type: Route, description: '创建路由成功' })
   create(@Headers('x-platform') platform: string, @Body() createRouteDto: CreateRouteDto) {
     return this.routesService.create(createRouteDto, platform);
   }
 
   @Get()
   @ApiOperation({ summary: '查询所有路由' })
-  @ApiOkResponse({ type: ApiResult<Route[]>, description: '查询所有路由成功' })
+  @ApiOkResponse({ type: [Route], description: '查询所有路由成功' })
   findAll(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findRouteDto: FindRouteDto
@@ -55,14 +55,14 @@ export class RoutesController {
 
   @Get(':id')
   @ApiOperation({ summary: '获取路由详情' })
-  @ApiOkResponse({ type: ApiResult<Route>, description: '获取路由详情成功' })
+  @ApiOkResponse({ type: Route, description: '获取路由详情成功' })
   findOne(@Param('id') id: string) {
     return this.routesService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '修改路由信息' })
-  @ApiOkResponse({ type: ApiResult<Route>, description: '修改路由信息成功' })
+  @ApiOkResponse({ type: Route, description: '修改路由信息成功' })
   update(@Param('id') id: string, @Body() updateRouteDto: UpdateRouteDto) {
     return this.routesService.update(id, updateRouteDto);
   }

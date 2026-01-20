@@ -37,14 +37,14 @@ export class ScheduleController {
 
   @Post()
   @ApiOperation({ summary: '创建定时任务' })
-  @ApiOkResponse({ type: ApiResult<Schedule>, description: '创建定时任务成功' })
+  @ApiOkResponse({ type: Schedule, description: '创建定时任务成功' })
   create(@Headers('x-platform') platform: string, @Body() createScheduleDto: CreateScheduleDto) {
     return this.scheduleService.create(createScheduleDto, platform);
   }
 
   @Get()
   @ApiOperation({ summary: '查询定时任务列表(分页)' })
-  @ApiOkResponse({ type: ApiResult<Schedule[]>, description: '查询定时任务列表成功' })
+  @ApiOkResponse({ type: [Schedule], description: '查询定时任务列表成功' })
   findByPage(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) query: FindScheduleDtoByPage
@@ -54,7 +54,7 @@ export class ScheduleController {
 
   @Get('all')
   @ApiOperation({ summary: '查询定时任务列表(不分页)' })
-  @ApiOkResponse({ type: ApiResult<Schedule[]>, description: '查询定时任务列表成功' })
+  @ApiOkResponse({ type: [Schedule], description: '查询定时任务列表成功' })
   findAll(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) query: Record<string, unknown>
@@ -64,14 +64,14 @@ export class ScheduleController {
 
   @Get(':id')
   @ApiOperation({ summary: '查询定时任务详情' })
-  @ApiOkResponse({ type: ApiResult<Schedule>, description: '查询定时任务详情成功' })
+  @ApiOkResponse({ type: Schedule, description: '查询定时任务详情成功' })
   findOne(@Param('id') id: string) {
     return this.scheduleService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '更新定时任务' })
-  @ApiOkResponse({ type: ApiResult<Schedule>, description: '更新定时任务成功' })
+  @ApiOkResponse({ type: Schedule, description: '更新定时任务成功' })
   update(@Param('id') id: string, @Body() updateScheduleDto: UpdateScheduleDto) {
     return this.scheduleService.update(id, updateScheduleDto);
   }
@@ -85,21 +85,21 @@ export class ScheduleController {
 
   @Patch(':id/status')
   @ApiOperation({ summary: '启用/禁用定时任务' })
-  @ApiOkResponse({ type: ApiResult<Schedule>, description: '启用/禁用定时任务成功' })
+  @ApiOkResponse({ type: Schedule, description: '启用/禁用定时任务成功' })
   toggleStatus(@Param('id') id: string, @Body('status') status: number) {
     return this.scheduleService.toggleStatus(id, status);
   }
 
   @Post(':id/execute')
   @ApiOperation({ summary: '手动执行定时任务' })
-  @ApiOkResponse({ type: ApiResult<Schedule>, description: '手动执行定时任务成功' })
+  @ApiOkResponse({ type: Schedule, description: '手动执行定时任务成功' })
   executeManually(@Param('id') id: string) {
     return this.scheduleService.executeManually(id);
   }
 
   @Get(':id/logs')
   @ApiOperation({ summary: '查询定时任务执行日志(分页)' })
-  @ApiOkResponse({ type: ApiResult<ScheduleLog[]>, description: '查询定时任务执行日志成功' })
+  @ApiOkResponse({ type: [ScheduleLog], description: '查询定时任务执行日志成功' })
   findLogsByPage(
     @Headers('x-platform') platform: string,
     @Param('id') id: string,

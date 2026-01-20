@@ -30,35 +30,35 @@ export class DictionaryController {
 
   @Post()
   @ApiOperation({ summary: '字典分类创建' })
-  @ApiOkResponse({ type: ApiResult<Dictionary>, description: '字典分类创建成功' })
+  @ApiOkResponse({ type: Dictionary, description: '字典分类创建成功' })
   create(@Body() createDictionaryDto: CreateDictionaryDto) {
     return this.dictionaryService.create(createDictionaryDto);
   }
 
   @Get()
   @ApiOperation({ summary: '字典分类分页查询' })
-  @ApiOkResponse({ type: ApiResult<Dictionary[]>, description: '字典分类分页查询成功' })
+  @ApiOkResponse({ type: [Dictionary], description: '字典分类分页查询成功' })
   findByPage(@Query() findDictionaryDtoByPage: FindDictionaryDtoByPage) {
     return this.dictionaryService.findByPage(findDictionaryDtoByPage);
   }
 
   @Get('all')
   @ApiOperation({ summary: '查询所有字典分类' })
-  @ApiOkResponse({ type: ApiResult<Dictionary[]>, description: '查询所有字典分类成功' })
+  @ApiOkResponse({ type: [Dictionary], description: '查询所有字典分类成功' })
   findAll(@Query() findDictionaryDto: FindDictionaryDto) {
     return this.dictionaryService.findAll(findDictionaryDto);
   }
 
   @Get(':id')
   @ApiOperation({ summary: '查询字典分类详情' })
-  @ApiOkResponse({ type: ApiResult<Dictionary>, description: '查询字典分类详情成功' })
+  @ApiOkResponse({ type: Dictionary, description: '查询字典分类详情成功' })
   findOne(@Param('id') id: string) {
     return this.dictionaryService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '更新字典分类信息' })
-  @ApiOkResponse({ type: ApiResult<Dictionary>, description: '更新字典分类信息成功' })
+  @ApiOkResponse({ type: Dictionary, description: '更新字典分类信息成功' })
   update(@Param('id') id: string, @Body() updateDictionaryDto: UpdateDictionaryDto) {
     return this.dictionaryService.update(id, updateDictionaryDto);
   }
@@ -85,35 +85,35 @@ export class DictionaryItemController {
 
   @Post()
   @ApiOperation({ summary: '字典项创建' })
-  @ApiOkResponse({ type: ApiResult<DictionaryItem>, description: '字典项创建成功' })
+  @ApiOkResponse({ type: DictionaryItem, description: '字典项创建成功' })
   create(@Body() createDictionaryItemDto: CreateDictionaryItemDto) {
     return this.dictionaryService.createItem(createDictionaryItemDto);
   }
 
   @Get()
   @ApiOperation({ summary: '字典项分页查询' })
-  @ApiOkResponse({ type: ApiResult<DictionaryItem[]>, description: '字典项分页查询成功' })
+  @ApiOkResponse({ type: [DictionaryItem], description: '字典项分页查询成功' })
   findByPage(@Query() findDictionaryItemDtoByPage: FindDictionaryItemDtoByPage) {
     return this.dictionaryService.findItemByPage(findDictionaryItemDtoByPage);
   }
 
   @Get('all')
   @ApiOperation({ summary: '查询所有字典项' })
-  @ApiOkResponse({ type: ApiResult<DictionaryItem[]>, description: '查询所有字典项成功' })
+  @ApiOkResponse({ type: [DictionaryItem], description: '查询所有字典项成功' })
   findAll(@Query() findDictionaryItemDto: FindDictionaryItemDto) {
     return this.dictionaryService.findItemAll(findDictionaryItemDto);
   }
 
   @Get(':id')
   @ApiOperation({ summary: '查询字典项详情' })
-  @ApiOkResponse({ type: ApiResult<DictionaryItem>, description: '查询字典项详情成功' })
+  @ApiOkResponse({ type: DictionaryItem, description: '查询字典项详情成功' })
   findOne(@Param('id') id: string) {
     return this.dictionaryService.findItemOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '更新字典项信息' })
-  @ApiOkResponse({ type: ApiResult<DictionaryItem>, description: '更新字典项信息成功' })
+  @ApiOkResponse({ type: DictionaryItem, description: '更新字典项信息成功' })
   update(@Param('id') id: string, @Body() updateDictionaryItemDto: UpdateDictionaryItemDto) {
     return this.dictionaryService.updateItem(id, updateDictionaryItemDto);
   }

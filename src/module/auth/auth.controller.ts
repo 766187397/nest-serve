@@ -3,14 +3,13 @@ import { AuthService } from './auth.service';
 import {
   LogInDto,
   VerificationCodeLoginDto,
-  CaptchaDto,
   SimpleLoginDto,
+  CaptchaDto,
 } from '@/module/users/dto/index';
 import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { Request, Response } from 'express';
-import { ApiResult } from '@/common/utils/result';
-import { Captcha, UserLogin, RefreshToken } from '@/types/user';
+import { CaptchaResponseDto, UserLoginDto, RefreshTokenDto } from './dto';
 
 @ApiTags('认证管理')
 @ApiResponse({ status: 200, description: '操作成功' })
@@ -26,28 +25,28 @@ export class AuthController {
 
   @Get('captcha')
   @ApiOperation({ summary: '获取验证码' })
-  @ApiOkResponse({ type: ApiResult<Captcha>, description: '获取验证码成功' })
+  @ApiOkResponse({ type: CaptchaResponseDto, description: '获取验证码成功' })
   async captcha(@Query(new FilterEmptyPipe()) captchaDto: CaptchaDto) {
     return await this.authService.captcha(captchaDto);
   }
 
   @Post('login')
   @ApiOperation({ summary: '用户登录' })
-  @ApiOkResponse({ type: ApiResult<UserLogin>, description: '用户登录成功' })
+  @ApiOkResponse({ type: UserLoginDto, description: '用户登录成功' })
   logIn(@Headers('x-platform') platform: string, @Body() loginDto: LogInDto) {
     return this.authService.logIn(loginDto, platform);
   }
 
   @Post('simple-login')
   @ApiOperation({ summary: '简化登录（仅账号密码）' })
-  @ApiOkResponse({ type: ApiResult<UserLogin>, description: '简化登录成功' })
+  @ApiOkResponse({ type: UserLoginDto, description: '简化登录成功' })
   simpleLogin(@Headers('x-platform') platform: string, @Body() simpleLoginDto: SimpleLoginDto) {
     return this.authService.simpleLogin(simpleLoginDto, platform);
   }
 
   @Post('login/set-cookie')
   @ApiOperation({ summary: '用户登录(设置Cookie)' })
-  @ApiOkResponse({ type: ApiResult<UserLogin>, description: '用户登录成功' })
+  @ApiOkResponse({ type: UserLoginDto, description: '用户登录成功' })
   async logInSetCookie(
     @Headers('x-platform') platform: string,
     @Body() loginDto: LogInDto,
@@ -58,7 +57,7 @@ export class AuthController {
 
   @Post('verification-code-login')
   @ApiOperation({ summary: '邮箱验证码登录' })
-  @ApiOkResponse({ type: ApiResult<UserLogin>, description: '邮箱验证码登录成功' })
+  @ApiOkResponse({ type: UserLoginDto, description: '邮箱验证码登录成功' })
   async verificationCodeLogin(
     @Headers('x-platform') platform: string,
     @Body() verificationCodeLogin: VerificationCodeLoginDto
@@ -68,7 +67,7 @@ export class AuthController {
 
   @Post('refresh-token')
   @ApiOperation({ summary: '刷新token' })
-  @ApiOkResponse({ type: ApiResult<RefreshToken>, description: '刷新token成功' })
+  @ApiOkResponse({ type: RefreshTokenDto, description: '刷新token成功' })
   async refreshToken(
     @Headers('x-platform') platform: string,
     @Req() req: Request,
