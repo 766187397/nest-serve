@@ -3,15 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 /**
  * 连接池统计数据响应DTO
  * @description 用于传输连接池的实时状态统计信息，包括连接数、等待请求数等关键指标
- * @example
- * const stats = {
- *   totalConnections: 17,
- *   idleConnections: 4,
- *   activeConnections: 13,
- *   waitingRequests: 0,
- *   maxConnections: 17,
- *   minConnections: 4
- * };
  */
 export class PoolStatsResponseDto {
   /** 总连接数 - 当前连接池中所有连接的总数 */
@@ -40,13 +31,36 @@ export class PoolStatsResponseDto {
 }
 
 /**
+ * 所有连接池统计数据响应DTO
+ * @description 用于传输所有连接池的实时状态统计信息
+ */
+export class AllPoolStatsResponseDto {
+  /** 主数据库连接池状态 */
+  @ApiProperty({ description: '主数据库连接池状态', type: PoolStatsResponseDto, example: {
+    totalConnections: 17,
+    idleConnections: 4,
+    activeConnections: 13,
+    waitingRequests: 0,
+    maxConnections: 17,
+    minConnections: 4
+  } })
+  main: PoolStatsResponseDto;
+
+  /** 日志数据库连接池状态 */
+  @ApiProperty({ description: '日志数据库连接池状态', type: PoolStatsResponseDto, example: {
+    totalConnections: 10,
+    idleConnections: 8,
+    activeConnections: 2,
+    waitingRequests: 0,
+    maxConnections: 10,
+    minConnections: 2
+  } })
+  logger: PoolStatsResponseDto;
+}
+
+/**
  * 连接池健康状态响应DTO
  * @description 用于传输连接池的健康检查结果，包括健康状态和问题列表
- * @example
- * const health = {
- *   healthy: true,
- *   issues: []
- * };
  */
 export class PoolHealthResponseDto {
   /** 是否健康 - 连接池是否处于正常工作状态 */
@@ -56,6 +70,26 @@ export class PoolHealthResponseDto {
   /** 问题列表 - 连接池存在的所有问题列表，如果为空则表示无问题 */
   @ApiProperty({ description: '问题列表', example: [], type: [String] })
   issues: string[];
+}
+
+/**
+ * 所有连接池健康状态响应DTO
+ * @description 用于传输所有连接池的健康检查结果
+ */
+export class AllPoolHealthResponseDto {
+  /** 主数据库连接池健康状态 */
+  @ApiProperty({ description: '主数据库连接池健康状态', type: PoolHealthResponseDto, example: {
+    healthy: true,
+    issues: []
+  } })
+  main: PoolHealthResponseDto;
+
+  /** 日志数据库连接池健康状态 */
+  @ApiProperty({ description: '日志数据库连接池健康状态', type: PoolHealthResponseDto, example: {
+    healthy: true,
+    issues: []
+  } })
+  logger: PoolHealthResponseDto;
 }
 
 /**

@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiOkResponse } from '@nestjs/swagger';
 import { ConnectionPoolMonitorService } from './connection-pool-monitor.service';
 import { ApiResult } from '@/common/utils/result';
-import { PoolStatsResponseDto, PoolHealthResponseDto, PoolHistoryItemResponseDto } from './dto';
+import { PoolStatsResponseDto, PoolHealthResponseDto, PoolHistoryItemResponseDto, AllPoolStatsResponseDto, AllPoolHealthResponseDto } from './dto';
 
 @ApiTags('连接池监控')
 @ApiResponse({ status: 200, description: '操作成功' })
@@ -33,21 +33,21 @@ export class ConnectionPoolMonitorController {
 
   @Get('all')
   @ApiOperation({ summary: '获取所有数据库连接池状态' })
-  @ApiOkResponse({ type: Object, description: '所有数据库连接池状态' })
+  @ApiOkResponse({ type: AllPoolStatsResponseDto, description: '所有数据库连接池状态' })
   async getAllPoolStats() {
     const stats = await this.poolMonitorService.getAllPoolStats();
-    return ApiResult.success<{ main: PoolStatsResponseDto; logger: PoolStatsResponseDto }>({
-      data: stats as unknown as { main: PoolStatsResponseDto; logger: PoolStatsResponseDto },
+    return ApiResult.success<AllPoolStatsResponseDto>({
+      data: stats as unknown as AllPoolStatsResponseDto,
     });
   }
 
   @Get('health')
   @ApiOperation({ summary: '获取连接池健康状态' })
-  @ApiOkResponse({ type: Object, description: '连接池健康状态' })
+  @ApiOkResponse({ type: AllPoolHealthResponseDto, description: '连接池健康状态' })
   async getPoolHealth() {
     const health = await this.poolMonitorService.getPoolHealthStatus();
-    return ApiResult.success<{ main: PoolHealthResponseDto; logger: PoolHealthResponseDto }>({
-      data: health as unknown as { main: PoolHealthResponseDto; logger: PoolHealthResponseDto },
+    return ApiResult.success<AllPoolHealthResponseDto>({
+      data: health as unknown as AllPoolHealthResponseDto,
     });
   }
 
