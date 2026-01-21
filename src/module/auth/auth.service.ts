@@ -139,14 +139,16 @@ export class AuthService {
   }
 
   /**
-   * 简化登录（仅账号密码，无需验证码）
+   * 简化登录（仅账号密码，无需验证码，设置Cookie）
    * @param {SimpleLoginDto} simpleLoginDto 登录参数
    * @param {string} platform  平台(admin/web/app/mini)
+   * @param {Response} res 响应对象
    * @returns {Promise<ApiResult<UserLogin | null>>} 统一返回结果
    */
   async simpleLogin(
     simpleLoginDto: SimpleLoginDto,
-    platform: string = 'admin'
+    platform: string = 'admin',
+    res: Response
   ): Promise<ApiResult<UserLogin | null>> {
     try {
       const data = await this.userRepository.findOne({
@@ -165,7 +167,6 @@ export class AuthService {
         return ApiResult.error<null>('账号或密码错误');
       }
 
-      // 这个状态需要自定义
       if (data.status === 2) {
         return ApiResult.error<null>('当前账号已被禁用，请联系管理员！');
       }
@@ -191,6 +192,14 @@ export class AuthService {
           }
         ),
       };
+
+      res.cookie('token', userInfo.access_token, {
+        maxAge: Number(options.jwt_expires_in),
+      });
+      res.cookie('refresh_token', userInfo.refresh_token, {
+        maxAge: Number(options.jwt_refresh_expires_in),
+      });
+
       return ApiResult.success<UserLogin>({
         data: userInfo,
         message: '登录成功',

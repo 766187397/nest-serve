@@ -38,10 +38,14 @@ export class AuthController {
   }
 
   @Post('simple-login')
-  @ApiOperation({ summary: '简化登录（仅账号密码）' })
+  @ApiOperation({ summary: '简化登录（仅账号密码，设置Cookie）' })
   @ApiOkResponse({ type: UserLoginResponseDto, description: '简化登录成功' })
-  simpleLogin(@Headers('x-platform') platform: string, @Body() simpleLoginDto: SimpleLoginDto) {
-    return this.authService.simpleLogin(simpleLoginDto, platform);
+  simpleLogin(
+    @Headers('x-platform') platform: string,
+    @Body() simpleLoginDto: SimpleLoginDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    return this.authService.simpleLogin(simpleLoginDto, platform, res);
   }
 
   @Post('login/set-cookie')
