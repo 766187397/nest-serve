@@ -18,8 +18,7 @@ import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { Request } from 'express';
 import { User } from '@/module/users/entities/user.entity';
 import { HttpStatusCodes } from '@/common/constants/http-status';
-import { Email } from './entities/email.entity';
-import { ApiResult } from '@/common/utils/result';
+import { EmailResponseDto } from './dto/response.dto';
 
 @ApiTags('邮箱管理')
 // @ApiBearerAuth("Authorization")
@@ -36,14 +35,14 @@ export class EmailController {
 
   @Post()
   @ApiOperation({ summary: '创建邮箱模板' })
-  @ApiOkResponse({ type: Email, description: '创建邮箱模板成功' })
+  @ApiOkResponse({ type: EmailResponseDto, description: '创建邮箱模板成功' })
   create(@Headers('x-platform') platform: string, @Body() createEmailDto: CreateEmailDto) {
     return this.emailService.create(createEmailDto, platform);
   }
 
   @Get()
   @ApiOperation({ summary: '查询邮箱列表(分页)' })
-  @ApiOkResponse({ type: [Email], description: '查询邮箱列表成功' })
+  @ApiOkResponse({ type: [EmailResponseDto], description: '查询邮箱列表成功' })
   findByPage(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findEmailtoByPage: FindEmailtoByPage
@@ -53,7 +52,7 @@ export class EmailController {
 
   @Get('all')
   @ApiOperation({ summary: '查询邮箱列表(不分页)' })
-  @ApiOkResponse({ type: [Email], description: '查询邮箱列表成功' })
+  @ApiOkResponse({ type: [EmailResponseDto], description: '查询邮箱列表成功' })
   findAll(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findEmailDto: FindEmailDto
@@ -63,14 +62,14 @@ export class EmailController {
 
   @Get(':id')
   @ApiOperation({ summary: '查询邮箱详情' })
-  @ApiOkResponse({ type: Email, description: '查询邮箱详情成功' })
+  @ApiOkResponse({ type: EmailResponseDto, description: '查询邮箱详情成功' })
   findOne(@Param('id') id: string) {
     return this.emailService.findOne(+id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '更新邮箱模板' })
-  @ApiOkResponse({ type: Email, description: '更新邮箱模板成功' })
+  @ApiOkResponse({ type: EmailResponseDto, description: '更新邮箱模板成功' })
   update(@Param('id') id: string, @Body() updateEmailDto: UpdateEmailDto) {
     return this.emailService.update(+id, updateEmailDto);
   }

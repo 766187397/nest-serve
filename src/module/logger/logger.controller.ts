@@ -4,8 +4,7 @@ import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagg
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { FindLogDtoByPage } from './dto';
 import { Roles } from '@/common/decorator/roles.decorator';
-import { Log } from './entities/logger.entity';
-import { ApiResult } from '@/common/utils/result';
+import { LogResponseDto } from './dto/response.dto';
 
 @ApiTags('日志')
 @ApiResponse({ status: 200, description: '操作成功' })
@@ -22,7 +21,7 @@ export class LoggerController {
   @Roles('admin', 'dev')
   @Get()
   @ApiOperation({ summary: '查询日志列表(分页)' })
-  @ApiOkResponse({ type: [Log], description: '查询日志列表成功' })
+  @ApiOkResponse({ type: [LogResponseDto], description: '查询日志列表成功' })
   findByPage(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findLogDtoByPage: FindLogDtoByPage

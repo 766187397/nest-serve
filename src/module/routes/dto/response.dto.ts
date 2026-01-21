@@ -1,0 +1,55 @@
+import { ApiProperty } from '@nestjs/swagger';
+
+/** 路由信息响应DTO */
+export class RouteResponseDto {
+  @ApiProperty({ description: '路由ID', example: '1' })
+  id: string;
+
+  @ApiProperty({ description: '路由类型：菜单/按钮/API等', example: 'menu' })
+  type: string;
+
+  @ApiProperty({ description: '路由名称（跳转）', example: '用户管理' })
+  name: string;
+
+  @ApiProperty({ description: '路由显示名称', example: '用户管理' })
+  title: string;
+
+  @ApiProperty({ description: '前端路由路径（含动态参数）', example: '/users' })
+  path: string;
+
+  @ApiProperty({ description: 'Vue组件路径（物理路径）', example: '@/views/users/index.vue' })
+  component: string;
+
+  @ApiProperty({ description: '其他携带信息json字符串(object对象的形式)', example: '{"icon":"user"}' })
+  meta: string;
+
+  @ApiProperty({ description: '图标标识', example: 'user' })
+  icon: string;
+
+  @ApiProperty({ description: '是否为外链', example: false })
+  externalLinks: boolean;
+
+  @ApiProperty({ description: '重定向地址', example: '' })
+  redirect: string;
+
+  @ApiProperty({ description: '排序', example: 1 })
+  sort: number;
+
+  @ApiProperty({ description: '状态 0禁用 1启用', example: 1 })
+  status: number;
+
+  @ApiProperty({ description: '创建时间', example: '2024-01-01T00:00:00.000Z' })
+  createdAt: Date | string;
+
+  @ApiProperty({ description: '更新时间', example: '2024-01-01T00:00:00.000Z' })
+  updatedAt: Date | string;
+
+  @ApiProperty({ description: '删除时间', required: false, example: '2024-01-01T00:00:00.000Z' })
+  deletedAt?: Date;
+
+  @ApiProperty({ description: '子路由', type: [RouteResponseDto], required: false })
+  children?: RouteResponseDto[];
+
+  @ApiProperty({ description: '父路由', type: RouteResponseDto, required: false })
+  parent?: RouteResponseDto;
+}

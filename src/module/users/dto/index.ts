@@ -7,6 +7,7 @@ import {
 import { ApiProperty, IntersectionType, PartialType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsArray, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
+import { UserResponseDto, RoleResponseDto } from './response.dto';
 
 /** 用户创建Dto */
 export class CreateUserDto extends CreateBaseDto {

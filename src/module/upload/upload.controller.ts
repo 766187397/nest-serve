@@ -27,8 +27,7 @@ import * as http from 'http';
 import { URL } from 'url';
 import { Response } from 'express';
 import { HttpStatusCodes } from '@/common/constants/http-status';
-import { Upload } from './entities/upload.entity';
-import { ApiResult } from '@/common/utils/result';
+import { UploadResponseDto } from './dto/response.dto';
 
 @ApiTags('文件上传')
 @Controller('api/v1/upload')
@@ -53,21 +52,21 @@ export class UploadController {
       required: ['file'],
     },
   })
-  @ApiOkResponse({ type: Upload, description: '文件上传成功' })
+  @ApiOkResponse({ type: UploadResponseDto, description: '文件上传成功' })
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return this.uploadService.uploadFile(file);
   }
 
   @Get('all')
   @ApiOperation({ summary: '获取所有文件列表' })
-  @ApiOkResponse({ type: [Upload], description: '获取所有文件列表成功' })
+  @ApiOkResponse({ type: [UploadResponseDto], description: '获取所有文件列表成功' })
   getFileAll(@Query(new FilterEmptyPipe()) FindFileDto: FindFileDto) {
     return this.uploadService.getFileAll(FindFileDto);
   }
 
   @Get()
   @ApiOperation({ summary: '分页查询文件' })
-  @ApiOkResponse({ type: [Upload], description: '分页查询文件成功' })
+  @ApiOkResponse({ type: [UploadResponseDto], description: '分页查询文件成功' })
   getFileByPage(@Query(new FilterEmptyPipe()) findFileDtoByPage: FindFileDtoByPage) {
     return this.uploadService.getFileByPage(findFileDtoByPage);
   }
@@ -117,7 +116,7 @@ export class UploadController {
   @Get(':id')
   @ApiParam({ name: 'id', required: true, description: '文件 ID' })
   @ApiOperation({ summary: '根据id获取文件' })
-  @ApiOkResponse({ type: Upload, description: '根据id获取文件成功' })
+  @ApiOkResponse({ type: UploadResponseDto, description: '根据id获取文件成功' })
   getFileById(@Param('id') id: string) {
     return this.uploadService.getFileById(id);
   }
