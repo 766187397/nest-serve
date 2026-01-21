@@ -13,14 +13,13 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { RoutesService } from './routes.service';
-import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from './dto';
+import { CreateRouteDto, FindRouteDto, UpdateRouteDto, RoleRoutesResponseDto } from './dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { User } from '@/module/users/entities/user.entity';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import { RouteResponseDto } from './dto/response.dto';
-import { RoleRoutesDto } from './dto/role-routes.dto';
 
 @ApiTags('路由管理')
 // @ApiBearerAuth("Authorization")
@@ -83,7 +82,7 @@ export class RoutesController {
   })
   @ApiOperation({ summary: '根据登录用户的角色ids获取路由' })
   @ApiOkResponse({
-    type: [RoleRoutesDto],
+    type: [RoleRoutesResponseDto],
     description: '根据登录用户的角色ids获取路由成功',
   })
   async getRoutesByRoleId(@Req() req: Request, @Res() res: Response) {

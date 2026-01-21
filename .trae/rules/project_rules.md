@@ -29,3 +29,58 @@
   2. 如果不是第三方库类型，优先考虑是否可以使用项目中的 DTO（Data Transfer Object）或 Entity（实体）的 class 作为类型
 - **类型定义抽离**：当必须手动定义类型时，优先将类型定义抽离到 `src/types` 文件夹对应的文件中，避免在代码中内联定义类型
 
+## 8. DTO文件组织规范
+所有模块的DTO（Data Transfer Object）必须按照以下规范进行组织，确保代码结构清晰、易于维护：
+
+### 8.1 DTO文件目录结构
+每个业务模块的DTO文件夹应遵循以下结构：
+```
+src/module/{模块名}/dto/
+├── request.dto.ts    # 请求DTO文件（存放所有请求相关的DTO类）
+├── response.dto.ts   # 响应DTO文件（存放所有响应相关的DTO类）
+└── index.ts          # 通用导出文件（统一导出所有DTO类）
+```
+
+### 8.2 DTO类命名规范
+所有DTO类必须遵循以下命名规范，确保命名清晰、语义明确：
+
+#### 8.2.1 请求DTO命名规范
+请求DTO类命名采用 **动词 + 名词 + Dto** 的格式，动词使用PascalCase，具体规则如下：
+
+- **创建类请求**：使用 `Create` + `实体名` + `Dto`
+  - 示例：`CreateUserDto`、`CreateOrderDto`、`CreateProductDto`
+  
+- **更新类请求**：使用 `Update` + `实体名` + `Dto`
+  - 示例：`UpdateUserDto`、`UpdateOrderDto`、`UpdateProductDto`
+  
+- **查询类请求**：使用 `Query` + `实体名` + `Dto`
+  - 示例：`QueryUserDto`、`QueryOrderDto`、`QueryProductDto`
+  
+- **删除类请求**：使用 `Delete` + `实体名` + `Dto`
+  - 示例：`DeleteUserDto`、`DeleteOrderDto`、`DeleteProductDto`
+  
+- **其他操作请求**：使用对应的动词 + 实体名 + Dto
+  - 示例：`LoginUserDto`、`RegisterUserDto`、`ChangePasswordDto`
+
+#### 8.2.2 响应DTO命名规范
+响应DTO类命名采用 **名词 + Response + Dto** 的格式，具体规则如下：
+
+- **单个实体响应**：使用 `实体名` + `Response` + `Dto`
+  - 示例：`UserResponseDto`、`OrderResponseDto`、`ProductResponseDto`
+  
+- **列表响应**：使用 `实体名` + `List` + `Response` + `Dto`
+  - 示例：`UserListResponseDto`、`OrderListResponseDto`、`ProductListResponseDto`
+  
+- **分页响应**：使用 `实体名` + `Page` + `Response` + `Dto`
+  - 示例：`UserPageResponseDto`、`OrderPageResponseDto`、`ProductPageResponseDto`
+  
+- **统计/聚合响应**：使用 `实体名` + `Stat` + `Response` + `Dto`
+  - 示例：`UserStatResponseDto`、`OrderStatResponseDto`、`ProductStatResponseDto`
+
+#### 8.2.3 命名注意事项
+- 所有DTO类名必须以 `Dto` 结尾
+- 使用PascalCase命名法（每个单词首字母大写）
+- 命名应清晰表达其用途和操作类型
+- 避免使用缩写，优先使用完整的英文单词
+- 实体名应与数据库实体名称保持一致
+- 同一模块内的DTO命名风格应保持统一

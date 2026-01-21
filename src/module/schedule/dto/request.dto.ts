@@ -1,7 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsNumber, Max, Min } from 'class-validator';
-import { CreateBaseDto } from '@/common/dto/base';
+import { CreateBaseDto, FindByParameter, PageByParameter } from '@/common/dto/base';
+import { ApiProperty, IntersectionType, PartialType } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
+/** 创建定时任务请求DTO */
 export class CreateScheduleDto extends CreateBaseDto {
   @ApiProperty({ description: '任务名称', example: '清理日志' })
   @IsNotEmpty({ message: '任务名称不能为空' })
@@ -23,12 +24,7 @@ export class CreateScheduleDto extends CreateBaseDto {
   @IsString({ message: '内部任务标识必须为字符串' })
   jobName: string;
 
-  @ApiProperty({
-    description: '任务执行超时时间（秒）',
-    required: false,
-    default: 300,
-    example: 300,
-  })
+  @ApiProperty({ description: '任务执行超时时间（秒）', required: false, default: 300, example: 300 })
   @IsOptional()
   @IsNumber({}, { message: '超时时间必须为数字' })
   @Min(1, { message: '超时时间必须大于0' })
@@ -48,4 +44,19 @@ export class CreateScheduleDto extends CreateBaseDto {
   @Min(1, { message: '重试间隔必须大于0' })
   @Max(600, { message: '重试间隔不能超过600秒' })
   retryInterval?: number;
+}
+
+/** 更新定时任务请求DTO */
+export class UpdateScheduleDto extends PartialType(CreateScheduleDto) {}
+
+/** 分页查询定时任务请求DTO */
+export class FindScheduleDtoByPage extends PartialType(IntersectionType(FindByParameter, PageByParameter)) {
+  name?: string;
+}
+
+/** 分页查询定时任务日志请求DTO */
+export class FindScheduleLogDtoByPage extends PartialType(IntersectionType(FindByParameter, PageByParameter)) {
+  scheduleName?: string;
+  scheduleId?: string;
+  status?: string;
 }

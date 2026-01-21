@@ -20,7 +20,7 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { MulterConfigInterceptor } from '@/common/interceptor/multer-config.interceptor';
-import { FindFileDto, FindFileDtoByPage } from './dto/index.dto';
+import { FindFileDto, FindFileDtoByPage } from './dto';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import * as https from 'https';
 import * as http from 'http';

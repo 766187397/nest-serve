@@ -9,7 +9,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { Request, Response } from 'express';
-import { CaptchaResponseDto, UserLoginDto, RefreshTokenDto } from './dto';
+import { CaptchaResponseDto, UserLoginResponseDto, RefreshTokenResponseDto } from './dto';
 
 @ApiTags('认证管理')
 @ApiResponse({ status: 200, description: '操作成功' })
@@ -32,21 +32,21 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: '用户登录' })
-  @ApiOkResponse({ type: UserLoginDto, description: '用户登录成功' })
+  @ApiOkResponse({ type: UserLoginResponseDto, description: '用户登录成功' })
   logIn(@Headers('x-platform') platform: string, @Body() loginDto: LogInDto) {
     return this.authService.logIn(loginDto, platform);
   }
 
   @Post('simple-login')
   @ApiOperation({ summary: '简化登录（仅账号密码）' })
-  @ApiOkResponse({ type: UserLoginDto, description: '简化登录成功' })
+  @ApiOkResponse({ type: UserLoginResponseDto, description: '简化登录成功' })
   simpleLogin(@Headers('x-platform') platform: string, @Body() simpleLoginDto: SimpleLoginDto) {
     return this.authService.simpleLogin(simpleLoginDto, platform);
   }
 
   @Post('login/set-cookie')
   @ApiOperation({ summary: '用户登录(设置Cookie)' })
-  @ApiOkResponse({ type: UserLoginDto, description: '用户登录成功' })
+  @ApiOkResponse({ type: UserLoginResponseDto, description: '用户登录成功' })
   async logInSetCookie(
     @Headers('x-platform') platform: string,
     @Body() loginDto: LogInDto,
@@ -57,7 +57,7 @@ export class AuthController {
 
   @Post('verification-code-login')
   @ApiOperation({ summary: '邮箱验证码登录' })
-  @ApiOkResponse({ type: UserLoginDto, description: '邮箱验证码登录成功' })
+  @ApiOkResponse({ type: UserLoginResponseDto, description: '邮箱验证码登录成功' })
   async verificationCodeLogin(
     @Headers('x-platform') platform: string,
     @Body() verificationCodeLogin: VerificationCodeLoginDto
@@ -67,7 +67,7 @@ export class AuthController {
 
   @Post('refresh-token')
   @ApiOperation({ summary: '刷新token' })
-  @ApiOkResponse({ type: RefreshTokenDto, description: '刷新token成功' })
+  @ApiOkResponse({ type: RefreshTokenResponseDto, description: '刷新token成功' })
   async refreshToken(
     @Headers('x-platform') platform: string,
     @Req() req: Request,

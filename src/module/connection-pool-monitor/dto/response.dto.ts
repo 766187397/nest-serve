@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
- * 连接池统计数据传输对象
+ * 连接池统计数据响应DTO
  * @description 用于传输连接池的实时状态统计信息，包括连接数、等待请求数等关键指标
  * @example
  * const stats = {
@@ -13,7 +13,7 @@ import { ApiProperty } from '@nestjs/swagger';
  *   minConnections: 4
  * };
  */
-export class PoolStatsDto {
+export class PoolStatsResponseDto {
   /** 总连接数 - 当前连接池中所有连接的总数 */
   @ApiProperty({ description: '总连接数', example: 17 })
   totalConnections: number;
@@ -40,7 +40,7 @@ export class PoolStatsDto {
 }
 
 /**
- * 连接池健康状态传输对象
+ * 连接池健康状态响应DTO
  * @description 用于传输连接池的健康检查结果，包括健康状态和问题列表
  * @example
  * const health = {
@@ -48,7 +48,7 @@ export class PoolStatsDto {
  *   issues: []
  * };
  */
-export class PoolHealthDto {
+export class PoolHealthResponseDto {
   /** 是否健康 - 连接池是否处于正常工作状态 */
   @ApiProperty({ description: '是否健康', example: true })
   healthy: boolean;
@@ -59,7 +59,7 @@ export class PoolHealthDto {
 }
 
 /**
- * 连接池历史记录项传输对象
+ * 连接池历史记录项响应DTO
  * @description 用于传输连接池在特定时间点的状态记录，用于历史数据追踪和趋势分析
  * @example
  * const historyItem = {
@@ -74,12 +74,12 @@ export class PoolHealthDto {
  *   }
  * };
  */
-export class PoolHistoryItemDto {
+export class PoolHistoryItemResponseDto {
   /** 时间戳 - 记录该状态的时间戳（毫秒） */
   @ApiProperty({ description: '时间戳', example: 1768788407384 })
   timestamp: number;
 
   /** 连接池状态 - 该时间点的连接池统计信息 */
-  @ApiProperty({ description: '连接池状态', type: PoolStatsDto })
-  stats: PoolStatsDto;
+  @ApiProperty({ description: '连接池状态', type: PoolStatsResponseDto })
+  stats: PoolStatsResponseDto;
 }

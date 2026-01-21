@@ -4,7 +4,7 @@ import { Upload } from './entities/upload.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import * as dayjs from 'dayjs';
-import { FileHashDTO, FindFileDto, FindFileDtoByPage } from './dto/index.dto';
+import { FileHashDTO, FindFileDto, FindFileDtoByPage } from './dto';
 import { UploadFile } from '@/types/upload';
 import { PageApiResult } from '@/types/public';
 import { HttpStatusCodes } from '@/common/constants/http-status';
