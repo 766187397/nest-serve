@@ -1,6 +1,7 @@
 import { HttpException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { HttpStatusCodes } from '@/common/constants/http-status';
+import { ApiProperty } from '@nestjs/swagger';
 
 interface Result<T> {
   code?: number;
@@ -13,12 +14,29 @@ interface Result<T> {
 export class ApiResult<T> {
   readonly __isApiResult = true;
 
+  @ApiProperty({ description: '状态码', example: HttpStatusCodes.OK })
+  code: number;
+
+  @ApiProperty({ description: '消息', example: '操作成功' })
+  message: string;
+
+  @ApiProperty({ description: '数据', example: null })
+  data: T | null;
+
+  @ApiProperty({ description: '时间戳', example: '2023-01-01T00:00:00.000Z' })
+  timestamp: string;
+
   constructor(
-    public code: number = HttpStatusCodes.OK,
-    public message: string = '操作成功',
-    public data: T | null = null,
-    public timestamp: string = new Date().toISOString()
-  ) {}
+    code: number = HttpStatusCodes.OK,
+    message: string = '操作成功',
+    data: T | null = null,
+    timestamp: string = new Date().toISOString()
+  ) {
+    this.code = code;
+    this.message = message;
+    this.data = data;
+    this.timestamp = timestamp;
+  }
 
   static success<T>({
     data = null,
