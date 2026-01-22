@@ -3,7 +3,6 @@ export class JWTWhiteList {
   // 前缀匹配
   static whiteListStartsWith: string[] = [
     '/doc.html', // knife4j 前台地址
-    '/api-docs', // knife4j 分组接口文档
     '/webjars', // knife4j 静态资源
     '/swagger', // swagger 接口文档地址
     '/api/v1/large/files', // 大文件上传
@@ -14,7 +13,7 @@ export class JWTWhiteList {
   // 全匹配
   static whiteListExact: string[] = [
     '/favicon.ico', // 网站图标
-    '/v3/api-docs/swagger-config', // knife4j 请求配置
+    '/services.json', // 网站图标
     '/json', // 获取 Swagger JSON
     '/download', // 下载 Swagger JSON
     '/api/v1/auth/login', // 账号密码登录接口
