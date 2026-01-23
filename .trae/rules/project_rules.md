@@ -21,8 +21,6 @@
 ## 7. TypeScript类型安全
 - 禁止使用 any 类型，优先使用具体类型、联合类型或泛型
 - 第三方库必须使用官方类型定义
-- 确保类型定义准确反映实际数据结构
-- 充分利用类型推导能力
 - 类型来源优先级：第三方库官方类型 > 项目 DTO/Entity class > src/types 手动定义
 
 ## 8. DTO文件组织
@@ -36,29 +34,10 @@ src/module/{模块名}/dto/
 ```
 
 ### 8.2 命名规范
+- 请求DTO：动词+名词+Dto（CreateUserDto、UpdateUserDto、QueryUserDto、DeleteUserDto、LoginUserDto）
+- 响应DTO：实体名+场景+Response+Dto（UserResponseDto、UserListResponseDto、UserPageResponseDto、UserStatResponseDto）
+- 统一要求：PascalCase、以Dto结尾、避免缩写、实体名与数据库一致
 
-**请求DTO（动词+名词+Dto）**
-- 创建：Create + 实体名 + Dto（CreateUserDto）
-- 更新：Update + 实体名 + Dto（UpdateUserDto）
-- 查询：Query + 实体名 + Dto（QueryUserDto）
-- 删除：Delete + 实体名 + Dto（DeleteUserDto）
-- 其他：动词 + 实体名 + Dto（LoginUserDto）
-
-**响应DTO（名词+Response+Dto）**
-- 单个：实体名 + Response + Dto（UserResponseDto）
-- 列表：实体名 + List + Response + Dto（UserListResponseDto）
-- 分页：实体名 + Page + Response + Dto（UserPageResponseDto）
-- 统计：实体名 + Stat + Response + Dto（UserStatResponseDto）
-
-**注意事项**
-- 必须以 Dto 结尾
-- 使用 PascalCase
-- 避免缩写，使用完整英文单词
-- 实体名与数据库实体保持一致
-
-### 8.3 响应DTO包装规范
-
-**统一响应包装**
-- 所有使用统一响应函数返回的值，必须使用 `ApiResultWrapperDto<T>` 进行包装
-- `ApiResultWrapperDto<T>` 位于 `src/common/dto/base.ts`
-- 包装后的响应格式包含：code（状态码）、message（消息）、data（数据）、timestamp（时间戳）
+### 8.3 响应包装
+- 统一响应函数返回值必须使用 `ApiResultWrapperDto<T>` 包装（位于 `src/common/dto/base.ts`）
+- 响应格式：code、message、data、timestamp

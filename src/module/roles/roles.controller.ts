@@ -15,7 +15,7 @@ import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from './
 import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { HttpStatusCodes } from '@/common/constants/http-status';
-import { RoleResponseDto } from './dto/response.dto';
+import { RoleResponseDto, RoleResponseWrapperDto, RoleListResponseWrapperDto } from './dto/response.dto';
 
 @ApiTags('角色管理')
 // @ApiBearerAuth("Authorization")
@@ -32,14 +32,14 @@ export class RolesController {
 
   @Post()
   @ApiOperation({ summary: '创建角色' })
-  @ApiOkResponse({ type: RoleResponseDto, description: '创建角色成功' })
+  @ApiOkResponse({ type: () => RoleResponseWrapperDto, description: '创建角色成功' })
   create(@Headers('x-platform') platform: string, @Body() createRoleDto: CreateRoleDto) {
     return this.rolesService.create(createRoleDto, platform);
   }
 
   @Get()
   @ApiOperation({ summary: '查询角色列表(分页)' })
-  @ApiOkResponse({ type: [RoleResponseDto], description: '查询角色列表成功' })
+  @ApiOkResponse({ type: () => RoleListResponseWrapperDto, description: '查询角色列表成功' })
   findByPage(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findRoleDtoByPage: FindRoleDtoByPage
@@ -49,7 +49,7 @@ export class RolesController {
 
   @Get('all')
   @ApiOperation({ summary: '查询角色列表(不分页)' })
-  @ApiOkResponse({ type: [RoleResponseDto], description: '查询角色列表成功' })
+  @ApiOkResponse({ type: () => RoleListResponseWrapperDto, description: '查询角色列表成功' })
   findAll(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findRoleDto: FindRoleDto
@@ -59,14 +59,14 @@ export class RolesController {
 
   @Get(':id')
   @ApiOperation({ summary: '查询角色详情' })
-  @ApiOkResponse({ type: RoleResponseDto, description: '查询角色详情成功' })
+  @ApiOkResponse({ type: () => RoleResponseWrapperDto, description: '查询角色详情成功' })
   findOne(@Param('id') id: string) {
     return this.rolesService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '更新角色信息' })
-  @ApiOkResponse({ type: RoleResponseDto, description: '更新角色信息成功' })
+  @ApiOkResponse({ type: () => RoleResponseWrapperDto, description: '更新角色信息成功' })
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     return this.rolesService.update(id, updateRoleDto);
   }

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiResultWrapperDto } from '@/common/dto/base';
 
 /** 验证码响应DTO */
 export class CaptchaResponseDto {
@@ -70,4 +71,28 @@ export class RefreshTokenResponseDto {
 
   @ApiProperty({ description: 'token类型', example: 'Bearer' })
   token_type: string;
+}
+
+/** 验证码响应包装 DTO */
+export class CaptchaResponseWrapperDto extends ApiResultWrapperDto<CaptchaResponseDto> {
+  @ApiProperty({ description: '响应数据', type: CaptchaResponseDto })
+  declare data: CaptchaResponseDto;
+}
+
+/** 用户信息响应包装 DTO */
+export class UserInfoResponseWrapperDto extends ApiResultWrapperDto<UserInfoResponseDto> {
+  @ApiProperty({ description: '响应数据', type: UserInfoResponseDto })
+  declare data: UserInfoResponseDto;
+}
+
+/** 用户登录响应包装 DTO */
+export class UserLoginResponseWrapperDto extends ApiResultWrapperDto<UserLoginResponseDto> {
+  @ApiProperty({ description: '响应数据', type: UserLoginResponseDto })
+  declare data: UserLoginResponseDto;
+}
+
+/** 刷新token响应包装 DTO */
+export class RefreshTokenResponseWrapperDto extends ApiResultWrapperDto<RefreshTokenResponseDto> {
+  @ApiProperty({ description: '响应数据', type: RefreshTokenResponseDto })
+  declare data: RefreshTokenResponseDto;
 }

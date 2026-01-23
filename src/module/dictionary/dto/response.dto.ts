@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiResultWrapperDto } from '@/common/dto/base';
 
 /** 字典项响应DTO */
 export class DictionaryItemResponseDto {
@@ -58,4 +59,28 @@ export class DictionaryResponseDto {
 
   @ApiProperty({ description: '删除时间', required: false, example: '2024-01-01T00:00:00.000Z' })
   deletedAt?: Date;
+}
+
+/** 字典分类响应包装 DTO */
+export class DictionaryResponseWrapperDto extends ApiResultWrapperDto<DictionaryResponseDto> {
+  @ApiProperty({ description: '响应数据', type: DictionaryResponseDto })
+  declare data: DictionaryResponseDto;
+}
+
+/** 字典分类列表响应包装 DTO */
+export class DictionaryListResponseWrapperDto extends ApiResultWrapperDto<DictionaryResponseDto[]> {
+  @ApiProperty({ description: '响应数据', type: [DictionaryResponseDto] })
+  declare data: DictionaryResponseDto[];
+}
+
+/** 字典项响应包装 DTO */
+export class DictionaryItemResponseWrapperDto extends ApiResultWrapperDto<DictionaryItemResponseDto> {
+  @ApiProperty({ description: '响应数据', type: DictionaryItemResponseDto })
+  declare data: DictionaryItemResponseDto;
+}
+
+/** 字典项列表响应包装 DTO */
+export class DictionaryItemListResponseWrapperDto extends ApiResultWrapperDto<DictionaryItemResponseDto[]> {
+  @ApiProperty({ description: '响应数据', type: [DictionaryItemResponseDto] })
+  declare data: DictionaryItemResponseDto[];
 }

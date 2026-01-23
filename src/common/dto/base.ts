@@ -3,6 +3,28 @@ import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional, IsString, Matches } from 'class-validator';
 import { FindOptionsOrderValue } from 'typeorm';
 
+/**
+ * ApiResult 包装 DTO 基类
+ * @description 用于包装 ApiResult 统一响应格式，包含 code、message、data、timestamp 字段
+ */
+export class ApiResultWrapperDto<T> {
+  /** 响应状态码 */
+  @ApiProperty({ description: '响应状态码', example: 200 })
+  code: number;
+
+  /** 响应消息 */
+  @ApiProperty({ description: '响应消息', example: '操作成功' })
+  message: string;
+
+  /** 响应数据 */
+  @ApiProperty({ description: '响应数据' })
+  data: T;
+
+  /** 响应时间戳 */
+  @ApiProperty({ description: '响应时间戳', example: '2026-01-23T10:00:00.000Z' })
+  timestamp: string;
+}
+
 /** 创建基础数据 */
 export class CreateBaseDto {
   @ApiProperty({ description: '排序', required: false, example: 1 })

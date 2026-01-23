@@ -27,7 +27,11 @@ import * as http from 'http';
 import { URL } from 'url';
 import { Response } from 'express';
 import { HttpStatusCodes } from '@/common/constants/http-status';
-import { UploadResponseDto } from './dto/response.dto';
+import {
+  UploadResponseDto,
+  UploadResponseWrapperDto,
+  UploadListResponseWrapperDto,
+} from './dto/response.dto';
 
 @ApiTags('文件上传')
 @Controller('api/v1/upload')
@@ -52,21 +56,21 @@ export class UploadController {
       required: ['file'],
     },
   })
-  @ApiOkResponse({ type: UploadResponseDto, description: '文件上传成功' })
+  @ApiOkResponse({ type: () => UploadResponseWrapperDto, description: '文件上传成功' })
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return this.uploadService.uploadFile(file);
   }
 
   @Get('all')
   @ApiOperation({ summary: '获取所有文件列表' })
-  @ApiOkResponse({ type: [UploadResponseDto], description: '获取所有文件列表成功' })
+  @ApiOkResponse({ type: () => UploadListResponseWrapperDto, description: '获取所有文件列表成功' })
   getFileAll(@Query(new FilterEmptyPipe()) FindFileDto: FindFileDto) {
     return this.uploadService.getFileAll(FindFileDto);
   }
 
   @Get()
   @ApiOperation({ summary: '分页查询文件' })
-  @ApiOkResponse({ type: [UploadResponseDto], description: '分页查询文件成功' })
+  @ApiOkResponse({ type: () => UploadListResponseWrapperDto, description: '分页查询文件成功' })
   getFileByPage(@Query(new FilterEmptyPipe()) findFileDtoByPage: FindFileDtoByPage) {
     return this.uploadService.getFileByPage(findFileDtoByPage);
   }

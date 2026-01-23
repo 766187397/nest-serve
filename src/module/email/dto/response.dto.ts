@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiResultWrapperDto } from '@/common/dto/base';
 
 /** 邮箱模板响应DTO */
 export class EmailResponseDto {
@@ -28,4 +29,16 @@ export class EmailResponseDto {
 
   @ApiProperty({ description: '删除时间', required: false, example: '2024-01-01T00:00:00.000Z' })
   deletedAt?: Date;
+}
+
+/** 邮箱模板响应包装 DTO */
+export class EmailResponseWrapperDto extends ApiResultWrapperDto<EmailResponseDto> {
+  @ApiProperty({ description: '响应数据', type: EmailResponseDto })
+  declare data: EmailResponseDto;
+}
+
+/** 邮箱模板列表响应包装 DTO */
+export class EmailListResponseWrapperDto extends ApiResultWrapperDto<EmailResponseDto[]> {
+  @ApiProperty({ description: '响应数据', type: [EmailResponseDto] })
+  declare data: EmailResponseDto[];
 }

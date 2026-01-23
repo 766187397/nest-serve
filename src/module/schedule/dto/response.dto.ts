@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiResultWrapperDto } from '@/common/dto/base';
 
 /** 定时任务响应DTO */
 export class ScheduleResponseDto {
@@ -48,6 +49,12 @@ export class ScheduleResponseDto {
   deletedAt?: Date;
 }
 
+/** 定时任务响应包装 DTO */
+export class ScheduleResponseWrapperDto extends ApiResultWrapperDto<ScheduleResponseDto> {
+  @ApiProperty({ description: '响应数据', type: ScheduleResponseDto })
+  declare data: ScheduleResponseDto;
+}
+
 /** 定时任务执行日志响应DTO */
 export class ScheduleLogResponseDto {
   @ApiProperty({ description: '日志ID', example: '1' })
@@ -82,4 +89,22 @@ export class ScheduleLogResponseDto {
 
   @ApiProperty({ description: '删除时间', required: false, example: '2024-01-01T00:00:00.000Z' })
   deletedAt?: Date;
+}
+
+/** 定时任务执行日志响应包装 DTO */
+export class ScheduleLogResponseWrapperDto extends ApiResultWrapperDto<ScheduleLogResponseDto> {
+  @ApiProperty({ description: '响应数据', type: ScheduleLogResponseDto })
+  declare data: ScheduleLogResponseDto;
+}
+
+/** 定时任务列表响应包装 DTO */
+export class ScheduleListResponseWrapperDto extends ApiResultWrapperDto<ScheduleResponseDto[]> {
+  @ApiProperty({ description: '响应数据', type: [ScheduleResponseDto] })
+  declare data: ScheduleResponseDto[];
+}
+
+/** 定时任务执行日志列表响应包装 DTO */
+export class ScheduleLogListResponseWrapperDto extends ApiResultWrapperDto<ScheduleLogResponseDto[]> {
+  @ApiProperty({ description: '响应数据', type: [ScheduleLogResponseDto] })
+  declare data: ScheduleLogResponseDto[];
 }

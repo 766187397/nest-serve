@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiResultWrapperDto } from '@/common/dto/base';
 
 /** 文件信息响应DTO */
 export class UploadResponseDto {
@@ -70,4 +71,22 @@ export class UploadFileResponseDto {
 
   @ApiProperty({ description: '删除时间', required: false, example: '2024-01-01T00:00:00.000Z' })
   deletedAt?: Date;
+}
+
+/** 文件信息响应包装 DTO */
+export class UploadResponseWrapperDto extends ApiResultWrapperDto<UploadResponseDto> {
+  @ApiProperty({ description: '响应数据', type: UploadResponseDto })
+  declare data: UploadResponseDto;
+}
+
+/** 文件上传响应包装 DTO */
+export class UploadFileResponseWrapperDto extends ApiResultWrapperDto<UploadFileResponseDto> {
+  @ApiProperty({ description: '响应数据', type: UploadFileResponseDto })
+  declare data: UploadFileResponseDto;
+}
+
+/** 文件列表响应包装 DTO */
+export class UploadListResponseWrapperDto extends ApiResultWrapperDto<UploadResponseDto[]> {
+  @ApiProperty({ description: '响应数据', type: [UploadResponseDto] })
+  declare data: UploadResponseDto[];
 }

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiResultWrapperDto } from '@/common/dto/base';
 
 /**
  * 连接池统计数据响应DTO
@@ -36,25 +37,33 @@ export class PoolStatsResponseDto {
  */
 export class AllPoolStatsResponseDto {
   /** 主数据库连接池状态 */
-  @ApiProperty({ description: '主数据库连接池状态', type: PoolStatsResponseDto, example: {
-    totalConnections: 17,
-    idleConnections: 4,
-    activeConnections: 13,
-    waitingRequests: 0,
-    maxConnections: 17,
-    minConnections: 4
-  } })
+  @ApiProperty({
+    description: '主数据库连接池状态',
+    type: PoolStatsResponseDto,
+    example: {
+      totalConnections: 17,
+      idleConnections: 4,
+      activeConnections: 13,
+      waitingRequests: 0,
+      maxConnections: 17,
+      minConnections: 4,
+    },
+  })
   main: PoolStatsResponseDto;
 
   /** 日志数据库连接池状态 */
-  @ApiProperty({ description: '日志数据库连接池状态', type: PoolStatsResponseDto, example: {
-    totalConnections: 10,
-    idleConnections: 8,
-    activeConnections: 2,
-    waitingRequests: 0,
-    maxConnections: 10,
-    minConnections: 2
-  } })
+  @ApiProperty({
+    description: '日志数据库连接池状态',
+    type: PoolStatsResponseDto,
+    example: {
+      totalConnections: 10,
+      idleConnections: 8,
+      activeConnections: 2,
+      waitingRequests: 0,
+      maxConnections: 10,
+      minConnections: 2,
+    },
+  })
   logger: PoolStatsResponseDto;
 }
 
@@ -78,17 +87,25 @@ export class PoolHealthResponseDto {
  */
 export class AllPoolHealthResponseDto {
   /** 主数据库连接池健康状态 */
-  @ApiProperty({ description: '主数据库连接池健康状态', type: PoolHealthResponseDto, example: {
-    healthy: true,
-    issues: []
-  } })
+  @ApiProperty({
+    description: '主数据库连接池健康状态',
+    type: PoolHealthResponseDto,
+    example: {
+      healthy: true,
+      issues: [],
+    },
+  })
   main: PoolHealthResponseDto;
 
   /** 日志数据库连接池健康状态 */
-  @ApiProperty({ description: '日志数据库连接池健康状态', type: PoolHealthResponseDto, example: {
-    healthy: true,
-    issues: []
-  } })
+  @ApiProperty({
+    description: '日志数据库连接池健康状态',
+    type: PoolHealthResponseDto,
+    example: {
+      healthy: true,
+      issues: [],
+    },
+  })
   logger: PoolHealthResponseDto;
 }
 
@@ -116,4 +133,49 @@ export class PoolHistoryItemResponseDto {
   /** 连接池状态 - 该时间点的连接池统计信息 */
   @ApiProperty({ description: '连接池状态', type: PoolStatsResponseDto })
   stats: PoolStatsResponseDto;
+}
+
+/**
+ * 主数据库连接池状态响应包装 DTO
+ * @description 包装 ApiResult 格式的主数据库连接池状态响应
+ */
+export class MainPoolStatsResponseDto extends ApiResultWrapperDto<PoolStatsResponseDto> {
+  @ApiProperty({ description: '响应数据', type: PoolStatsResponseDto })
+  declare data: PoolStatsResponseDto;
+}
+
+/**
+ * 日志数据库连接池状态响应包装 DTO
+ * @description 包装 ApiResult 格式的日志数据库连接池状态响应
+ */
+export class LoggerPoolStatsResponseDto extends ApiResultWrapperDto<PoolStatsResponseDto> {
+  @ApiProperty({ description: '响应数据', type: PoolStatsResponseDto })
+  declare data: PoolStatsResponseDto;
+}
+
+/**
+ * 所有连接池状态响应包装 DTO
+ * @description 包装 ApiResult 格式的所有连接池状态响应
+ */
+export class AllPoolStatsResponseWrapperDto extends ApiResultWrapperDto<AllPoolStatsResponseDto> {
+  @ApiProperty({ description: '响应数据', type: AllPoolStatsResponseDto })
+  declare data: AllPoolStatsResponseDto;
+}
+
+/**
+ * 连接池健康状态响应包装 DTO
+ * @description 包装 ApiResult 格式的连接池健康状态响应
+ */
+export class AllPoolHealthResponseWrapperDto extends ApiResultWrapperDto<AllPoolHealthResponseDto> {
+  @ApiProperty({ description: '响应数据', type: AllPoolHealthResponseDto })
+  declare data: AllPoolHealthResponseDto;
+}
+
+/**
+ * 连接池历史数据响应包装 DTO
+ * @description 包装 ApiResult 格式的连接池历史数据响应
+ */
+export class PoolHistoryResponseWrapperDto extends ApiResultWrapperDto<PoolHistoryItemResponseDto[]> {
+  @ApiProperty({ description: '响应数据', type: [PoolHistoryItemResponseDto] })
+  declare data: PoolHistoryItemResponseDto[];
 }
