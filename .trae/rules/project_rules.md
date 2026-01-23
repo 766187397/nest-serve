@@ -55,3 +55,10 @@ src/module/{模块名}/dto/
 - 使用 PascalCase
 - 避免缩写，使用完整英文单词
 - 实体名与数据库实体保持一致
+
+### 8.3 响应DTO包装规范
+
+**统一响应包装**
+- 所有使用统一响应函数返回的值，必须使用 `ApiResultWrapperDto<T>` 进行包装
+- `ApiResultWrapperDto<T>` 位于 `src/common/dto/base.ts`
+- 包装后的响应格式包含：code（状态码）、message（消息）、data（数据）、timestamp（时间戳）
