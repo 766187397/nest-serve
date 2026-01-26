@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ApiResultWrapperDto } from '@/common/dto/base';
+import { RouteResponseDto } from '@/module/routes/dto/response.dto';
 
 /** 角色信息响应DTO */
 export class RoleResponseDto {
@@ -20,6 +21,9 @@ export class RoleResponseDto {
 
   @ApiProperty({ description: '状态 0禁用 1启用', example: 1 })
   status: number;
+
+  @ApiProperty({ description: '路由列表', type: [RouteResponseDto], required: false })
+  routes?: RouteResponseDto[];
 
   @ApiProperty({ description: '创建时间', example: '2024-01-01T00:00:00.000Z' })
   createdAt: Date | string;
