@@ -26,9 +26,6 @@ export class EmailResponseDto {
 
   @ApiProperty({ description: '更新时间', example: '2024-01-01T00:00:00.000Z' })
   updatedAt: Date | string;
-
-  @ApiProperty({ description: '删除时间', required: false, example: '2024-01-01T00:00:00.000Z' })
-  deletedAt?: Date;
 }
 
 /** 邮箱模板响应包装 DTO */

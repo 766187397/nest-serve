@@ -44,9 +44,6 @@ export class ScheduleResponseDto {
 
   @ApiProperty({ description: '更新时间', example: '2024-01-01T00:00:00.000Z' })
   updatedAt: Date | string;
-
-  @ApiProperty({ description: '删除时间', required: false, example: '2024-01-01T00:00:00.000Z' })
-  deletedAt?: Date;
 }
 
 /** 定时任务响应包装 DTO */
@@ -86,9 +83,6 @@ export class ScheduleLogResponseDto {
 
   @ApiProperty({ description: '更新时间', example: '2024-01-01T00:00:00.000Z' })
   updatedAt: Date | string;
-
-  @ApiProperty({ description: '删除时间', required: false, example: '2024-01-01T00:00:00.000Z' })
-  deletedAt?: Date;
 }
 
 /** 定时任务执行日志响应包装 DTO */
