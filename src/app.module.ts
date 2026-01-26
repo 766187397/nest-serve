@@ -22,6 +22,7 @@ import { CacheModule } from './common/module/cache.module';
 import { CacheInitModule } from './common/module/cache-init.module';
 import { DocModule } from './module/doc/doc.module';
 import { ConnectionPoolMonitorModule } from './module/connection-pool-monitor/connection-pool-monitor.module';
+import { ConcurrencyControlModule } from './module/concurrency-control/concurrency-control.module';
 
 @Module({
   imports: [
@@ -168,6 +169,7 @@ import { ConnectionPoolMonitorModule } from './module/connection-pool-monitor/co
     CacheInitModule,
     DocModule,
     ConnectionPoolMonitorModule,
+    ConcurrencyControlModule,
   ],
   controllers: [],
   providers: [
