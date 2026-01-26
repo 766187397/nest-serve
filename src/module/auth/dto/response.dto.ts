@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ApiResultWrapperDto } from '@/common/dto/base';
+import { RoleResponseDto } from '@/module/roles/dto/response.dto';
 
 /** 验证码响应DTO */
 export class CaptchaResponseDto {
@@ -41,6 +42,9 @@ export class UserInfoResponseDto {
 
   @ApiProperty({ description: '平台', required: false, example: 'web' })
   platform?: string;
+
+  @ApiProperty({ description: '角色列表', type: [RoleResponseDto] })
+  roles: RoleResponseDto[];
 
   @ApiProperty({ description: '创建时间', example: '2024-01-01T00:00:00.000Z' })
   createdAt: Date | string;
