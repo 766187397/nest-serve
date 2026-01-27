@@ -24,6 +24,7 @@ import { DocModule } from './module/doc/doc.module';
 import { ConnectionPoolMonitorModule } from './module/connection-pool-monitor/connection-pool-monitor.module';
 import { ConcurrencyControlModule } from './module/concurrency-control/concurrency-control.module';
 import { PerformanceMonitorModule } from './module/performance-monitor/performance-monitor.module';
+import { DatabaseOptimizationModule } from './module/database-optimization/database-optimization.module';
 
 @Module({
   imports: [
@@ -172,6 +173,7 @@ import { PerformanceMonitorModule } from './module/performance-monitor/performan
     ConnectionPoolMonitorModule,
     ConcurrencyControlModule,
     PerformanceMonitorModule,
+    DatabaseOptimizationModule,
   ],
   controllers: [],
   providers: [

@@ -9,5 +9,6 @@ import { EmailSendRecord } from './entities/email-send-record.entity';
   imports: [TypeOrmModule.forFeature([Email, EmailSendRecord])],
   controllers: [EmailController],
   providers: [EmailService],
+  exports: [EmailService],
 })
 export class EmailModule {}
