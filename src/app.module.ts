@@ -25,6 +25,7 @@ import { ConnectionPoolMonitorModule } from './module/connection-pool-monitor/co
 import { ConcurrencyControlModule } from './module/concurrency-control/concurrency-control.module';
 import { PerformanceMonitorModule } from './module/performance-monitor/performance-monitor.module';
 import { DatabaseOptimizationModule } from './module/database-optimization/database-optimization.module';
+import { EventDrivenModule } from './module/event-driven/event-driven.module';
 
 @Module({
   imports: [
@@ -174,6 +175,7 @@ import { DatabaseOptimizationModule } from './module/database-optimization/datab
     ConcurrencyControlModule,
     PerformanceMonitorModule,
     DatabaseOptimizationModule,
+    EventDrivenModule,
   ],
   controllers: [],
   providers: [
