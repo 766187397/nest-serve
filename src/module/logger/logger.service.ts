@@ -169,12 +169,12 @@ export class LoggerService {
 
   async deleteLogs(): Promise<void> {
     try {
-      console.log('定时任务删除日志');
+      this.logger.log('定时任务删除日志');
       await this.logRepository.delete({
         createdAt: LessThan(dayjs().subtract(30, 'day').toDate()),
       });
     } catch (error) {
-      console.log('日志删除失败，请稍后再试', error);
+      this.logger.error('日志删除失败，请稍后再试', error);
       throw error;
     }
   }

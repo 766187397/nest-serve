@@ -6,6 +6,7 @@ import {
   SubscribeMessage,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Logger } from '@nestjs/common';
 import { NoticeService } from './notice.service';
 
 interface WsMessagePayload {
@@ -17,12 +18,13 @@ interface WsMessagePayload {
   namespace: '/api/v1/admin/notice/ws', // 命名空间（可选）
 })
 export class NoticeWS implements OnGatewayConnection, OnGatewayDisconnect {
+  private readonly logger = new Logger(NoticeWS.name);
   constructor(private readonly noticeService: NoticeService) {}
   @WebSocketServer() server: Server; // 访问 Socket.io  服务端实例
 
   // 客户端连接时触发
   async handleConnection(client: Socket) {
-    console.log(`客户端连接时触发: ${client.id}`);
+    this.logger.log(`客户端连接时触发: ${client.id}`);
     const token = client.handshake.query.token as string;
     const data = await this.noticeService.handleWsFindUserOrRole(token, 'admin');
     client.emit('list', data);
@@ -30,13 +32,13 @@ export class NoticeWS implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 客户端断开时触发
   handleDisconnect(client: Socket) {
-    console.log(`客户端断开时触发: ${client.id}`);
+    this.logger.log(`客户端断开时触发: ${client.id}`);
   }
 
   // 处理前端发送的 "message" 事件
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: WsMessagePayload) {
-    console.log('payload', payload);
+    this.logger.log('payload', payload);
     const token = payload.token;
 
     const data = await this.noticeService.handleWsFindUserOrRole(token, 'admin');
@@ -49,7 +51,7 @@ export class NoticeWS implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 1. 推送给所有客户端
   broadcastAlert(message: string) {
-    console.log('推送给所有客户端', message);
+    this.logger.log('推送给所有客户端', message);
     this.server.emit('update', { message });
   }
 

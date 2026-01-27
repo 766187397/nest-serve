@@ -26,6 +26,8 @@ import { ConcurrencyControlModule } from './module/concurrency-control/concurren
 import { PerformanceMonitorModule } from './module/performance-monitor/performance-monitor.module';
 import { DatabaseOptimizationModule } from './module/database-optimization/database-optimization.module';
 import { EventDrivenModule } from './module/event-driven/event-driven.module';
+import { ConfigManagementModule } from './module/config-management/config-management.module';
+import { ExceptionTestModule } from './module/exception-test/exception-test.module';
 
 @Module({
   imports: [
@@ -176,6 +178,8 @@ import { EventDrivenModule } from './module/event-driven/event-driven.module';
     PerformanceMonitorModule,
     DatabaseOptimizationModule,
     EventDrivenModule,
+    ConfigManagementModule,
+    ExceptionTestModule,
   ],
   controllers: [],
   providers: [

@@ -12,6 +12,7 @@ let url = `${baseUrl}`;
 global.url = url;
 
 import { NestFactory, Reflector } from '@nestjs/core';
+import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { SwaggerConfig } from './config/swagger';
@@ -94,25 +95,26 @@ bootstrap();
  * @param app NestFactory.create nestjs创建的实例
  */
 async function run(app: INestApplication) {
+  const logger = new Logger('Bootstrap');
   url = `${baseUrl}`;
   global.url = url;
   await app
     .listen(port, IP)
     .then((res) => {
-      console.log(`当前环境为：${envFilePath}`);
-      console.log(`当前端口为：${port}`);
-      console.log(`server to ${url}`);
-      console.log(`swagger to ${url}/swagger`);
-      console.log(`knife4j to ${url}/doc.html`);
+      logger.log(`当前环境为：${envFilePath}`);
+      logger.log(`当前端口为：${port}`);
+      logger.log(`server to ${url}`);
+      logger.log(`swagger to ${url}/swagger`);
+      logger.log(`knife4j to ${url}/doc.html`);
     })
     .catch((err) => {
       if (err.errno === -4091 && process.env.PORT_AUTO !== 'true') {
-        console.log('请检查端口号是否被占用');
+        logger.error('请检查端口号是否被占用');
       } else if (err.errno === -4091 && process.env.PORT_AUTO === 'true') {
         port = Number(port) + 1;
         run(app);
       } else {
-        console.log('err：', err);
+        logger.error('err：', err);
       }
     });
 }

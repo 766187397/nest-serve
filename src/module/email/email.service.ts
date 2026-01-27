@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateEmailDto, FindEmailDto, FindEmailtoByPage, SendEmail, UpdateEmailDto } from './dto';
 import * as dayjs from 'dayjs';
 import * as nodemailer from 'nodemailer';
@@ -37,6 +37,8 @@ const QQPostbox = nodemailer.createTransport({
 
 @Injectable()
 export class EmailService {
+  private readonly logger = new Logger(EmailService.name);
+
   constructor(
     @InjectRepository(Email)
     private emailRepository: Repository<Email>,
@@ -357,9 +359,9 @@ export class EmailService {
         createdAt: LessThan(oneMonthAgo),
       });
 
-      console.log(`清理了 ${result.affected || 0} 条超过一个月的邮箱发送记录`);
+      this.logger.log(`清理了 ${result.affected || 0} 条超过一个月的邮箱发送记录`);
     } catch (error) {
-      console.error('清理邮箱发送记录失败:', error);
+      this.logger.error('清理邮箱发送记录失败:', error);
     }
   }
 }

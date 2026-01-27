@@ -8,6 +8,7 @@ interface Result<T> {
   data?: T | null;
   entities?: new (...args: unknown[]) => T;
   timestamp?: string;
+  details?: Record<string, unknown>;
 }
 
 export class ApiResult<T> {
@@ -17,7 +18,8 @@ export class ApiResult<T> {
     public code: number = HttpStatusCodes.OK,
     public message: string = '操作成功',
     public data: T | null = null,
-    public timestamp: string = new Date().toISOString()
+    public timestamp: string = new Date().toISOString(),
+    public details?: Record<string, unknown>
   ) {}
 
   static success<T>({
@@ -35,7 +37,8 @@ export class ApiResult<T> {
   static error<T>(param: Error | string | Result<T> = {}): ApiResult<T> {
     let message = '操作失败',
       code = HttpStatusCodes.BAD_REQUEST,
-      data: T | null = null;
+      data: T | null = null,
+      details: Record<string, unknown> | undefined;
     if (param instanceof HttpException) {
       // 获取 HttpException 的响应内容和状态码
       const response = param.getResponse();
@@ -56,7 +59,8 @@ export class ApiResult<T> {
       if (param.code) code = param.code;
       if (param.message) message = param.message;
       if (param.data) data = param.data;
+      if (param.details) details = param.details;
     }
-    return new ApiResult<T>(code, message, data);
+    return new ApiResult<T>(code, message, data, undefined, details);
   }
 }
