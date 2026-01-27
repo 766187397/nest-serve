@@ -23,6 +23,7 @@ import { CacheInitModule } from './common/module/cache-init.module';
 import { DocModule } from './module/doc/doc.module';
 import { ConnectionPoolMonitorModule } from './module/connection-pool-monitor/connection-pool-monitor.module';
 import { ConcurrencyControlModule } from './module/concurrency-control/concurrency-control.module';
+import { PerformanceMonitorModule } from './module/performance-monitor/performance-monitor.module';
 
 @Module({
   imports: [
@@ -170,6 +171,7 @@ import { ConcurrencyControlModule } from './module/concurrency-control/concurren
     DocModule,
     ConnectionPoolMonitorModule,
     ConcurrencyControlModule,
+    PerformanceMonitorModule,
   ],
   controllers: [],
   providers: [
