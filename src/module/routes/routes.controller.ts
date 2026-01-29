@@ -39,6 +39,31 @@ import {
 export class RoutesController {
   constructor(private readonly routesService: RoutesService) {}
 
+  @Get('by-role')
+  @ApiQuery({
+    name: 'type',
+    description: '路由类型',
+    required: false,
+    type: 'string',
+    example: 'menu',
+  })
+  @ApiOperation({ summary: '根据登录用户的角色ids获取路由' })
+  @ApiOkResponse({
+    type: () => RoleRoutesListResponseWrapperDto,
+    description: '根据登录用户的角色ids获取路由成功',
+  })
+  async getRoutesByRoleId(@Req() req: Request, @Res() res: Response) {
+    console.log('根据登录用户的角色ids获取路由成功', req);
+    const type = req.query.type as string;
+    console.log('type', type);
+    const userInfo = req.userInfo as User;
+    console.log('userInfo', userInfo);
+    const rolesIds = userInfo.roles.map((item) => item.id);
+    const data = await this.routesService.getRoutesByRoleId(rolesIds, userInfo.platform, type);
+    res.status(data.code).json(data);
+    return data;
+  }
+
   @Post()
   @ApiOperation({ summary: '创建路由' })
   @ApiOkResponse({ type: () => RouteResponseWrapperDto, description: '创建路由成功' })
@@ -75,27 +100,5 @@ export class RoutesController {
   @HttpCode(HttpStatusCodes.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.routesService.remove(id);
-  }
-
-  @Get('by-role')
-  @ApiQuery({
-    name: 'type',
-    description: '路由类型',
-    required: false,
-    type: 'string',
-    example: 'menu',
-  })
-  @ApiOperation({ summary: '根据登录用户的角色ids获取路由' })
-  @ApiOkResponse({
-    type: () => RoleRoutesListResponseWrapperDto,
-    description: '根据登录用户的角色ids获取路由成功',
-  })
-  async getRoutesByRoleId(@Req() req: Request, @Res() res: Response) {
-    const type = req.query.type as string;
-    const userInfo = req.userInfo as User;
-    const rolesIds = userInfo.roles.map((item) => item.id);
-    const data = await this.routesService.getRoutesByRoleId(rolesIds, userInfo.platform, type);
-    res.status(data.code).json(data);
-    return data;
   }
 }

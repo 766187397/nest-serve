@@ -107,7 +107,7 @@ export class AuthService {
       if (data.status === 2) {
         return ApiResult.error<null>('当前账号已被禁用，请联系管理员！');
       }
-      const { password: _password, deletedAt: _deletedAt, platform: _userPlatform, ...info } = data;
+      const { password: _password, deletedAt: _deletedAt, ...info } = data;
 
       const options = getPlatformJwtConfig(platform) as JwtConfig;
       const userInfo = {
@@ -170,7 +170,7 @@ export class AuthService {
       if (data.status === 2) {
         return ApiResult.error<null>('当前账号已被禁用，请联系管理员！');
       }
-      const { password: _password, deletedAt: _deletedAt, platform: _userPlatform, ...info } = data;
+      const { password: _password, deletedAt: _deletedAt, ...info } = data;
 
       const options = getPlatformJwtConfig(platform) as JwtConfig;
       const userInfo = {
@@ -335,7 +335,7 @@ export class AuthService {
       if (data.status === 2) {
         return ApiResult.error<null>('当前账号已被禁用，请联系管理员！');
       }
-      const { password: _password, deletedAt: _deletedAt, platform: _userPlatform, ...info } = data;
+      const { password: _password, deletedAt: _deletedAt, ...info } = data;
 
       const options = getPlatformJwtConfig(platform) as JwtConfig;
       const userInfo = {

@@ -49,9 +49,9 @@ export class AuthGuard implements CanActivate {
       throw new HttpException('请登录后访问！', HttpStatus.UNAUTHORIZED);
       return false;
     }
-
+    let platform = (req.headers['x-platform'] as string) || '';
     try {
-      const options = getPlatformJwtConfig(url.split('/')[3]);
+      const options = getPlatformJwtConfig(platform);
       if (options && token) {
         let user: JwtPayload;
         user = this.jwtService.verify<JwtPayload>(token, {
