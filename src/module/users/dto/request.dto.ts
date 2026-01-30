@@ -71,13 +71,13 @@ export class FindUserDto extends FindByParameter {
   @ApiProperty({ type: 'string', description: '邮箱', required: false, example: 'admin@qq.com' })
   @Transform(({ value }: { value: string }) => (value === '' ? undefined : value))
   @IsOptional()
-  @IsEmail({}, { message: '邮箱格式错误' })
+  @IsString({ message: '邮箱必须是字符串' })
   email?: string;
 
   @ApiProperty({ type: 'string', description: '手机号', required: false, example: '13800138000' })
   @Transform(({ value }: { value: string }) => (value === '' ? undefined : value))
   @IsOptional()
-  @Matches(/^1[3456789]\d{9}$/, { message: '手机号格式错误' })
+  @IsString({ message: '手机号必须是字符串' })
   phone?: string;
 }
 

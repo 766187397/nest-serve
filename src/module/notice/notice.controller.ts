@@ -85,39 +85,6 @@ export class NoticeController {
     );
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: '获取公告' })
-  @ApiOkResponse({ type: () => NoticeResponseWrapperDto, description: '获取公告成功' })
-  findOne(@Param('id') id: string) {
-    return this.noticeService.findOne(id);
-  }
-
-  @Patch(':id')
-  @ApiOperation({ summary: '更新公告' })
-  @ApiOkResponse({ type: () => NoticeResponseWrapperDto, description: '更新公告成功' })
-  async update(@Param('id') id: string, @Body() updateNoticeDto: UpdateNoticeDto) {
-    const { __isApiResult, ...data } = await this.noticeService.update(id, updateNoticeDto);
-    if (data.code === BusinessStatusCodes.SUCCESS) {
-      // 广播新公告给所有连接的客户端
-      this.noticeWS.broadcastAlert(`有新公告`);
-    }
-    return data;
-  }
-
-  @Post('read/:id')
-  @ApiOperation({ summary: '标记公告为已读' })
-  @ApiOkResponse({ type: () => NoticeResponseWrapperDto, description: '标记公告为已读成功' })
-  async read(@Param('id') id: string, @Req() req: Request) {
-    return this.noticeService.handleMarkByUserId(req.userInfo?.id as string, id);
-  }
-
-  @Delete(':id')
-  @ApiOperation({ summary: '删除公告' })
-  @HttpCode(HttpStatusCodes.NO_CONTENT)
-  remove(@Param('id') id: string) {
-    return this.noticeService.remove(id);
-  }
-
   @Get('ws')
   @ApiOperation({
     summary: 'WebSocket 未读公告',
@@ -125,4 +92,11 @@ export class NoticeController {
       '通过ws获取前三条未读的通知公告，展示用于WebSocket服务（前端使用socket.io-client这个包）',
   })
   ws() {}
+
+  @Get(':id')
+  @ApiOperation({ summary: '获取公告' })
+  @ApiOkResponse({ type: () => NoticeResponseWrapperDto, description: '获取公告成功' })
+  findOne(@Headers('x-platform') platform: string, @Param('id') id: string) {
+    return this.noticeService.findOne(id, platform);
+  }
 }

@@ -6,12 +6,15 @@
 
 /**
  * 处理平台查询条件
- * @param {string} requestPlatform 请求头中的平台标识
- * @param {string} [queryPlatform] 查询条件中的平台标识（仅admin平台可用）
+ * @param {string | undefined} requestPlatform 请求头中的平台标识
+ * @param {string | undefined} [queryPlatform] 查询条件中的平台标识（仅admin平台可用）
  * @returns {string} 最终使用的平台标识
  * @description 当请求平台为admin且提供了queryPlatform参数时，使用queryPlatform；否则使用requestPlatform
  */
-export function handlePlatformQuery(requestPlatform: string, queryPlatform?: string): string {
+export function handlePlatformQuery(
+  requestPlatform: string | undefined,
+  queryPlatform?: string | undefined
+): string {
   // 定义管理员平台标识，可根据需要修改
   const ADMIN_PLATFORM = 'admin';
 
@@ -21,5 +24,5 @@ export function handlePlatformQuery(requestPlatform: string, queryPlatform?: str
   }
 
   // 否则使用请求头中的平台标识
-  return requestPlatform;
+  return requestPlatform || '';
 }

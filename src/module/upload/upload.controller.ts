@@ -75,6 +75,14 @@ export class UploadController {
     return this.uploadService.getFileByPage(findFileDtoByPage);
   }
 
+  @Get(':id')
+  @ApiParam({ name: 'id', required: true, description: '文件 ID' })
+  @ApiOperation({ summary: '根据id获取文件' })
+  @ApiOkResponse({ type: UploadResponseDto, description: '根据id获取文件成功' })
+  getFileById(@Param('id') id: string) {
+    return this.uploadService.getFileById(id);
+  }
+
   @Get('download')
   @ApiOperation({ summary: '下载文件' })
   @ApiParam({ name: 'fileUrl', required: true, description: '文件 URL' })
@@ -115,21 +123,5 @@ export class UploadController {
       .on('error', () => {
         throw new Error('下载失败');
       });
-  }
-
-  @Get(':id')
-  @ApiParam({ name: 'id', required: true, description: '文件 ID' })
-  @ApiOperation({ summary: '根据id获取文件' })
-  @ApiOkResponse({ type: UploadResponseDto, description: '根据id获取文件成功' })
-  getFileById(@Param('id') id: string) {
-    return this.uploadService.getFileById(id);
-  }
-
-  @Delete(':id')
-  @ApiOperation({ summary: '根据id删除文件' })
-  @ApiParam({ name: 'id', required: true, description: '文件 ID' })
-  @HttpCode(HttpStatusCodes.NO_CONTENT)
-  deleteFileById(@Param('id') id: string) {
-    return this.uploadService.deleteFileById(id);
   }
 }

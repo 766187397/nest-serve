@@ -163,19 +163,21 @@ export class RolesService {
    * 更新角色
    * @param {string} id 角色ID
    * @param {UpdateRoleDto} updateRoleDto 更新角色信息
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<ApiResult<null>> {
+  async update(id: string, updateRoleDto: UpdateRoleDto, platform?: string): Promise<ApiResult<null>> {
     try {
-      const role = await this.roleRepository.findOne({ where: { id } });
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const role = await this.roleRepository.findOne({ where: { id, platform: finalPlatform } });
       if (!role) {
         return ApiResult.error('角色不存在');
       }
 
       const exist = await this.roleRepository.find({
         where: [
-          { id: Not(id), name: role.name, platform: role.platform },
-          { id: Not(id), roleKey: role.roleKey, platform: role.platform },
+          { id: Not(id), name: role.name, platform: finalPlatform },
+          { id: Not(id), roleKey: role.roleKey, platform: finalPlatform },
         ],
       });
       if (exist && exist.length > 0) {
@@ -199,11 +201,13 @@ export class RolesService {
   /**
    * 删除角色
    * @param {string} id 角色ID
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<UpdateResult | null>>} 统一返回结果
    */
-  async remove(id: string): Promise<ApiResult<UpdateResult | null>> {
+  async remove(id: string, platform?: string): Promise<ApiResult<UpdateResult | null>> {
     try {
-      const data = await this.roleRepository.softDelete(id);
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const data = await this.roleRepository.softDelete({ id, platform: finalPlatform });
       return ApiResult.success<UpdateResult>({ data });
     } catch (error) {
       return ApiResult.error<null>(error || '角色删除失败，请稍后再试');

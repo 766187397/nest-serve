@@ -47,7 +47,7 @@ export class UsersController {
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage
   ) {
-    return this.usersService.findByPage(findUserDtoByPage);
+    return this.usersService.findByPage(findUserDtoByPage, platform);
   }
 
   @Get('all')
@@ -57,28 +57,7 @@ export class UsersController {
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) findUserDto: FindUserDto
   ) {
-    return this.usersService.findAll(findUserDto);
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: '查询用户详情' })
-  @ApiOkResponse({ type: () => UserResponseWrapperDto, description: '查询用户详情成功' })
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
-  }
-
-  @Patch(':id')
-  @ApiOperation({ summary: '更新用户信息' })
-  @ApiOkResponse({ type: () => UserResponseWrapperDto, description: '更新用户信息成功' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
-  }
-
-  @Delete(':id')
-  @ApiOperation({ summary: '删除用户' })
-  @HttpCode(204)
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+    return this.usersService.findAll(findUserDto, platform);
   }
 
   @Get('export')
@@ -89,7 +68,7 @@ export class UsersController {
     @Query(new FilterEmptyPipe()) findUserDtoByPage: FindUserDtoByPage,
     @Res() res: Response
   ) {
-    const data = await this.usersService.exportUserList(findUserDtoByPage);
+    const data = await this.usersService.exportUserList(findUserDtoByPage, platform);
     if ('buffer' in data) {
       res.setHeader(
         'Content-Disposition',
@@ -100,5 +79,12 @@ export class UsersController {
       return;
     }
     return data;
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: '查询用户详情' })
+  @ApiOkResponse({ type: () => UserResponseDto, description: '查询用户详情成功' })
+  findOne(@Headers('x-platform') platform: string, @Param('id') id: string) {
+    return this.usersService.findOne(id, platform);
   }
 }

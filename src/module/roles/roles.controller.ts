@@ -60,21 +60,21 @@ export class RolesController {
   @Get(':id')
   @ApiOperation({ summary: '查询角色详情' })
   @ApiOkResponse({ type: () => RoleResponseWrapperDto, description: '查询角色详情成功' })
-  findOne(@Param('id') id: string) {
-    return this.rolesService.findOne(id);
+  findOne(@Headers('x-platform') platform: string, @Param('id') id: string) {
+    return this.rolesService.findOne(id, platform);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '更新角色信息' })
   @ApiOkResponse({ type: () => RoleResponseWrapperDto, description: '更新角色信息成功' })
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(id, updateRoleDto);
+  update(@Headers('x-platform') platform: string, @Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
+    return this.rolesService.update(id, updateRoleDto, platform);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: '删除角色' })
   @HttpCode(HttpStatusCodes.NO_CONTENT)
-  remove(@Param('id') id: string) {
-    return this.rolesService.remove(id);
+  remove(@Headers('x-platform') platform: string, @Param('id') id: string) {
+    return this.rolesService.remove(id, platform);
   }
 }

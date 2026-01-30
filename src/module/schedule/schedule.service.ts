@@ -141,11 +141,13 @@ export class ScheduleService {
   /**
    * 通过ID查询定时任务
    * @param {string} id 任务ID
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<Schedule | null>>} 统一返回结果
    */
-  async findOne(id: string): Promise<ApiResult<Schedule | null>> {
+  async findOne(id: string, platform?: string): Promise<ApiResult<Schedule | null>> {
     try {
-      const data = await this.scheduleRepository.findOne({ where: { id } });
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const data = await this.scheduleRepository.findOne({ where: { id, platform: finalPlatform } });
       if (!data) {
         return ApiResult.error<null>('定时任务不存在');
       }
@@ -159,15 +161,17 @@ export class ScheduleService {
    * 更新定时任务
    * @param {string} id 任务ID
    * @param {UpdateScheduleDto} updateScheduleDto 更新DTO
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
   async update(
     id: string,
     updateScheduleDto: UpdateScheduleDto,
-    platform: string = 'admin'
+    platform?: string
   ): Promise<ApiResult<null>> {
     try {
-      const schedule = await this.scheduleRepository.findOne({ where: { id } });
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const schedule = await this.scheduleRepository.findOne({ where: { id, platform: finalPlatform } });
       if (!schedule) {
         return ApiResult.error<null>('定时任务不存在');
       }
@@ -209,11 +213,13 @@ export class ScheduleService {
   /**
    * 删除定时任务
    * @param {string} id 任务ID
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async remove(id: string): Promise<ApiResult<null>> {
+  async remove(id: string, platform?: string): Promise<ApiResult<null>> {
     try {
-      const schedule = await this.scheduleRepository.findOne({ where: { id } });
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const schedule = await this.scheduleRepository.findOne({ where: { id, platform: finalPlatform } });
       if (!schedule) {
         return ApiResult.error<null>('定时任务不存在');
       }
@@ -223,7 +229,7 @@ export class ScheduleService {
         this.schedulerRegistry.deleteCronJob(jobName);
       }
 
-      await this.scheduleRepository.softDelete(id);
+      await this.scheduleRepository.softDelete({ id, platform: finalPlatform });
       return ApiResult.success<null>();
     } catch (error) {
       return ApiResult.error<null>((error as Error)?.message || '定时任务删除失败');
@@ -234,11 +240,13 @@ export class ScheduleService {
    * 启用/禁用定时任务
    * @param {string} id 任务ID
    * @param {number} status 状态 1-启用 2-禁用
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async toggleStatus(id: string, status: number): Promise<ApiResult<null>> {
+  async toggleStatus(id: string, status: number, platform?: string): Promise<ApiResult<null>> {
     try {
-      const schedule = await this.scheduleRepository.findOne({ where: { id } });
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const schedule = await this.scheduleRepository.findOne({ where: { id, platform: finalPlatform } });
       if (!schedule) {
         return ApiResult.error<null>('定时任务不存在');
       }
@@ -266,11 +274,13 @@ export class ScheduleService {
   /**
    * 手动执行定时任务
    * @param {string} id 任务ID
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async executeManually(id: string): Promise<ApiResult<null>> {
+  async executeManually(id: string, platform?: string): Promise<ApiResult<null>> {
     try {
-      const schedule = await this.scheduleRepository.findOne({ where: { id } });
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const schedule = await this.scheduleRepository.findOne({ where: { id, platform: finalPlatform } });
       if (!schedule) {
         return ApiResult.error<null>('定时任务不存在');
       }

@@ -127,12 +127,14 @@ export class RoutesService {
   /**
    * 通过id查询详情
    * @param {string} id 路由的id
+   * @param {string} platform 请求头中的平台标识
    * @returns
    */
-  async findOne(id: string): Promise<ApiResult<Route | null>> {
+  async findOne(id: string, platform?: string): Promise<ApiResult<Route | null>> {
     try {
+      const finalPlatform = handlePlatformQuery(platform, undefined);
       const data: RouteInfo = await this.routeRepository.findOne({
-        where: { id },
+        where: { id, platform: finalPlatform },
         relations: ['children', 'parent'],
       });
       if (data && data.parent) {
@@ -148,20 +150,22 @@ export class RoutesService {
    * 路由信息修改
    * @param {string} id 路由id
    * @param {UpdateRouteDto} updateRouteDto 路由信息
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async update(id: string, updateRouteDto: UpdateRouteDto): Promise<ApiResult<null>> {
+  async update(id: string, updateRouteDto: UpdateRouteDto, platform?: string): Promise<ApiResult<null>> {
     try {
+      const finalPlatform = handlePlatformQuery(platform, undefined);
       // 查询当前路由是否存在
       const route = await this.routeRepository.findOne({
-        where: { id },
+        where: { id, platform: finalPlatform },
         relations: ['children', 'parent'],
       });
       if (!route) {
         return ApiResult.error('路由不存在');
       }
       const exist = await this.routeRepository.findOne({
-        where: { id: Not(id), name: route.name, platform: route.platform },
+        where: { id: Not(id), name: route.name, platform: finalPlatform },
       });
       if (exist) {
         return ApiResult.error<null>(`路由${exist.name}已存在`);
@@ -175,7 +179,7 @@ export class RoutesService {
         const parentRoute = await this.routeRepository.findOne({
           where: {
             id: updateRouteDto.parentId,
-            platform: updateRouteDto.platform,
+            platform: finalPlatform,
           },
         });
         if (!parentRoute) {
@@ -201,11 +205,13 @@ export class RoutesService {
   /**
    * 删除路由信息
    * @param {string} id 路由id
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<null>>} 统一返回结果
    */
-  async remove(id: string): Promise<ApiResult<null>> {
+  async remove(id: string, platform?: string): Promise<ApiResult<null>> {
     try {
-      await this.routeRepository.softDelete(id);
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      await this.routeRepository.softDelete({ id, platform: finalPlatform });
       return ApiResult.success<null>();
     } catch (error) {
       return ApiResult.error<null>((error as Error)?.message || '路由删除失败，请稍后再试');

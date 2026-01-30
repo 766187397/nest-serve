@@ -65,10 +65,12 @@ export class UsersService {
   /**
    * 分页查询
    * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<PageApiResult<User[]> | null>>} 统一返回结果
    */
   async findByPage(
-    findUserDtoByPage?: FindUserDtoByPage
+    findUserDtoByPage?: FindUserDtoByPage,
+    platform?: string
   ): Promise<ApiResult<PageApiResult<User[]> | null>> {
     try {
       const { take, skip } = buildCommonPaging(
@@ -76,8 +78,10 @@ export class UsersService {
         findUserDtoByPage?.pageSize
       );
       const order = buildCommonSort(findUserDtoByPage?.sort);
+      const finalPlatform = handlePlatformQuery(platform, findUserDtoByPage?.platform);
       const [data, total] = await this.userRepository.findAndCount({
         where: {
+          platform: finalPlatform,
           account: findUserDtoByPage?.account ? ILike(`%${findUserDtoByPage.account}%`) : undefined,
           nickName: findUserDtoByPage?.nickName
             ? ILike(`%${findUserDtoByPage.nickName}%`)
@@ -111,13 +115,16 @@ export class UsersService {
   /**
    * 查询所有用户
    * @param {FindUserDto} findUserDto 查询条件
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<User[] | null>>} 统一返回结果
    */
-  async findAll(findUserDto?: FindUserDto): Promise<ApiResult<User[] | null>> {
+  async findAll(findUserDto?: FindUserDto, platform?: string): Promise<ApiResult<User[] | null>> {
     try {
       const order = buildCommonSort(findUserDto?.sort);
+      const finalPlatform = handlePlatformQuery(platform, findUserDto?.platform);
       const data = await this.userRepository.find({
         where: {
+          platform: finalPlatform,
           nickName: findUserDto?.nickName ? ILike(`%${findUserDto.nickName}%`) : undefined,
           email: findUserDto?.email ? ILike(`%${findUserDto.email}%`) : undefined,
           phone: findUserDto?.phone ? ILike(`%${findUserDto.phone}%`) : undefined,
@@ -134,12 +141,14 @@ export class UsersService {
 
   /**
    * 通过ID查询详情
-   * @param {string} id
+   * @param {string} id 用户ID
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<ApiResult<User | null>>} 统一返回结果
    */
-  async findOne(id: string): Promise<ApiResult<User | null>> {
+  async findOne(id: string, platform?: string): Promise<ApiResult<User | null>> {
     try {
-      const data = await this.userRepository.findOne({ where: { id } });
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const data = await this.userRepository.findOne({ where: { id, platform: finalPlatform } });
       if (!data) {
         return ApiResult.error<null>('用户不存在');
       }
@@ -224,18 +233,21 @@ export class UsersService {
   }
 
   /**
-   * 导出用户列表
-
+   * 导出用户数据
    * @param {FindUserDtoByPage} findUserDtoByPage 查询条件
+   * @param {string} platform 请求头中的平台标识
    * @returns {Promise<{buffer: Buffer; fileName: string} | ApiResult<null>>} 成功Excel文件和名称，失败统一返回结果
    */
   async exportUserList(
-    findUserDtoByPage?: FindUserDtoByPage
+    findUserDtoByPage?: FindUserDtoByPage,
+    platform?: string
   ): Promise<{ buffer: Buffer; fileName: string } | ApiResult<null>> {
     try {
+      const finalPlatform = handlePlatformQuery(platform || '', findUserDtoByPage?.platform);
       const order = buildCommonSort(findUserDtoByPage?.sort);
       const [data] = await this.userRepository.findAndCount({
         where: {
+          platform: finalPlatform,
           account: findUserDtoByPage?.account ? ILike(`%${findUserDtoByPage.account}%`) : undefined,
           nickName: findUserDtoByPage?.nickName
             ? ILike(`%${findUserDtoByPage.nickName}%`)

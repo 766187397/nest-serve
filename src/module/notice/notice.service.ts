@@ -168,13 +168,15 @@ export class NoticeService {
   }
 
   /**
-   * 通过id查看详情
-   * @param {string} id
+   * 通过ID查询详情
+   * @param {string} id 公告ID
+   * @param {string} platform 请求头中的平台标识
    * @returns { Promise<ApiResult<Notice | null>>} 统一返回结果
    */
-  async findOne(id: string): Promise<ApiResult<Notice | null>> {
+  async findOne(id: string, platform?: string): Promise<ApiResult<Notice | null>> {
     try {
-      const data = await this.noticeRepository.findOne({ where: { id } });
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const data = await this.noticeRepository.findOne({ where: { id, platform: finalPlatform } });
       return ApiResult.success<Notice | null>({ data });
     } catch (error) {
       return ApiResult.error<null>(error);

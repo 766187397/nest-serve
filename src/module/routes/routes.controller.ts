@@ -84,21 +84,21 @@ export class RoutesController {
   @Get(':id')
   @ApiOperation({ summary: '获取路由详情' })
   @ApiOkResponse({ type: () => RouteResponseWrapperDto, description: '获取路由详情成功' })
-  findOne(@Param('id') id: string) {
-    return this.routesService.findOne(id);
+  findOne(@Headers('x-platform') platform: string, @Param('id') id: string) {
+    return this.routesService.findOne(id, platform);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '修改路由信息' })
   @ApiOkResponse({ type: () => RouteResponseWrapperDto, description: '修改路由信息成功' })
-  update(@Param('id') id: string, @Body() updateRouteDto: UpdateRouteDto) {
-    return this.routesService.update(id, updateRouteDto);
+  update(@Headers('x-platform') platform: string, @Param('id') id: string, @Body() updateRouteDto: UpdateRouteDto) {
+    return this.routesService.update(id, updateRouteDto, platform);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: '删除路由' })
   @HttpCode(HttpStatusCodes.NO_CONTENT)
-  remove(@Param('id') id: string) {
-    return this.routesService.remove(id);
+  remove(@Headers('x-platform') platform: string, @Param('id') id: string) {
+    return this.routesService.remove(id, platform);
   }
 }

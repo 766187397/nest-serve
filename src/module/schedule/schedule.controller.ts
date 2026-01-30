@@ -67,41 +67,6 @@ export class ScheduleController {
     return this.scheduleService.findAll(query, platform);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: '查询定时任务详情' })
-  @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '查询定时任务详情成功' })
-  findOne(@Param('id') id: string) {
-    return this.scheduleService.findOne(id);
-  }
-
-  @Patch(':id')
-  @ApiOperation({ summary: '更新定时任务' })
-  @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '更新定时任务成功' })
-  update(@Param('id') id: string, @Body() updateScheduleDto: UpdateScheduleDto) {
-    return this.scheduleService.update(id, updateScheduleDto);
-  }
-
-  @Delete(':id')
-  @ApiOperation({ summary: '删除定时任务' })
-  @HttpCode(204)
-  remove(@Param('id') id: string) {
-    return this.scheduleService.remove(id);
-  }
-
-  @Patch(':id/status')
-  @ApiOperation({ summary: '启用/禁用定时任务' })
-  @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '启用/禁用定时任务成功' })
-  toggleStatus(@Param('id') id: string, @Body('status') status: number) {
-    return this.scheduleService.toggleStatus(id, status);
-  }
-
-  @Post(':id/execute')
-  @ApiOperation({ summary: '手动执行定时任务' })
-  @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '手动执行定时任务成功' })
-  executeManually(@Param('id') id: string) {
-    return this.scheduleService.executeManually(id);
-  }
-
   @Get(':id/logs')
   @ApiOperation({ summary: '查询定时任务执行日志(分页)' })
   @ApiOkResponse({ type: () => ScheduleLogListResponseWrapperDto, description: '查询定时任务执行日志成功' })
@@ -111,5 +76,40 @@ export class ScheduleController {
     @Query(new FilterEmptyPipe()) query: FindScheduleLogDtoByPage
   ) {
     return this.scheduleService.findLogsByPage({ ...query, scheduleId: id }, platform);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: '查询定时任务详情' })
+  @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '查询定时任务详情成功' })
+  findOne(@Headers('x-platform') platform: string, @Param('id') id: string) {
+    return this.scheduleService.findOne(id, platform);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: '更新定时任务' })
+  @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '更新定时任务成功' })
+  update(@Headers('x-platform') platform: string, @Param('id') id: string, @Body() updateScheduleDto: UpdateScheduleDto) {
+    return this.scheduleService.update(id, updateScheduleDto, platform);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: '删除定时任务' })
+  @HttpCode(204)
+  remove(@Headers('x-platform') platform: string, @Param('id') id: string) {
+    return this.scheduleService.remove(id, platform);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: '启用/禁用定时任务' })
+  @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '启用/禁用定时任务成功' })
+  toggleStatus(@Headers('x-platform') platform: string, @Param('id') id: string, @Body('status') status: number) {
+    return this.scheduleService.toggleStatus(id, status, platform);
+  }
+
+  @Post(':id/execute')
+  @ApiOperation({ summary: '手动执行定时任务' })
+  @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '手动执行定时任务成功' })
+  executeManually(@Headers('x-platform') platform: string, @Param('id') id: string) {
+    return this.scheduleService.executeManually(id, platform);
   }
 }
