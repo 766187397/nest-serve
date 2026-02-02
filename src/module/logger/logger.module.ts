@@ -10,9 +10,18 @@ import { LogQueueService } from './log-queue.service';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { getRedisConfig } from '@/config/redis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { WinstonModule } from 'nest-winston';
+import { createWinstonConfig } from '@/config/winston';
 
 @Module({
   imports: [
+    WinstonModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService<Record<string, unknown>, false>) => {
+        return createWinstonConfig(configService);
+      },
+    }),
     TypeOrmModule.forFeature([Log], 'logger'),
     ScheduleModule.forRoot(),
     BullModule.forRootAsync({

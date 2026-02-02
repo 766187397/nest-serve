@@ -121,5 +121,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     });
 
     response.status(status).json(data);
+
+    this.loggerService.create(request, message, status.toString());
   }
 }

@@ -1,6 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { LoggerService } from './logger.service';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, throwError, finalize } from 'rxjs';
 import { LoggerWhiteList } from '@/config/whiteList';
 import { Request } from 'express';
 
@@ -9,9 +9,7 @@ export class LoggerInterceptor implements NestInterceptor {
   constructor(private readonly loggerService: LoggerService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    // 以什么开头
     const whiteListStartsWith: string[] = LoggerWhiteList.whiteListStartsWith;
-    // 以什么全匹配
     const whiteListExact: string[] = LoggerWhiteList.whiteListExact;
 
     const request: Request = context.switchToHttp().getRequest();
@@ -19,7 +17,6 @@ export class LoggerInterceptor implements NestInterceptor {
     request.startTime = Date.now();
 
     const url: string = request.url || '';
-    // 如果是白名单中的接口就不记录到日志
     if (
       whiteListStartsWith.some((prefix) => url.startsWith(prefix)) ||
       whiteListExact.includes(url)
@@ -30,6 +27,19 @@ export class LoggerInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(async (data) => {
         this.loggerService.create(request, data, response.statusCode.toString());
+      }),
+      catchError((error) => {
+        const statusCode = error.status || response.statusCode || 500;
+        this.loggerService.create(request, error.message || 'Error', statusCode.toString());
+        return throwError(() => error);
+      }),
+      finalize(() => {
+        if (!response.headersSent && response.statusCode) {
+          const statusCode = response.statusCode.toString();
+          if (parseInt(statusCode, 10) >= 400) {
+            this.loggerService.create(request, `Request completed with status ${statusCode}`, statusCode);
+          }
+        }
       })
     );
   }

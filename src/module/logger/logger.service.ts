@@ -1,5 +1,5 @@
 import { ApiResult } from '@/common/utils/result';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import * as dayjs from 'dayjs';
 import { Log } from './entities/logger.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +11,8 @@ import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/u
 import { LogQueueService } from './log-queue.service';
 import { ConfigService } from '@nestjs/config';
 import { getLoggerConfig, LoggerConfig } from '@/config/logger';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger as WinstonLogger } from 'winston';
 
 export enum LogLevel {
   ERROR = 'error',
@@ -23,15 +25,18 @@ export enum LogLevel {
 export class LoggerService {
   private readonly logger = new Logger(LoggerService.name);
   private readonly config: LoggerConfig;
+  private readonly winstonLogger: WinstonLogger;
   private samplingCounter = 0;
 
   constructor(
     @InjectRepository(Log, 'logger')
     private logRepository: Repository<Log>,
     private readonly logQueueService: LogQueueService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    @Inject(WINSTON_MODULE_PROVIDER) winstonLogger: WinstonLogger
   ) {
     this.config = getLoggerConfig(this.configService);
+    this.winstonLogger = winstonLogger;
   }
 
   private shouldLog(level: LogLevel): boolean {
@@ -41,7 +46,7 @@ export class LoggerService {
       [LogLevel.INFO]: 2,
       [LogLevel.DEBUG]: 3,
     };
-    return levelPriority[level] >= levelPriority[this.config.level];
+    return levelPriority[level] <= levelPriority[this.config.level];
   }
 
   private shouldSample(): boolean {
@@ -119,6 +124,13 @@ export class LoggerService {
       if (!logData.resData) {
         logData.resData = '';
       }
+
+      const logMessage = {
+        ...logData,
+        timestamp: new Date().toISOString(),
+      };
+
+      this.winstonLogger.log(logLevel, 'HTTP Request', logMessage);
 
       if (this.config.asyncEnabled) {
         await this.logQueueService.addLogToQueue(logData);

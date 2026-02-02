@@ -286,7 +286,7 @@ export class ScheduleService {
         return ApiResult.error<null>('定时任务不存在');
       }
 
-      await this.executeJob(schedule);
+      this.executeJob(schedule);
       return ApiResult.success<null>();
     } catch (error) {
       return ApiResult.error<null>((error as Error)?.message || '定时任务执行失败');
