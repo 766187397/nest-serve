@@ -8,10 +8,12 @@ import { Dictionary } from '@/module/dictionary/entities/dictionary.entity';
 import { DictionaryItem } from '@/module/dictionary/entities/dictionaryItem.entity';
 import { Email } from '@/module/email/entities/email.entity';
 import { Notice } from '@/module/notice/entities/notice.entity';
+import { Schedule } from '@/module/schedule/entities/schedule.entity';
+import { ScheduleLog } from '@/module/schedule/entities/schedule-log.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role, Route, Dictionary, DictionaryItem, Email, Notice]),
+    TypeOrmModule.forFeature([User, Role, Route, Dictionary, DictionaryItem, Email, Notice, Schedule, ScheduleLog]),
   ],
   controllers: [],
   providers: [defaultData],

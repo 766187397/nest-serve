@@ -9,6 +9,8 @@ import { Dictionary } from '@/module/dictionary/entities/dictionary.entity';
 import { DictionaryItem } from '@/module/dictionary/entities/dictionaryItem.entity';
 import { Email } from '@/module/email/entities/email.entity';
 import { Notice } from '@/module/notice/entities/notice.entity';
+import { Schedule } from '@/module/schedule/entities/schedule.entity';
+import { ScheduleLog } from '@/module/schedule/entities/schedule-log.entity';
 
 @Injectable()
 export class defaultData implements OnApplicationBootstrap {
@@ -39,7 +41,15 @@ export class defaultData implements OnApplicationBootstrap {
 
     /** 通知公告 */
     @InjectRepository(Notice)
-    private readonly noticeRepository: Repository<Notice>
+    private readonly noticeRepository: Repository<Notice>,
+
+    /** 定时任务 */
+    @InjectRepository(Schedule)
+    private readonly scheduleRepository: Repository<Schedule>,
+
+    /** 定时任务日志 */
+    @InjectRepository(ScheduleLog)
+    private readonly scheduleLogRepository: Repository<ScheduleLog>
   ) {}
 
   async onApplicationBootstrap() {
@@ -49,6 +59,7 @@ export class defaultData implements OnApplicationBootstrap {
     await this.seedDictionary();
     await this.seedEmails();
     await this.seedNotice();
+    await this.seedSchedules();
   }
 
   /** 用户数据信息 */
@@ -672,6 +683,41 @@ export class defaultData implements OnApplicationBootstrap {
 
       const notice = this.noticeRepository.create(noticeData);
       await this.noticeRepository.save(notice);
+    }
+  }
+
+  /** 定时任务 */
+  private async seedSchedules() {
+    const count = await this.scheduleRepository.count();
+    if (count === 0) {
+      const scheduleData = [
+        {
+          platform: 'admin',
+          name: '清理日志任务',
+          description: '定期清理系统日志数据',
+          cronExpression: '0 0 3 * *',
+          jobName: 'deleteLogs',
+          status: 1,
+          timeout: 300,
+          retryCount: 3,
+          retryInterval: 60,
+        },
+      ];
+
+      const schedules = scheduleData.map((item) => this.scheduleRepository.create(item));
+      const savedSchedules = await this.scheduleRepository.save(schedules);
+
+      const scheduleLogData = [
+        {
+          scheduleId: savedSchedules[0].id,
+          executionTime: new Date(),
+          executionStatus: 'success',
+          duration: 100,
+        },
+      ];
+
+      const scheduleLog = this.scheduleLogRepository.create(scheduleLogData);
+      await this.scheduleLogRepository.save(scheduleLog);
     }
   }
 }

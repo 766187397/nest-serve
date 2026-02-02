@@ -109,7 +109,7 @@ export class ScheduleController {
   @Post(':id/execute')
   @ApiOperation({ summary: '手动执行定时任务' })
   @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '手动执行定时任务成功' })
-  executeManually(@Headers('x-platform') platform: string, @Param('id') id: string) {
+  executeManually(@Headers('x-platform') platform: string = 'admin', @Param('id') id: string) {
     return this.scheduleService.executeManually(id, platform);
   }
 }

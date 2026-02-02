@@ -6,6 +6,7 @@ import * as dayjs from 'dayjs';
 import { CronJob } from 'cron';
 import { Schedule } from './entities/schedule.entity';
 import { ScheduleLog } from './entities/schedule-log.entity';
+import { Log } from '@/module/logger/entities/logger.entity';
 import {
   CreateScheduleDto,
   UpdateScheduleDto,
@@ -467,7 +468,7 @@ export class ScheduleService {
    * 删除旧日志
    */
   private async deleteOldLogs(): Promise<void> {
-    const logRepository = this.scheduleRepository.manager.getRepository('Log');
+    const logRepository = this.scheduleRepository.manager.getRepository(Log);
     await logRepository.delete({
       createdAt: LessThan(dayjs().subtract(30, 'day').toDate()),
     });
