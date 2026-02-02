@@ -25,6 +25,8 @@ export class ScheduleService {
     private scheduleRepository: Repository<Schedule>,
     @InjectRepository(ScheduleLog)
     private scheduleLogRepository: Repository<ScheduleLog>,
+    @InjectRepository(Log, 'logger')
+    private logRepository: Repository<Log>,
     @Inject(SchedulerRegistry)
     private schedulerRegistry: SchedulerRegistry
   ) {}
@@ -468,8 +470,7 @@ export class ScheduleService {
    * 删除旧日志
    */
   private async deleteOldLogs(): Promise<void> {
-    const logRepository = this.scheduleRepository.manager.getRepository(Log);
-    await logRepository.delete({
+    await this.logRepository.delete({
       createdAt: LessThan(dayjs().subtract(30, 'day').toDate()),
     });
   }
