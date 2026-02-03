@@ -21,6 +21,9 @@ import * as cookieParser from 'cookie-parser';
 import { LoggerService } from './module/logger/logger.service';
 import { LoggerInterceptor } from './module/logger/logger.interceptor';
 import { ApiResultInterceptor } from './common/interceptor/api-result.interceptor';
+import { PerformanceMonitorInterceptor } from './common/interceptor/performance-monitor.interceptor';
+import { PrometheusService } from './module/performance-monitor/prometheus.service';
+import { TraceService } from './module/performance-monitor/trace.service';
 import { GlobalExceptionFilter } from './common/filter/global-exception.filter';
 import { RouteNotFoundFilter } from './common/filter/route-not-found.filter';
 import { ConfigService } from '@nestjs/config';
@@ -68,6 +71,8 @@ async function bootstrap() {
 
   const loggerService = app.get(LoggerService); // 从 DI 容器中获取 LoggerService
   const configService = app.get(ConfigService); // 从 DI 容器中获取 ConfigService
+  const prometheusService = app.get(PrometheusService); // 从 DI 容器中获取 PrometheusService
+  const traceService = app.get(TraceService); // 从 DI 容器中获取 TraceService
   // 全局过滤器
   app.useGlobalFilters(
     // 全局的异常过滤器
@@ -80,6 +85,8 @@ async function bootstrap() {
   app.useGlobalInterceptors(
     // 使用 ClassSerializerInterceptor
     new ClassSerializerInterceptor(app.get(Reflector)),
+    // 性能监控拦截器
+    new PerformanceMonitorInterceptor(prometheusService, traceService),
     // 返回格式处理拦截器
     new ApiResultInterceptor(),
     // 自定义日志拦截器
