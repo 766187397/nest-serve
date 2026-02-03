@@ -298,7 +298,7 @@ export class ScheduleService {
         return ApiResult.error<null>('定时任务不存在');
       }
 
-      this.executeJob(schedule);
+      await this.executeJob(schedule);
       return ApiResult.success<null>();
     } catch (error) {
       return ApiResult.error<null>((error as Error)?.message || '定时任务执行失败');
@@ -494,13 +494,16 @@ export class ScheduleService {
       const files = fs.readdirSync(logsDir);
       for (const file of files) {
         if (file.startsWith('application-') && file.endsWith('.log')) {
-          const filePath = path.join(logsDir, file);
-          const stats = fs.statSync(filePath);
-          const fileDate = dayjs(stats.mtime);
-          
-          if (fileDate.isBefore(retentionDate)) {
-            console.log(`删除文件: ${file} (修改时间: ${fileDate.format('YYYY-MM-DD HH:mm:ss')})`);
-            fs.unlinkSync(filePath);
+          const match = file.match(/application-(\d{4}-\d{2}-\d{2})\.log/);
+          if (match) {
+            const fileDateStr = match[1];
+            const fileDate = dayjs(fileDateStr);
+            
+            if (fileDate.isBefore(retentionDate)) {
+              const filePath = path.join(logsDir, file);
+              console.log(`删除文件: ${file} (文件日期: ${fileDate.format('YYYY-MM-DD')})`);
+              fs.unlinkSync(filePath);
+            }
           }
         }
       }
