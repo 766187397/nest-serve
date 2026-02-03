@@ -89,8 +89,8 @@ export class AuthController {
 
   @Post('logout')
   @ApiOperation({ summary: '退出登录清除Cookie' })
-  @HttpCode(204)
-  logout(@Res({ passthrough: true }) res: Response) {
+  @ApiOkResponse({ description: '退出登录成功' })
+  async logout(@Res({ passthrough: true }) res: Response) {
     return this.authService.logout(res);
   }
 }

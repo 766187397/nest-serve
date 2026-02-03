@@ -370,8 +370,12 @@ export class AuthService {
    * 退出登录清除Cookie
    * @param {Response} res 响应对象
    */
-  async logout(res: Response): Promise<void> {
+  async logout(res: Response): Promise<ApiResult<null>> {
     res.cookie('token', '', { expires: new Date(0) });
     res.cookie('refresh_token', '', { expires: new Date(0) });
+    return ApiResult.success<null>({
+      data: null,
+      message: '退出登录成功',
+    });
   }
 }

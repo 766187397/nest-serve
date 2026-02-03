@@ -11,6 +11,7 @@ export interface LoggerConfig {
   filePath: string;
   maxFileSize: number;
   maxFiles: number;
+  retentionDays: number;
 }
 
 export const getLoggerConfig = (configService: ConfigService): LoggerConfig => {
@@ -29,5 +30,6 @@ export const getLoggerConfig = (configService: ConfigService): LoggerConfig => {
     filePath: configService.get<string>('LOG_FILE_PATH') || './logs',
     maxFileSize: configService.get<number>('LOG_MAX_FILE_SIZE') || 20 * 1024 * 1024,
     maxFiles: configService.get<number>('LOG_MAX_FILES') || 14,
+    retentionDays: configService.get<number>('LOG_RETENTION_DAYS') || 30,
   };
 };

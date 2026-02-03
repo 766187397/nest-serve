@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
 import { Repository, LessThan } from 'typeorm';
 import * as dayjs from 'dayjs';
 import { CronJob } from 'cron';
@@ -17,9 +18,14 @@ import { ApiResult } from '@/common/utils/result';
 import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 import { PageApiResult } from '@/types/public';
 import { handlePlatformQuery } from '@/common/utils/query.util';
+import * as fs from 'fs';
+import * as path from 'path';
+import { getLoggerConfig, LoggerConfig } from '@/config/logger';
 
 @Injectable()
 export class ScheduleService {
+  private loggerConfig: LoggerConfig;
+
   constructor(
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
@@ -28,8 +34,12 @@ export class ScheduleService {
     @InjectRepository(Log, 'logger')
     private logRepository: Repository<Log>,
     @Inject(SchedulerRegistry)
-    private schedulerRegistry: SchedulerRegistry
-  ) {}
+    private schedulerRegistry: SchedulerRegistry,
+    private configService: ConfigService
+  ) {
+    this.loggerConfig = getLoggerConfig(this.configService);
+    console.log('ScheduleService 初始化，日志保留天数配置:', this.loggerConfig.retentionDays);
+  }
 
   /**
    * 创建定时任务
@@ -470,9 +480,33 @@ export class ScheduleService {
    * 删除旧日志
    */
   private async deleteOldLogs(): Promise<void> {
+    const retentionDays = this.loggerConfig.retentionDays;
+    console.log('日志保留天数配置:', retentionDays);
     await this.logRepository.delete({
-      createdAt: LessThan(dayjs().subtract(30, 'day').toDate()),
+      createdAt: LessThan(dayjs().subtract(retentionDays, 'day').toDate()),
     });
+
+    const logsDir = path.join(process.cwd(), 'logs');
+    const retentionDate = dayjs().subtract(retentionDays, 'day');
+    console.log('删除日期阈值:', retentionDate.format('YYYY-MM-DD HH:mm:ss'));
+    
+    try {
+      const files = fs.readdirSync(logsDir);
+      for (const file of files) {
+        if (file.startsWith('application-') && file.endsWith('.log')) {
+          const filePath = path.join(logsDir, file);
+          const stats = fs.statSync(filePath);
+          const fileDate = dayjs(stats.mtime);
+          
+          if (fileDate.isBefore(retentionDate)) {
+            console.log(`删除文件: ${file} (修改时间: ${fileDate.format('YYYY-MM-DD HH:mm:ss')})`);
+            fs.unlinkSync(filePath);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('删除日志文件失败:', error);
+    }
   }
 
   /**

@@ -21,6 +21,7 @@ export class JWTWhiteList {
     '/api/v1/auth/verification-code-login', // 邮箱验证码登录接口
     '/api/v1/auth/simple-login', // 简化登录接口（仅账号密码）
     '/api/v1/auth/refresh-token', // 刷新token
+    '/api/v1/auth/logout', // 退出登录接口
     '/api/v1/upload/file', // 文件上传接口
   ];
 }
