@@ -52,7 +52,7 @@ export class PerformanceMonitorController {
     });
   }
 
-  @Get('metrics/reset')
+  @Post('metrics/reset')
   @ApiOperation({ summary: '重置所有指标' })
   @ApiResponse({ status: 200, description: '指标已重置' })
   async resetMetrics() {
