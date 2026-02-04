@@ -520,6 +520,125 @@ export class defaultData implements OnApplicationBootstrap {
         },
       ]);
       await this.routeRepository.save(emailPageData);
+
+      // 高并发控制
+      const concurrencyControlData = this.routeRepository.create({
+        platform: 'admin',
+        type: 'menu',
+        name: 'concurrency-control',
+        title: '高并发控制',
+        path: '/system/concurrency-control',
+        component: 'system/concurrency-control/Index',
+        icon: 'Coin',
+        externalLinks: false,
+        redirect: '',
+        meta: '',
+        parent: adminSystem,
+        sort: 10,
+      });
+      await this.routeRepository.save(concurrencyControlData);
+
+      // 配置管理
+      const configManagementData = this.routeRepository.create({
+        platform: 'admin',
+        type: 'menu',
+        name: 'config-management',
+        title: '配置管理',
+        path: '/system/config-management',
+        component: 'system/config-management/Index',
+        icon: 'Setting',
+        externalLinks: false,
+        redirect: '',
+        meta: '',
+        parent: adminSystem,
+        sort: 11,
+      });
+      await this.routeRepository.save(configManagementData);
+
+      // 数据库优化
+      const databaseOptimizationData = this.routeRepository.create({
+        platform: 'admin',
+        type: 'menu',
+        name: 'database-optimization',
+        title: '数据库优化',
+        path: '/system/database-optimization',
+        component: 'system/database-optimization/Index',
+        icon: 'MessageBox',
+        externalLinks: false,
+        redirect: '',
+        meta: '',
+        parent: adminSystem,
+        sort: 12,
+      });
+      await this.routeRepository.save(databaseOptimizationData);
+
+      // 事件驱动
+      const eventDrivenData = this.routeRepository.create({
+        platform: 'admin',
+        type: 'menu',
+        name: 'event-driven',
+        title: '事件驱动',
+        path: '/system/event-driven',
+        component: 'system/event-driven/Index',
+        icon: 'Odometer',
+        externalLinks: false,
+        redirect: '',
+        meta: '',
+        parent: adminSystem,
+        sort: 13,
+      });
+      await this.routeRepository.save(eventDrivenData);
+
+      // 系统健康
+      const healthData = this.routeRepository.create({
+        platform: 'admin',
+        type: 'menu',
+        name: 'health',
+        title: '系统健康',
+        path: '/system/health',
+        component: 'system/health/Index',
+        icon: 'Timer',
+        externalLinks: false,
+        redirect: '',
+        meta: '',
+        parent: adminSystem,
+        sort: 14,
+      });
+      await this.routeRepository.save(healthData);
+
+      // 性能监控
+      const performanceMonitorData = this.routeRepository.create({
+        platform: 'admin',
+        type: 'menu',
+        name: 'performance-monitor',
+        title: '性能监控',
+        path: '/system/performance-monitor',
+        component: 'system/performance-monitor/Index',
+        icon: 'DataAnalysis',
+        externalLinks: false,
+        redirect: '',
+        meta: '',
+        parent: adminSystem,
+        sort: 16,
+      });
+      await this.routeRepository.save(performanceMonitorData);
+
+      // 定时任务
+      const scheduleData = this.routeRepository.create({
+        platform: 'admin',
+        type: 'menu',
+        name: 'schedule',
+        title: '定时任务',
+        path: '/system/schedule',
+        component: 'system/schedule/Index',
+        icon: 'Clock',
+        externalLinks: false,
+        redirect: '',
+        meta: '',
+        parent: adminSystem,
+        sort: 18,
+      });
+      await this.routeRepository.save(scheduleData);
       //#endregion
 
       //#region web路由数据

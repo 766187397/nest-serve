@@ -52,12 +52,6 @@ export class LogResponseDto {
   updatedAt: Date | string;
 }
 
-/** 日志信息响应包装 DTO */
-export class LogResponseWrapperDto extends ApiResultWrapperDto<LogResponseDto> {
-  @ApiProperty({ description: '响应数据', type: LogResponseDto })
-  declare data: LogResponseDto;
-}
-
 /** 日志列表响应包装 DTO */
 export class LogListResponseWrapperDto extends ApiResultWrapperDto<LogResponseDto[]> {
   @ApiProperty({ description: '响应数据', type: [LogResponseDto] })
