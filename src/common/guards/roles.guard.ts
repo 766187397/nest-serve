@@ -7,7 +7,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Role } from '@/module/roles/entities/role.entity';
+import { Role } from '@/modules/roles/entities/role.entity';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

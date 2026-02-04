@@ -1,9 +1,9 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { SlowQueryMonitorService } from '@/module/database-optimization/slow-query-monitor.service';
-import { QueryCacheService } from '@/module/database-optimization/query-cache.service';
-import { ReadWriteSplitService } from '@/module/database-optimization/read-write-split.service';
+import { SlowQueryMonitorService } from '@/modules/database-optimization/slow-query-monitor.service';
+import { QueryCacheService } from '@/modules/database-optimization/query-cache.service';
+import { ReadWriteSplitService } from '@/modules/database-optimization/read-write-split.service';
 import { Repository, ObjectLiteral } from 'typeorm';
 
 @Injectable()

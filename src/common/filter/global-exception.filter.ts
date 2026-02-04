@@ -1,5 +1,5 @@
 // src/filters/global-exception.filter.ts
-import { LoggerService } from '@/module/logger/logger.service';
+import { LoggerService } from '@/modules/logger/logger.service';
 import {
   ExceptionFilter,
   Catch,

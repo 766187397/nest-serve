@@ -1,4 +1,4 @@
-import type { User } from '@/module/users/entities/user.entity';
+import type { User } from '@/modules/users/entities/user.entity';
 
 /**
  * JWT 载荷类型

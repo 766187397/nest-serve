@@ -1,9 +1,9 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
-import { CircuitBreakerService } from '@/module/concurrency-control/circuit-breaker.service';
-import { ServiceDegradationService } from '@/module/concurrency-control/service-degradation.service';
-import { DistributedLockService } from '@/module/concurrency-control/distributed-lock.service';
+import { CircuitBreakerService } from '@/modules/concurrency-control/circuit-breaker.service';
+import { ServiceDegradationService } from '@/modules/concurrency-control/service-degradation.service';
+import { DistributedLockService } from '@/modules/concurrency-control/distributed-lock.service';
 import { CIRCUIT_BREAKER_KEY, CIRCUIT_BREAKER_FALLBACK_KEY } from '../decorators/circuit-breaker.decorator';
 import { SERVICE_DEGRADATION_KEY } from '../decorators/service-degradation.decorator';
 import { DISTRIBUTED_LOCK_KEY } from '../decorators/distributed-lock.decorator';

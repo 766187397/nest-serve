@@ -1,4 +1,4 @@
-import { Route } from '@/module/routes/entities/route.entity';
+import { Route } from '@/modules/routes/entities/route.entity';
 
 export interface RoleRoutes {
   path: string;

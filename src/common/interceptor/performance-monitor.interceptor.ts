@@ -1,8 +1,8 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { PrometheusService } from '@/module/performance-monitor/prometheus.service';
-import { TraceService } from '@/module/performance-monitor/trace.service';
+import { PrometheusService } from '@/modules/performance-monitor/prometheus.service';
+import { TraceService } from '@/modules/performance-monitor/trace.service';
 
 @Injectable()
 export class PerformanceMonitorInterceptor implements NestInterceptor {

@@ -1,0 +1,216 @@
+import { Injectable } from '@nestjs/common';
+import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from './dto';
+import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
+import { Role } from './entities/role.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Brackets, ILike, In, Not, Repository, UpdateResult } from 'typeorm';
+import { ApiResult } from '@/common/utils/result';
+import { PageApiResult } from '@/types/public';
+import { Route } from '@/modules/routes/entities/route.entity';
+import { handlePlatformQuery } from '@/common/utils/query.util';
+
+@Injectable()
+export class RolesService {
+  constructor(
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
+
+    @InjectRepository(Route)
+    private routeRepository: Repository<Route>
+  ) {}
+  /**
+   * 创建角色
+   * @param {CreateRoleDto} createRoleDto 角色信息
+   * @param {string} platform 平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<Role | null>>} 统一返回结果
+   */
+  async create(
+    createRoleDto: CreateRoleDto,
+    platform: string = 'admin'
+  ): Promise<ApiResult<Role | null>> {
+    try {
+      const { name, roleKey } = createRoleDto;
+      // 构建查询条件
+      const queryBuilder = this.roleRepository.createQueryBuilder('role');
+      // 处理平台查询条件
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      queryBuilder.andWhere('role.platform = :platform', { platform: finalPlatform });
+      if (name || roleKey) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            if (name) qb.where('role.name = :name', { name });
+            if (roleKey) qb.orWhere('role.roleKey = :roleKey', { roleKey });
+          })
+        );
+      }
+      // 执行查询
+      const existingRole = await queryBuilder.getOne();
+      // 如果查询结果存在，返回错误
+      if (existingRole) {
+        return ApiResult.error<null>('角色名称或角色标识已存在');
+      }
+      const role = this.roleRepository.create(createRoleDto);
+      role.platform = platform; // 指定平台
+
+      const data = await this.roleRepository.save(role); // 保存到数据库并返回
+      return ApiResult.success<Role>({ data });
+    } catch (error) {
+      const errorMessage = typeof error === 'string' ? error : JSON.stringify(error);
+      return ApiResult.error<null>(errorMessage || '创建角色失败，请稍后重试');
+    }
+  }
+
+  /**
+   * 分页查询
+   * @param {FindRoleDtoByPage} findRoleDtoByPage 查询条件
+   * @param {string} platform 平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<PageApiResult<Role[]> | null>>} 统一返回结果
+   */
+  async findByPage(
+    findRoleDtoByPage: FindRoleDtoByPage,
+    platform: string = 'admin'
+  ): Promise<ApiResult<PageApiResult<Role[]> | null>> {
+    try {
+      const { take, skip } = buildCommonPaging(
+        findRoleDtoByPage?.page,
+        findRoleDtoByPage?.pageSize
+      );
+      const where = buildCommonQuery(findRoleDtoByPage);
+      const order = buildCommonSort(findRoleDtoByPage?.sort);
+      // 查询符合条件的用户
+      const [data, total] = await this.roleRepository.findAndCount({
+        where: {
+          ...where,
+          platform: handlePlatformQuery(platform, findRoleDtoByPage?.platform),
+          name: findRoleDtoByPage?.name ? ILike(`%${findRoleDtoByPage.name}%`) : undefined,
+          roleKey: findRoleDtoByPage?.roleKey,
+        },
+        order: {
+          ...order,
+        },
+        skip, // 跳过的条数
+        take, // 每页条数
+      });
+
+      // 计算总页数
+      const totalPages = Math.ceil(total / take);
+      return ApiResult.success<PageApiResult<Role[]>>({
+        data: {
+          data,
+          total,
+          totalPages,
+          page: findRoleDtoByPage?.page || 1,
+          pageSize: findRoleDtoByPage?.pageSize || 10,
+        },
+      });
+    } catch (error) {
+      return ApiResult.error<null>(error || '查询角色失败，请稍后重试');
+    }
+  }
+
+  /**
+   * 查询所有角色
+   * @param {FindRoleDto} findRoleDto 查询条件
+   * @param {string} platform 平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<Role[] | null>>} 统一返回结果
+   */
+  async findAll(
+    findRoleDto: FindRoleDto,
+    platform: string = 'admin'
+  ): Promise<ApiResult<Role[] | null>> {
+    try {
+      const where = buildCommonQuery(findRoleDto);
+      const order = buildCommonSort(findRoleDto?.sort);
+      const data = await this.roleRepository.find({
+        where: {
+          ...where,
+          platform: handlePlatformQuery(platform, findRoleDto?.platform),
+          name: findRoleDto?.name ? ILike(`%${findRoleDto.name}%`) : undefined,
+          roleKey: findRoleDto?.roleKey,
+        },
+        order: {
+          ...order,
+        },
+      }); // 查询所有用户并返回;
+      return ApiResult.success<Role[]>({ data });
+    } catch (error) {
+      return ApiResult.error<null>(error || '查询角色失败，请稍后重试');
+    }
+  }
+
+  /**
+   * 通过id查询角色
+   * @param {string} id 角色ID
+   * @param {string} platform 平台(admin/web/app/mini)
+   * @returns {Promise<ApiResult<Role | null>>} 统一返回结果
+   */
+  async findOne(id: string, platform: string = 'admin'): Promise<ApiResult<Role | null>> {
+    try {
+      const data = await this.roleRepository.findOne({
+        where: { id, platform: handlePlatformQuery(platform, undefined) },
+        relations: ['routes'],
+      });
+      if (!data) {
+        return ApiResult.error<null>('角色不存在');
+      }
+      return ApiResult.success<Role>({ data });
+    } catch (error) {
+      return ApiResult.error<null>(error || '查询角色失败，请稍后重试');
+    }
+  }
+
+  /**
+   * 更新角色
+   * @param {string} id 角色ID
+   * @param {UpdateRoleDto} updateRoleDto 更新角色信息
+   * @param {string} platform 请求头中的平台标识
+   * @returns {Promise<ApiResult<null>>} 统一返回结果
+   */
+  async update(id: string, updateRoleDto: UpdateRoleDto, platform?: string): Promise<ApiResult<null>> {
+    try {
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const role = await this.roleRepository.findOne({ where: { id, platform: finalPlatform } });
+      if (!role) {
+        return ApiResult.error('角色不存在');
+      }
+
+      const exist = await this.roleRepository.find({
+        where: [
+          { id: Not(id), name: role.name, platform: finalPlatform },
+          { id: Not(id), roleKey: role.roleKey, platform: finalPlatform },
+        ],
+      });
+      if (exist && exist.length > 0) {
+        return ApiResult.error('角色名称或角色标识已存在');
+      }
+
+      // role = { ...role, ...updateRoleDto };
+      Object.assign(role, updateRoleDto);
+      if (updateRoleDto.routeIds) {
+        role.routes = await this.routeRepository.find({
+          where: { id: In(updateRoleDto.routeIds) },
+        });
+      }
+      await this.roleRepository.save(role);
+      return ApiResult.success<null>();
+    } catch (error) {
+      return ApiResult.error<null>(error || '角色更新失败，请稍后再试');
+    }
+  }
+
+  /**
+   * 删除角色
+   * @param {string} id 角色ID
+   * @param {string} platform 请求头中的平台标识
+   * @returns {Promise<ApiResult<UpdateResult | null>>} 统一返回结果
+   */
+  async remove(id: string, platform?: string): Promise<ApiResult<UpdateResult | null>> {
+    try {
+      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const data = await this.roleRepository.softDelete({ id, platform: finalPlatform });
+      return ApiResult.success<UpdateResult>({ data });
+    } catch (error) {
+      return ApiResult.error<null>(error || '角色删除失败，请稍后再试');
+    }
+  }
+}

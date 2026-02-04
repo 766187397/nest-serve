@@ -150,6 +150,64 @@ src/
 - `*.entity.ts` - 数据库实体
 - `*.spec.ts` - 测试文件
 
+### 功能模块组织
+**强制要求**：所有业务功能模块的源代码必须统一放在 `src/modules` 目录下，严禁在其他位置创建功能模块。
+
+#### 模块定义
+以下内容必须作为独立模块放在 `src/modules` 目录下：
+- 业务功能模块（如：用户管理、订单管理、商品管理等）
+- 包含Controller的业务功能
+- 包含Service的业务逻辑
+- 包含Entity的数据模型
+- 包含DTO的数据传输对象
+
+#### 目录结构规范
+```
+src/modules/
+├── user/                    # 用户模块
+│   ├── user.modules.ts
+│   ├── user.controller.ts
+│   ├── user.service.ts
+│   ├── user.entity.ts
+│   └── dto/
+│       ├── request.dto.ts
+│       ├── response.dto.ts
+│       └── index.ts
+├── order/                   # 订单模块
+│   └── ...
+└── product/                 # 商品模块
+    └── ...
+```
+
+#### 创建新功能时的检查清单
+在创建任何新功能前，必须按以下步骤检查：
+1. **第一步**：确认是否为业务功能模块（是→继续，否→考虑放入src/common或src/utils）
+2. **第二步**：在 `src/modules` 目录下创建对应的模块文件夹
+3. **第三步**：按照目录结构规范创建必要的文件（modules、controller、service、entity、dto）
+4. **第四步**：将模块注册到 `app.modules.ts` 或对应的父模块中
+
+#### 禁止行为
+- ❌ 禁止在 `src` 根目录直接创建业务模块文件
+- ❌ 禁止在 `src/common` 中创建业务功能模块
+- ❌ 禁止在 `src/config` 中创建业务功能模块
+- ❌ 禁止在 `src/utils` 中创建业务功能模块
+- ❌ 禁止在项目根目录创建业务模块文件夹
+
+### DTO文件组织
+
+#### 目录结构
+```
+src/modules/{模块名}/dto/
+├── request.dto.ts    # 请求DTO
+├── response.dto.ts   # 响应DTO
+└── index.ts          # 统一导出
+```
+
+#### 命名规范
+- 请求DTO：动词+名词+Dto（CreateUserDto、UpdateUserDto、QueryUserDto、DeleteUserDto、LoginUserDto）
+- 响应DTO：实体名+场景+Response+Dto（UserResponseDto、UserListResponseDto、UserPageResponseDto、UserStatResponseDto）
+- 统一要求：PascalCase、以Dto结尾、避免缩写、实体名与数据库一致
+
 ### 部署与运维
 
 #### 环境配置
