@@ -1,5 +1,7 @@
 import { UUIDBaseEntity } from '@/common/entities/base';
 import { Column, Entity, Index } from 'typeorm';
+import { Transform } from 'class-transformer';
+import * as dayjs from 'dayjs';
 
 @Entity('schedule_log', { comment: '定时任务执行日志表' })
 @Index('IDX_schedule_log_id_deletedAt', ['id', 'deletedAt'])
@@ -8,6 +10,7 @@ export class ScheduleLog extends UUIDBaseEntity {
   scheduleId: string;
 
   @Column({ type: 'timestamp', comment: '执行时间' })
+  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
   executionTime: Date;
 
   @Column({ type: 'varchar', length: 20, comment: '执行状态（success/failed）' })

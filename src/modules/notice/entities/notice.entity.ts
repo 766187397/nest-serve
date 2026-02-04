@@ -1,5 +1,7 @@
 import { UUIDBaseEntity } from '@/common/entities/base';
 import { Column, Entity, Index } from 'typeorm';
+import { Transform } from 'class-transformer';
+import * as dayjs from 'dayjs';
 
 @Entity('notice', { comment: '通知表' })
 // 复合索引 优化同时查询id和deletedAt的情况
@@ -18,6 +20,7 @@ export class Notice extends UUIDBaseEntity {
   content?: string;
 
   @Column({ type: 'date', comment: '指定时间', nullable: true })
+  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
   specifyTime?: Date;
 
   @Column({ type: 'text', comment: '标记已读用户id', nullable: true })

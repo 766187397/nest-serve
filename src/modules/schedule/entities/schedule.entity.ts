@@ -1,5 +1,7 @@
 import { UUIDBaseEntity } from '@/common/entities/base';
 import { Column, Entity, Index } from 'typeorm';
+import { Transform } from 'class-transformer';
+import * as dayjs from 'dayjs';
 
 @Entity('schedule', { comment: '定时任务表' })
 @Index('IDX_schedule_id_deletedAt', ['id', 'deletedAt'])
@@ -17,9 +19,11 @@ export class Schedule extends UUIDBaseEntity {
   jobName: string;
 
   @Column({ type: 'timestamp', nullable: true, comment: '上次执行时间' })
+  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
   lastExecutionTime: Date;
 
   @Column({ type: 'timestamp', nullable: true, comment: '下次执行时间' })
+  @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
   nextExecutionTime: Date;
 
   @Column({ type: 'int', default: 300, comment: '任务执行超时时间（秒）' })
