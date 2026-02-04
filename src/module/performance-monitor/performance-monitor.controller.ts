@@ -18,6 +18,7 @@ import {
   PerformanceStatusResponseDto,
 } from './dto';
 import { PageByParameter } from '@/common/dto/base';
+import { PageApiResult } from '@/types/public';
 import { ApiResult } from '@/common/utils/result';
 
 @ApiTags('性能监控')
@@ -69,9 +70,21 @@ export class PerformanceMonitorController {
   async getActiveTraces(@Query() query: GetTracesQueryDtoByPage) {
     const page = parseInt(query.page || '1', 10);
     const pageSize = parseInt(query.pageSize || '20', 10);
-    const traces = this.traceService.getActiveSpans(page, pageSize);
-    return ApiResult.success({
-      data: traces,
+    const allTraces = this.traceService.getActiveSpans();
+    const total = allTraces.length;
+    const totalPages = Math.ceil(total / pageSize);
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const traces = allTraces.slice(startIndex, endIndex);
+
+    return ApiResult.success<PageApiResult<SpanResponseDto[]>>({
+      data: {
+        data: traces,
+        total,
+        totalPages,
+        page,
+        pageSize,
+      },
     });
   }
 
@@ -107,12 +120,20 @@ export class PerformanceMonitorController {
 
     const page = parseInt(query.page || '1', 10);
     const pageSize = parseInt(query.pageSize || '20', 10);
+    const total = traces.length;
+    const totalPages = Math.ceil(total / pageSize);
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     const paginatedTraces = traces.slice(startIndex, endIndex);
 
-    return ApiResult.success({
-      data: paginatedTraces,
+    return ApiResult.success<PageApiResult<SpanResponseDto[]>>({
+      data: {
+        data: paginatedTraces,
+        total,
+        totalPages,
+        page,
+        pageSize,
+      },
     });
   }
 

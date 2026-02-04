@@ -190,11 +190,8 @@ export class TraceService implements OnModuleInit {
     }
   }
 
-  getActiveSpans(page: number = 1, pageSize: number = 20): Span[] {
-    const spans = Array.from(this.activeSpans.values());
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return spans.slice(startIndex, endIndex);
+  getActiveSpans(): Span[] {
+    return Array.from(this.activeSpans.values());
   }
 
   getCompletedSpans(): Span[] {

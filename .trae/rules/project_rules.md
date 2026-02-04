@@ -31,13 +31,13 @@
 禁止使用阻塞终端等待用户输入的命令，所有命令必须能自动执行完成。
 
 ## 5. 代码开发规范
-开发前先检查 `src/common` 和 `src/config` 是否有可复用函数，优先使用现有资源避免重复开发。
+开发前先检查 `src/common` 和 `src/config` 是否有可复用函数或根实例（DTO、Entity、Service等），优先使用现有资源避免重复开发。
 
 ## 6. 功能模块组织
-**强制要求**：所有业务功能模块的源代码必须统一放在 `src/module` 目录下，严禁在其他位置创建功能模块。
+**强制要求**：所有业务功能模块的源代码必须统一放在 `src/modules` 目录下，严禁在其他位置创建功能模块。
 
 ### 6.1 模块定义
-以下内容必须作为独立模块放在 `src/module` 目录下：
+以下内容必须作为独立模块放在 `src/modules` 目录下：
 - 业务功能模块（如：用户管理、订单管理、商品管理等）
 - 包含Controller的业务功能
 - 包含Service的业务逻辑
@@ -46,9 +46,9 @@
 
 ### 6.2 目录结构规范
 ```
-src/module/
+src/modules/
 ├── user/                    # 用户模块
-│   ├── user.module.ts
+│   ├── user.modules.ts
 │   ├── user.controller.ts
 │   ├── user.service.ts
 │   ├── user.entity.ts
@@ -65,9 +65,9 @@ src/module/
 ### 6.3 创建新功能时的检查清单
 在创建任何新功能前，必须按以下步骤检查：
 1. **第一步**：确认是否为业务功能模块（是→继续，否→考虑放入src/common或src/utils）
-2. **第二步**：在 `src/module` 目录下创建对应的模块文件夹
-3. **第三步**：按照目录结构规范创建必要的文件（module、controller、service、entity、dto）
-4. **第四步**：将模块注册到 `app.module.ts` 或对应的父模块中
+2. **第二步**：在 `src/modules` 目录下创建对应的模块文件夹
+3. **第三步**：按照目录结构规范创建必要的文件（modules、controller、service、entity、dto）
+4. **第四步**：将模块注册到 `app.modules.ts` 或对应的父模块中
 
 ### 6.4 禁止行为
 - ❌ 禁止在 `src` 根目录直接创建业务模块文件
@@ -85,7 +85,7 @@ src/module/
 
 ### 8.1 目录结构
 ```
-src/module/{模块名}/dto/
+src/modules/{模块名}/dto/
 ├── request.dto.ts    # 请求DTO
 ├── response.dto.ts   # 响应DTO
 └── index.ts          # 统一导出
