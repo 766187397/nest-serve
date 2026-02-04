@@ -42,14 +42,4 @@ export class FindRoleDto extends FindByParameter {
 }
 
 /** 分页查询角色信息请求DTO */
-export class FindRoleDtoByPage extends PartialType(IntersectionType(FindRoleDto, PageByParameter)) {
-  @ApiProperty({ name: 'page', type: Number, required: false, description: '页码', default: 1 })
-  @IsOptional()
-  @IsString({ message: '页码必须是字符串' })
-  page?: string;
-
-  @ApiProperty({ name: 'pageSize', type: Number, required: false, description: '每页数量', default: 10 })
-  @IsOptional()
-  @IsString({ message: '每页数量必须是字符串' })
-  pageSize?: string;
-}
+export class FindRoleDtoByPage extends PartialType(IntersectionType(FindRoleDto, PageByParameter)) {}

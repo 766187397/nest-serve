@@ -6,6 +6,7 @@ import { AlertService } from './alert.service';
 import {
   GetMetricsQueryDto,
   GetTracesQueryDto,
+  GetTracesQueryDtoByPage,
   GetAlertsQueryDto,
   ResolveAlertDto,
   CreateAlertRuleDto,
@@ -65,7 +66,7 @@ export class PerformanceMonitorController {
   @Get('traces/active')
   @ApiOperation({ summary: '获取活跃的追踪' })
   @ApiResponse({ status: 200, type: [SpanResponseDto] })
-  async getActiveTraces(@Query() query: PageByParameter) {
+  async getActiveTraces(@Query() query: GetTracesQueryDtoByPage) {
     const page = parseInt(query.page || '1', 10);
     const pageSize = parseInt(query.pageSize || '20', 10);
     const traces = this.traceService.getActiveSpans(page, pageSize);
@@ -77,13 +78,7 @@ export class PerformanceMonitorController {
   @Get('traces/completed')
   @ApiOperation({ summary: '获取已完成的追踪' })
   @ApiResponse({ status: 200, type: [SpanResponseDto] })
-  @ApiQuery({ name: 'traceId', required: false, description: '追踪ID' })
-  @ApiQuery({ name: 'operationName', required: false, description: '操作名称' })
-  @ApiQuery({ name: 'startTime', required: false, description: '开始时间' })
-  @ApiQuery({ name: 'endTime', required: false, description: '结束时间' })
-  @ApiQuery({ name: 'minDuration', required: false, description: '最小持续时间(ms)' })
-  @ApiQuery({ name: 'maxDuration', required: false, description: '最大持续时间(ms)' })
-  async getCompletedTraces(@Query() query: GetTracesQueryDto) {
+  async getCompletedTraces(@Query() query: GetTracesQueryDtoByPage) {
     let traces = this.traceService.getCompletedSpans();
 
     if (query.traceId) {
@@ -110,8 +105,14 @@ export class PerformanceMonitorController {
       traces = traces.filter((trace) => trace.duration && trace.duration <= query.maxDuration!);
     }
 
+    const page = parseInt(query.page || '1', 10);
+    const pageSize = parseInt(query.pageSize || '20', 10);
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedTraces = traces.slice(startIndex, endIndex);
+
     return ApiResult.success({
-      data: traces,
+      data: paginatedTraces,
     });
   }
 

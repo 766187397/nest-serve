@@ -1,4 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, IntersectionType, PartialType } from '@nestjs/swagger';
+import { PageByParameter } from '@/common/dto/base';
 
 export class GetMetricsQueryDto {
   @ApiProperty({ description: '指标名称', required: false })
@@ -23,13 +24,9 @@ export class GetTracesQueryDto {
 
   @ApiProperty({ description: '最大持续时间(ms)', required: false })
   maxDuration?: number;
-
-  @ApiProperty({ description: '页码', required: false, default: 1 })
-  page?: number;
-
-  @ApiProperty({ description: '每页数量', required: false, default: 20 })
-  pageSize?: number;
 }
+
+export class GetTracesQueryDtoByPage extends PartialType(IntersectionType(GetTracesQueryDto, PageByParameter)) {}
 
 export class GetAlertsQueryDto {
   @ApiProperty({ description: '告警类型', required: false, enum: ['qps', 'response_time', 'error_rate', 'cpu_usage', 'memory_usage'] })
