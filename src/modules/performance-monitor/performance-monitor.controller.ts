@@ -1,5 +1,5 @@
 import { Controller, Get, Query, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { PrometheusService } from './prometheus.service';
 import { TraceService } from './trace.service';
 import { AlertService } from './alert.service';
@@ -12,11 +12,18 @@ import {
   ResolveAlertDto,
   CreateAlertRuleDto,
   MetricsResponseDto,
+  MetricsResponseWrapperDto,
   TraceContextResponseDto,
+  TraceContextResponseWrapperDto,
   SpanResponseDto,
+  SpanListResponseWrapperDto,
   AlertResponseDto,
+  AlertResponseWrapperDto,
   AlertRuleResponseDto,
+  AlertRuleResponseWrapperDto,
   PerformanceStatusResponseDto,
+  PerformanceStatusResponseWrapperDto,
+  AlertListResponseWrapperDto,
 } from './dto';
 import { PageByParameter } from '@/common/dto/base';
 import { PageApiResult } from '@/types/public';
@@ -33,7 +40,7 @@ export class PerformanceMonitorController {
 
   @Get('metrics')
   @ApiOperation({ summary: '获取Prometheus指标' })
-  @ApiResponse({ status: 200, type: MetricsResponseDto })
+  @ApiOkResponse({ type: () => MetricsResponseWrapperDto, description: '获取Prometheus指标成功' })
   @ApiQuery({ name: 'name', required: false, description: '指标名称' })
   async getMetrics(@Query() query: GetMetricsQueryDto) {
     const metrics = this.prometheusService.getMetrics();
@@ -57,7 +64,7 @@ export class PerformanceMonitorController {
 
   @Get('traces/current')
   @ApiOperation({ summary: '获取当前追踪上下文' })
-  @ApiResponse({ status: 200, type: TraceContextResponseDto })
+  @ApiOkResponse({ type: () => TraceContextResponseWrapperDto, description: '获取当前追踪上下文成功' })
   async getCurrentTrace() {
     const trace = this.traceService.getCurrentTrace();
     return ApiResult.success({
@@ -67,7 +74,7 @@ export class PerformanceMonitorController {
 
   @Get('traces/active')
   @ApiOperation({ summary: '获取活跃的追踪' })
-  @ApiResponse({ status: 200, type: [SpanResponseDto] })
+  @ApiOkResponse({ type: () => SpanListResponseWrapperDto, description: '获取活跃的追踪成功' })
   async getActiveTraces(@Query() query: GetTracesQueryDtoByPage) {
     const page = parseInt(query.page || '1', 10);
     const pageSize = parseInt(query.pageSize || '20', 10);
@@ -91,7 +98,7 @@ export class PerformanceMonitorController {
 
   @Get('traces/completed')
   @ApiOperation({ summary: '获取已完成的追踪' })
-  @ApiResponse({ status: 200, type: [SpanResponseDto] })
+  @ApiOkResponse({ type: () => SpanListResponseWrapperDto, description: '获取已完成的追踪成功' })
   async getCompletedTraces(@Query() query: GetTracesQueryDtoByPage) {
     let traces = this.traceService.getCompletedSpans();
 
@@ -151,7 +158,7 @@ export class PerformanceMonitorController {
 
   @Get('alerts/active')
   @ApiOperation({ summary: '获取活跃的告警' })
-  @ApiResponse({ status: 200, type: [AlertResponseDto] })
+  @ApiOkResponse({ type: () => AlertListResponseWrapperDto, description: '获取活跃的告警成功' })
   async getActiveAlerts(@Query() query: GetAlertsQueryDtoByPage) {
     let alerts = this.alertService.getActiveAlerts();
 
@@ -188,7 +195,7 @@ export class PerformanceMonitorController {
 
   @Get('alerts/history')
   @ApiOperation({ summary: '获取告警历史' })
-  @ApiResponse({ status: 200, type: [AlertResponseDto] })
+  @ApiOkResponse({ type: () => AlertListResponseWrapperDto, description: '获取告警历史成功' })
   async getAlertHistory(@Query() query: GetAlertsQueryDtoByPage) {
     let alerts = this.alertService.getAlertHistory(query.type);
 
@@ -243,7 +250,7 @@ export class PerformanceMonitorController {
 
   @Get('status')
   @ApiOperation({ summary: '获取性能监控状态' })
-  @ApiResponse({ status: 200, type: PerformanceStatusResponseDto })
+  @ApiOkResponse({ type: () => PerformanceStatusResponseWrapperDto, description: '获取性能监控状态成功' })
   async getStatus() {
     const activeTraces = this.traceService.getActiveSpans().length;
     const completedTraces = this.traceService.getCompletedSpans().length;

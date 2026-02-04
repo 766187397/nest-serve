@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiResultWrapperDto } from '@/common/dto/base';
+import { PageApiResult } from '@/types/public';
 
 export class MetricResponseDto {
   @ApiProperty({ description: '指标名称' })
@@ -23,6 +25,12 @@ export class MetricsResponseDto {
 
   @ApiProperty({ description: '指标数量' })
   count: number;
+}
+
+/** Metrics 响应包装 DTO */
+export class MetricsResponseWrapperDto extends ApiResultWrapperDto<MetricsResponseDto> {
+  @ApiProperty({ description: '响应数据', type: MetricsResponseDto })
+  declare data: MetricsResponseDto;
 }
 
 export class TraceContextResponseDto {
@@ -55,6 +63,12 @@ export class TraceContextResponseDto {
 
   @ApiProperty({ description: '日志' })
   logs?: Array<{ timestamp: number; level: string; message: string }>;
+}
+
+/** TraceContext 响应包装 DTO */
+export class TraceContextResponseWrapperDto extends ApiResultWrapperDto<TraceContextResponseDto> {
+  @ApiProperty({ description: '响应数据', type: TraceContextResponseDto })
+  declare data: TraceContextResponseDto;
 }
 
 export class SpanResponseDto {
@@ -112,6 +126,12 @@ export class AlertResponseDto {
   resolved?: boolean;
 }
 
+/** Alert 响应包装 DTO */
+export class AlertResponseWrapperDto extends ApiResultWrapperDto<AlertResponseDto> {
+  @ApiProperty({ description: '响应数据', type: AlertResponseDto })
+  declare data: AlertResponseDto;
+}
+
 export class AlertRuleResponseDto {
   @ApiProperty({ description: '规则名称' })
   name: string;
@@ -135,6 +155,12 @@ export class AlertRuleResponseDto {
   lastTriggered?: number;
 }
 
+/** AlertRule 响应包装 DTO */
+export class AlertRuleResponseWrapperDto extends ApiResultWrapperDto<AlertRuleResponseDto> {
+  @ApiProperty({ description: '响应数据', type: AlertRuleResponseDto })
+  declare data: AlertRuleResponseDto;
+}
+
 export class PerformanceStatusResponseDto {
   @ApiProperty({ description: '活跃的追踪数量' })
   activeTraces: number;
@@ -150,4 +176,22 @@ export class PerformanceStatusResponseDto {
 
   @ApiProperty({ description: '指标数量' })
   metricsCount: number;
+}
+
+/** PerformanceStatus 响应包装 DTO */
+export class PerformanceStatusResponseWrapperDto extends ApiResultWrapperDto<PerformanceStatusResponseDto> {
+  @ApiProperty({ description: '响应数据', type: PerformanceStatusResponseDto })
+  declare data: PerformanceStatusResponseDto;
+}
+
+/** Span 列表响应包装 DTO */
+export class SpanListResponseWrapperDto extends ApiResultWrapperDto<PageApiResult<SpanResponseDto[]>> {
+  @ApiProperty({ description: '响应数据' })
+  declare data: PageApiResult<SpanResponseDto[]>;
+}
+
+/** Alert 列表响应包装 DTO */
+export class AlertListResponseWrapperDto extends ApiResultWrapperDto<PageApiResult<AlertResponseDto[]>> {
+  @ApiProperty({ description: '响应数据' })
+  declare data: PageApiResult<AlertResponseDto[]>;
 }
