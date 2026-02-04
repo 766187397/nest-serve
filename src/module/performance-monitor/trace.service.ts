@@ -1,4 +1,5 @@
-import { Injectable, Logger, Scope } from '@nestjs/common';
+import { Injectable, Logger, Scope, OnModuleInit } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { AsyncLocalStorage } from 'async_hooks';
 import { v4 as uuidv4 } from 'uuid';
 import { getPerformanceMonitorConfig, TraceConfig } from '@/config/performance-monitor';
@@ -29,7 +30,7 @@ export interface Span {
 }
 
 @Injectable({ scope: Scope.DEFAULT })
-export class TraceService {
+export class TraceService implements OnModuleInit {
   private readonly logger = new Logger(TraceService.name);
   private readonly config: TraceConfig;
   private readonly storage = new AsyncLocalStorage<TraceContext>();
@@ -38,6 +39,10 @@ export class TraceService {
 
   constructor() {
     this.config = getPerformanceMonitorConfig(new (require('@nestjs/config').ConfigService)()).trace;
+  }
+
+  onModuleInit(): void {
+    this.logger.log('TraceService initialized');
   }
 
   startTrace(operationName: string, tags?: Record<string, string>): TraceContext {
@@ -185,8 +190,11 @@ export class TraceService {
     }
   }
 
-  getActiveSpans(): Span[] {
-    return Array.from(this.activeSpans.values());
+  getActiveSpans(page: number = 1, pageSize: number = 20): Span[] {
+    const spans = Array.from(this.activeSpans.values());
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return spans.slice(startIndex, endIndex);
   }
 
   getCompletedSpans(): Span[] {
@@ -196,6 +204,25 @@ export class TraceService {
   clearCompletedSpans(): void {
     this.completedSpans.length = 0;
     this.logger.log('Completed spans cleared');
+  }
+
+  cleanupExpiredSpans(maxAge: number = 300000): void {
+    const now = Date.now();
+    const expiredSpans: string[] = [];
+
+    for (const [spanId, span] of this.activeSpans.entries()) {
+      if (now - span.startTime > maxAge) {
+        expiredSpans.push(spanId);
+      }
+    }
+
+    for (const spanId of expiredSpans) {
+      this.activeSpans.delete(spanId);
+    }
+
+    if (expiredSpans.length > 0) {
+      this.logger.log(`Cleaned up ${expiredSpans.length} expired spans`);
+    }
   }
 
   private generateTraceId(): string {
@@ -208,5 +235,10 @@ export class TraceService {
 
   private shouldSample(): boolean {
     return Math.random() < this.config.sampleRate;
+  }
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  cleanupExpiredTraces(): void {
+    this.cleanupExpiredSpans(300000);
   }
 }

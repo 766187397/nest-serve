@@ -23,6 +23,12 @@ export class GetTracesQueryDto {
 
   @ApiProperty({ description: '最大持续时间(ms)', required: false })
   maxDuration?: number;
+
+  @ApiProperty({ description: '页码', required: false, default: 1 })
+  page?: number;
+
+  @ApiProperty({ description: '每页数量', required: false, default: 20 })
+  pageSize?: number;
 }
 
 export class GetAlertsQueryDto {

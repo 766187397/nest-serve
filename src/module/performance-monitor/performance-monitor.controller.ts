@@ -16,6 +16,7 @@ import {
   AlertRuleResponseDto,
   PerformanceStatusResponseDto,
 } from './dto';
+import { PageByParameter } from '@/common/dto/base';
 import { ApiResult } from '@/common/utils/result';
 
 @ApiTags('性能监控')
@@ -64,8 +65,10 @@ export class PerformanceMonitorController {
   @Get('traces/active')
   @ApiOperation({ summary: '获取活跃的追踪' })
   @ApiResponse({ status: 200, type: [SpanResponseDto] })
-  async getActiveTraces() {
-    const traces = this.traceService.getActiveSpans();
+  async getActiveTraces(@Query() query: PageByParameter) {
+    const page = parseInt(query.page || '1', 10);
+    const pageSize = parseInt(query.pageSize || '20', 10);
+    const traces = this.traceService.getActiveSpans(page, pageSize);
     return ApiResult.success({
       data: traces,
     });
