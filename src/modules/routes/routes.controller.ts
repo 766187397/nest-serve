@@ -13,14 +13,13 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { RoutesService } from './routes.service';
-import { CreateRouteDto, FindRouteDto, UpdateRouteDto, RoleRoutesResponseDto } from './dto';
+import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from './dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { User } from '@/modules/users/entities/user.entity';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import {
-  RouteResponseDto,
   RouteResponseWrapperDto,
   RouteListResponseWrapperDto,
   RoleRoutesListResponseWrapperDto,
@@ -91,7 +90,11 @@ export class RoutesController {
   @Patch(':id')
   @ApiOperation({ summary: '修改路由信息' })
   @ApiOkResponse({ type: () => RouteResponseWrapperDto, description: '修改路由信息成功' })
-  update(@Headers('x-platform') platform: string, @Param('id') id: string, @Body() updateRouteDto: UpdateRouteDto) {
+  update(
+    @Headers('x-platform') platform: string,
+    @Param('id') id: string,
+    @Body() updateRouteDto: UpdateRouteDto
+  ) {
     return this.routesService.update(id, updateRouteDto, platform);
   }
 

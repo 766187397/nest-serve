@@ -4,7 +4,6 @@ import { ConnectionPoolMonitorService } from './connection-pool-monitor.service'
 import { ApiResult } from '@/common/utils/result';
 import {
   PoolStatsResponseDto,
-  PoolHealthResponseDto,
   PoolHistoryItemResponseDto,
   AllPoolStatsResponseDto,
   AllPoolHealthResponseDto,
@@ -48,7 +47,10 @@ export class ConnectionPoolMonitorController {
 
   @Get('all')
   @ApiOperation({ summary: '获取所有数据库连接池状态' })
-  @ApiOkResponse({ type: () => AllPoolStatsResponseWrapperDto, description: '所有数据库连接池状态' })
+  @ApiOkResponse({
+    type: () => AllPoolStatsResponseWrapperDto,
+    description: '所有数据库连接池状态',
+  })
   async getAllPoolStats() {
     const stats = await this.poolMonitorService.getAllPoolStats();
     return ApiResult.success<AllPoolStatsResponseDto>({
@@ -68,7 +70,10 @@ export class ConnectionPoolMonitorController {
 
   @Get('history/main')
   @ApiOperation({ summary: '获取主数据库连接池历史数据' })
-  @ApiOkResponse({ type: () => PoolHistoryResponseWrapperDto, description: '主数据库连接池历史数据' })
+  @ApiOkResponse({
+    type: () => PoolHistoryResponseWrapperDto,
+    description: '主数据库连接池历史数据',
+  })
   async getMainPoolHistory() {
     const history = this.poolMonitorService.getStatsHistory('main', 20);
     return ApiResult.success<Array<PoolHistoryItemResponseDto>>({
@@ -78,7 +83,10 @@ export class ConnectionPoolMonitorController {
 
   @Get('history/logger')
   @ApiOperation({ summary: '获取日志数据库连接池历史数据' })
-  @ApiOkResponse({ type: () => PoolHistoryResponseWrapperDto, description: '日志数据库连接池历史数据' })
+  @ApiOkResponse({
+    type: () => PoolHistoryResponseWrapperDto,
+    description: '日志数据库连接池历史数据',
+  })
   async getLoggerPoolHistory() {
     const history = this.poolMonitorService.getStatsHistory('logger', 20);
     return ApiResult.success<Array<PoolHistoryItemResponseDto>>({

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
-import { CircuitBreakerService, CircuitState } from './circuit-breaker.service';
+import { CircuitBreakerService } from './circuit-breaker.service';
 import { ServiceDegradationService } from './service-degradation.service';
 import { DistributedLockService } from './distributed-lock.service';
 import { ApiResult } from '@/common/utils/result';
@@ -63,10 +63,7 @@ export class ConcurrencyControlController {
   @ApiParam({ name: 'serviceName', description: '服务名称' })
   @ApiQuery({ name: 'level', description: '降级级别', required: false, type: Number })
   @ApiResponse({ status: 200, description: '成功降级服务' })
-  async degradeService(
-    @Param('serviceName') serviceName: string,
-    @Query('level') level?: number
-  ) {
+  async degradeService(@Param('serviceName') serviceName: string, @Query('level') level?: number) {
     this.serviceDegradationService.degrade(serviceName, level || 1);
     return ApiResult.success({ message: 'Service degraded successfully' });
   }

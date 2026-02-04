@@ -5,27 +5,17 @@ import { TraceService } from './trace.service';
 import { AlertService } from './alert.service';
 import {
   GetMetricsQueryDto,
-  GetTracesQueryDto,
   GetTracesQueryDtoByPage,
-  GetAlertsQueryDto,
   GetAlertsQueryDtoByPage,
   ResolveAlertDto,
-  CreateAlertRuleDto,
-  MetricsResponseDto,
   MetricsResponseWrapperDto,
-  TraceContextResponseDto,
   TraceContextResponseWrapperDto,
   SpanResponseDto,
   SpanListResponseWrapperDto,
   AlertResponseDto,
-  AlertResponseWrapperDto,
-  AlertRuleResponseDto,
-  AlertRuleResponseWrapperDto,
-  PerformanceStatusResponseDto,
-  PerformanceStatusResponseWrapperDto,
   AlertListResponseWrapperDto,
+  PerformanceStatusResponseWrapperDto,
 } from './dto';
-import { PageByParameter } from '@/common/dto/base';
 import { PageApiResult } from '@/types/public';
 import { ApiResult } from '@/common/utils/result';
 

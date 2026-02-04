@@ -1,10 +1,10 @@
-import { Controller, Get, Param, Query, Headers } from '@nestjs/common';
+import { Controller, Get, Query, Headers } from '@nestjs/common';
 import { LoggerService } from './logger.service';
 import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { FindLogDtoByPage } from './dto';
 import { Roles } from '@/common/decorator/roles.decorator';
-import { LogResponseDto, LogResponseWrapperDto, LogListResponseWrapperDto } from './dto/response.dto';
+import { LogListResponseWrapperDto } from './dto/response.dto';
 
 @ApiTags('日志')
 @ApiResponse({ status: 200, description: '操作成功' })

@@ -18,7 +18,7 @@ import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { Request } from 'express';
 import { User } from '@/modules/users/entities/user.entity';
 import { HttpStatusCodes } from '@/common/constants/http-status';
-import { EmailResponseDto, EmailResponseWrapperDto, EmailListResponseWrapperDto } from './dto/response.dto';
+import { EmailResponseWrapperDto, EmailListResponseWrapperDto } from './dto/response.dto';
 
 @ApiTags('邮箱管理')
 // @ApiBearerAuth("Authorization")

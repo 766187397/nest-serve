@@ -10,9 +10,6 @@ import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagg
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { Request, Response } from 'express';
 import {
-  CaptchaResponseDto,
-  UserLoginResponseDto,
-  RefreshTokenResponseDto,
   CaptchaResponseWrapperDto,
   UserLoginResponseWrapperDto,
   RefreshTokenResponseWrapperDto,

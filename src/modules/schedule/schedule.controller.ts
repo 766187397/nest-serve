@@ -20,11 +20,8 @@ import {
 import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import {
-  ScheduleResponseDto,
-  ScheduleLogResponseDto,
   ScheduleResponseWrapperDto,
   ScheduleListResponseWrapperDto,
-  ScheduleLogResponseWrapperDto,
   ScheduleLogListResponseWrapperDto,
 } from './dto/response.dto';
 
@@ -49,7 +46,10 @@ export class ScheduleController {
 
   @Get()
   @ApiOperation({ summary: '查询定时任务列表(分页)' })
-  @ApiOkResponse({ type: () => ScheduleListResponseWrapperDto, description: '查询定时任务列表成功' })
+  @ApiOkResponse({
+    type: () => ScheduleListResponseWrapperDto,
+    description: '查询定时任务列表成功',
+  })
   findByPage(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) query: FindScheduleDtoByPage
@@ -59,7 +59,10 @@ export class ScheduleController {
 
   @Get('all')
   @ApiOperation({ summary: '查询定时任务列表(不分页)' })
-  @ApiOkResponse({ type: () => ScheduleListResponseWrapperDto, description: '查询定时任务列表成功' })
+  @ApiOkResponse({
+    type: () => ScheduleListResponseWrapperDto,
+    description: '查询定时任务列表成功',
+  })
   findAll(
     @Headers('x-platform') platform: string,
     @Query(new FilterEmptyPipe()) query: Record<string, unknown>
@@ -69,7 +72,10 @@ export class ScheduleController {
 
   @Get(':id/logs')
   @ApiOperation({ summary: '查询定时任务执行日志(分页)' })
-  @ApiOkResponse({ type: () => ScheduleLogListResponseWrapperDto, description: '查询定时任务执行日志成功' })
+  @ApiOkResponse({
+    type: () => ScheduleLogListResponseWrapperDto,
+    description: '查询定时任务执行日志成功',
+  })
   findLogsByPage(
     @Headers('x-platform') platform: string,
     @Param('id') id: string,
@@ -88,7 +94,11 @@ export class ScheduleController {
   @Patch(':id')
   @ApiOperation({ summary: '更新定时任务' })
   @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '更新定时任务成功' })
-  update(@Headers('x-platform') platform: string, @Param('id') id: string, @Body() updateScheduleDto: UpdateScheduleDto) {
+  update(
+    @Headers('x-platform') platform: string,
+    @Param('id') id: string,
+    @Body() updateScheduleDto: UpdateScheduleDto
+  ) {
     return this.scheduleService.update(id, updateScheduleDto, platform);
   }
 
@@ -102,7 +112,11 @@ export class ScheduleController {
   @Patch(':id/status')
   @ApiOperation({ summary: '启用/禁用定时任务' })
   @ApiOkResponse({ type: () => ScheduleResponseWrapperDto, description: '启用/禁用定时任务成功' })
-  toggleStatus(@Headers('x-platform') platform: string, @Param('id') id: string, @Body('status') status: number) {
+  toggleStatus(
+    @Headers('x-platform') platform: string,
+    @Param('id') id: string,
+    @Body('status') status: number
+  ) {
     return this.scheduleService.toggleStatus(id, status, platform);
   }
 

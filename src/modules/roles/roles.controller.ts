@@ -15,7 +15,7 @@ import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from './
 import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { HttpStatusCodes } from '@/common/constants/http-status';
-import { RoleResponseDto, RoleResponseWrapperDto, RoleListResponseWrapperDto } from './dto/response.dto';
+import { RoleResponseWrapperDto, RoleListResponseWrapperDto } from './dto/response.dto';
 
 @ApiTags('角色管理')
 // @ApiBearerAuth("Authorization")
@@ -67,7 +67,11 @@ export class RolesController {
   @Patch(':id')
   @ApiOperation({ summary: '更新角色信息' })
   @ApiOkResponse({ type: () => RoleResponseWrapperDto, description: '更新角色信息成功' })
-  update(@Headers('x-platform') platform: string, @Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
+  update(
+    @Headers('x-platform') platform: string,
+    @Param('id') id: string,
+    @Body() updateRoleDto: UpdateRoleDto
+  ) {
     return this.rolesService.update(id, updateRoleDto, platform);
   }
 

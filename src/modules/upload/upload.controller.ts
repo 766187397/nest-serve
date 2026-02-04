@@ -26,7 +26,6 @@ import * as https from 'https';
 import * as http from 'http';
 import { URL } from 'url';
 import { Response } from 'express';
-import { HttpStatusCodes } from '@/common/constants/http-status';
 import {
   UploadResponseDto,
   UploadResponseWrapperDto,

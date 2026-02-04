@@ -10,10 +10,8 @@ import {
   UpdateDictionaryDto,
   UpdateDictionaryItemDto,
 } from './dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import {
-  DictionaryResponseDto,
-  DictionaryItemResponseDto,
   DictionaryResponseWrapperDto,
   DictionaryListResponseWrapperDto,
   DictionaryItemResponseWrapperDto,
@@ -42,14 +40,20 @@ export class DictionaryController {
 
   @Get()
   @ApiOperation({ summary: '字典分类分页查询' })
-  @ApiOkResponse({ type: () => DictionaryListResponseWrapperDto, description: '字典分类分页查询成功' })
+  @ApiOkResponse({
+    type: () => DictionaryListResponseWrapperDto,
+    description: '字典分类分页查询成功',
+  })
   findByPage(@Query() findDictionaryDtoByPage: FindDictionaryDtoByPage) {
     return this.dictionaryService.findByPage(findDictionaryDtoByPage);
   }
 
   @Get('all')
   @ApiOperation({ summary: '查询所有字典分类' })
-  @ApiOkResponse({ type: () => DictionaryListResponseWrapperDto, description: '查询所有字典分类成功' })
+  @ApiOkResponse({
+    type: () => DictionaryListResponseWrapperDto,
+    description: '查询所有字典分类成功',
+  })
   findAll(@Query() findDictionaryDto: FindDictionaryDto) {
     return this.dictionaryService.findAll(findDictionaryDto);
   }
@@ -97,28 +101,40 @@ export class DictionaryItemController {
 
   @Get()
   @ApiOperation({ summary: '字典项分页查询' })
-  @ApiOkResponse({ type: () => DictionaryItemListResponseWrapperDto, description: '字典项分页查询成功' })
+  @ApiOkResponse({
+    type: () => DictionaryItemListResponseWrapperDto,
+    description: '字典项分页查询成功',
+  })
   findByPage(@Query() findDictionaryItemDtoByPage: FindDictionaryItemDtoByPage) {
     return this.dictionaryService.findItemByPage(findDictionaryItemDtoByPage);
   }
 
   @Get('all')
   @ApiOperation({ summary: '查询所有字典项' })
-  @ApiOkResponse({ type: () => DictionaryItemListResponseWrapperDto, description: '查询所有字典项成功' })
+  @ApiOkResponse({
+    type: () => DictionaryItemListResponseWrapperDto,
+    description: '查询所有字典项成功',
+  })
   findAll(@Query() findDictionaryItemDto: FindDictionaryItemDto) {
     return this.dictionaryService.findItemAll(findDictionaryItemDto);
   }
 
   @Get(':id')
   @ApiOperation({ summary: '查询字典项详情' })
-  @ApiOkResponse({ type: () => DictionaryItemResponseWrapperDto, description: '查询字典项详情成功' })
+  @ApiOkResponse({
+    type: () => DictionaryItemResponseWrapperDto,
+    description: '查询字典项详情成功',
+  })
   findOne(@Param('id') id: string) {
     return this.dictionaryService.findItemOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '更新字典项信息' })
-  @ApiOkResponse({ type: () => DictionaryItemResponseWrapperDto, description: '更新字典项信息成功' })
+  @ApiOkResponse({
+    type: () => DictionaryItemResponseWrapperDto,
+    description: '更新字典项信息成功',
+  })
   update(@Param('id') id: string, @Body() updateDictionaryItemDto: UpdateDictionaryItemDto) {
     return this.dictionaryService.updateItem(id, updateDictionaryItemDto);
   }
