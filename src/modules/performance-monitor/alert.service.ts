@@ -267,6 +267,11 @@ export class AlertService implements OnModuleInit, OnModuleDestroy {
     return this.alerts.filter((alert) => !alert.resolved);
   }
 
+  /**
+   * 获取告警历史
+   * @param {string} type 告警类型（可选）
+   * @returns {Alert[]} 告警历史
+   */
   getAlertHistory(type?: string): Alert[] {
     if (type) {
       return this.alertHistory.get(type) || [];
@@ -282,6 +287,9 @@ export class AlertService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  /**
+   * 清除已解决的告警
+   */
   clearResolvedAlerts(): void {
     const unresolvedAlerts = this.alerts.filter((alert) => !alert.resolved);
     this.alerts.length = 0;

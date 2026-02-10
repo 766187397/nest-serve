@@ -57,6 +57,12 @@ export class QueryCacheService implements OnModuleInit, OnModuleDestroy {
     this.localCache.clear();
   }
 
+  /**
+   * 获取缓存
+   * @param {string} query 查询语句
+   * @param {any[]} parameters 查询参数
+   * @returns {Promise<T | null>} 缓存数据
+   */
   async get<T>(query: string, parameters?: any[]): Promise<T | null> {
     if (!this.config.queryCache.enabled) {
       return null;
@@ -90,6 +96,13 @@ export class QueryCacheService implements OnModuleInit, OnModuleDestroy {
     return null;
   }
 
+  /**
+   * 设置缓存
+   * @param {string} query 查询语句
+   * @param {T} data 要缓存的数据
+   * @param {number} ttl 过期时间（秒）
+   * @param {any[]} parameters 查询参数
+   */
   async set<T>(query: string, data: T, ttl?: number, parameters?: any[]): Promise<void> {
     if (!this.config.queryCache.enabled) {
       return;
@@ -121,6 +134,10 @@ export class QueryCacheService implements OnModuleInit, OnModuleDestroy {
     this.logger.debug(`Invalidated cache for query: ${this.truncateQuery(query)}`);
   }
 
+  /**
+   * 根据模式使缓存失效
+   * @param {string} pattern 匹配模式
+   */
   async invalidateByPattern(pattern: string): Promise<void> {
     const keys = Array.from(this.localCache.keys()).filter((key) => key.includes(pattern));
     for (const key of keys) {
@@ -151,6 +168,9 @@ export class QueryCacheService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
+  /**
+   * 重置缓存统计信息
+   */
   resetStats(): void {
     this.stats = {
       totalQueries: 0,
@@ -160,6 +180,11 @@ export class QueryCacheService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('Query cache stats reset');
   }
 
+  /**
+   * 获取缓存条目
+   * @param {number} limit 返回数量限制
+   * @returns {QueryCacheEntry<any>[]} 缓存条目列表
+   */
   getCacheEntries(limit?: number): QueryCacheEntry<any>[] {
     const entries = Array.from(this.localCache.values())
       .sort((a, b) => b.hitCount - a.hitCount);

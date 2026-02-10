@@ -33,6 +33,11 @@ export class ReadWriteSplitService {
     this.config = getDatabaseOptimizationConfig(new (require('@nestjs/config').ConfigService)());
   }
 
+  /**
+   * 注册数据库连接
+   * @param {string} name 连接名称
+   * @param {DataSource} dataSource 数据源
+   */
   registerConnection(name: string, dataSource: DataSource): void {
     this.connectionMap.set(name, dataSource);
     this.logger.log(`Registered connection: ${name}`);
@@ -58,6 +63,10 @@ export class ReadWriteSplitService {
     return connection;
   }
 
+  /**
+   * 获取主数据库连接
+   * @returns {DataSource} 主数据源
+   */
   getMasterConnection(): DataSource {
     const masterName = this.config.readWriteSplit.masterConnectionName;
     const connection = this.connectionMap.get(masterName);
@@ -106,6 +115,11 @@ export class ReadWriteSplitService {
     return callback(connection);
   }
 
+  /**
+   * 在事务中执行函数
+   * @param {(connection: DataSource) => Promise<T>} callback 回调函数
+   * @returns {Promise<T>} 执行结果
+   */
   async withTransaction<T>(
     callback: (connection: DataSource) => Promise<T>
   ): Promise<T> {
@@ -148,6 +162,9 @@ export class ReadWriteSplitService {
     };
   }
 
+  /**
+   * 重置读写分离统计信息
+   */
   resetStats(): void {
     this.stats.totalQueries = 0;
     this.stats.masterQueries = 0;
@@ -159,6 +176,10 @@ export class ReadWriteSplitService {
     return this.config.readWriteSplit.enabled;
   }
 
+  /**
+   * 获取读写比例
+   * @returns {number} 读写比例
+   */
   getReadWriteRatio(): number {
     return this.config.readWriteSplit.readWriteRatio;
   }

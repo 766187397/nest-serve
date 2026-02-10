@@ -119,6 +119,10 @@ export class PrometheusService implements OnModuleDestroy {
     this.histogramBuckets.set('db_query_duration_seconds', [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5]);
   }
 
+  /**
+   * 注册指标
+   * @param {Metric} metric 指标信息
+   */
   registerMetric(metric: Metric): void {
     if (this.metrics.has(metric.name)) {
       this.logger.warn(`Metric ${metric.name} already registered`);
@@ -140,6 +144,12 @@ export class PrometheusService implements OnModuleDestroy {
     this.metricValues.set(name, values);
   }
 
+  /**
+   * 设置仪表盘
+   * @param {string} name 指标名称
+   * @param {number} value 设置的值
+   * @param {Record<string, string>} labels 标签
+   */
   setGauge(name: string, value: number, labels?: Record<string, string>): void {
     const metric = this.metrics.get(name);
     if (!metric || metric.type !== 'gauge') {
@@ -220,6 +230,9 @@ export class PrometheusService implements OnModuleDestroy {
     return output;
   }
 
+  /**
+   * 重置所有指标
+   */
   resetMetrics(): void {
     this.metricValues.clear();
     this.logger.log('All metrics have been reset');

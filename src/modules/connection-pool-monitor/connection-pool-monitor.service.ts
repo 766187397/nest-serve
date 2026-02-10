@@ -15,10 +15,18 @@ export class ConnectionPoolMonitorService {
     @InjectDataSource('logger') private readonly loggerDataSource: DataSource
   ) {}
 
+  /**
+   * 获取主数据库连接池统计信息
+   * @returns {Promise<PoolStats>} 连接池统计信息
+   */
   async getMainPoolStats(): Promise<PoolStats> {
     return this.getPoolStats(this.mainDataSource, 'main');
   }
 
+  /**
+   * 获取日志数据库连接池统计信息
+   * @returns {Promise<PoolStats>} 连接池统计信息
+   */
   async getLoggerPoolStats(): Promise<PoolStats> {
     return this.getPoolStats(this.loggerDataSource, 'logger');
   }
@@ -188,6 +196,9 @@ export class ConnectionPoolMonitorService {
     };
   }
 
+  /**
+   * 记录连接池统计信息到日志
+   */
   async logPoolStats(): Promise<void> {
     const [main, logger] = await Promise.all([this.getMainPoolStats(), this.getLoggerPoolStats()]);
 

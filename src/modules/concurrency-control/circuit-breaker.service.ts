@@ -33,6 +33,13 @@ export class CircuitBreakerService {
     this.config = getConcurrencyControlConfig(new (require('@nestjs/config').ConfigService)()).circuitBreaker;
   }
 
+  /**
+   * 执行熔断器逻辑
+   * @param {string} key 熔断器标识
+   * @param {() => Promise<T>} fn 要执行的函数
+   * @param {() => Promise<T>} fallback 降级函数
+   * @returns {Promise<T>} 执行结果
+   */
   async execute<T>(
     key: string,
     fn: () => Promise<T>,
@@ -211,6 +218,11 @@ export class CircuitBreakerService {
     });
   }
 
+  /**
+   * 获取熔断器状态
+   * @param {string} key 熔断器标识
+   * @returns {CircuitBreakerState | undefined} 熔断器状态
+   */
   getState(key: string): CircuitBreakerState | undefined {
     return this.circuits.get(key);
   }
@@ -220,6 +232,9 @@ export class CircuitBreakerService {
     this.logger.log(`Circuit breaker reset for key: ${key}`);
   }
 
+  /**
+   * 重置所有熔断器
+   */
   resetAll(): void {
     this.circuits.clear();
     this.logger.log('All circuit breakers reset');

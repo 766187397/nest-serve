@@ -41,6 +41,13 @@ export class ServiceDegradationService implements OnModuleInit {
     this.logger.log('Service degradation service initialized');
   }
 
+  /**
+   * 执行服务降级逻辑
+   * @param {string} serviceName 服务名称
+   * @param {() => Promise<T>} fn 要执行的函数
+   * @param {FallbackHandler<T>} fallback 降级处理函数
+   * @returns {Promise<T>} 执行结果
+   */
   async execute<T>(
     serviceName: string,
     fn: () => Promise<T>,
@@ -95,6 +102,10 @@ export class ServiceDegradationService implements OnModuleInit {
     this.logger.warn(`Service ${serviceName} degraded to level ${level}`);
   }
 
+  /**
+   * 恢复服务
+   * @param {string} serviceName 服务名称
+   */
   recover(serviceName: string): void {
     const status = this.serviceStatus.get(serviceName);
     if (status) {
@@ -133,6 +144,10 @@ export class ServiceDegradationService implements OnModuleInit {
     return this.degradationLevels;
   }
 
+  /**
+   * 获取当前降级级别
+   * @returns {DegradationLevel} 当前降级级别
+   */
   getCurrentLevel(): DegradationLevel {
     return this.degradationLevels[this.currentLevel];
   }

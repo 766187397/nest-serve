@@ -66,6 +66,12 @@ export class LoggerService {
     return LogLevel.DEBUG;
   }
 
+  /**
+   * 创建日志
+   * @param {Request} request 请求对象
+   * @param {string} data 响应数据
+   * @param {string} statusCode 状态码
+   */
   async create(request: Request, data: string = '', statusCode: string = '200') {
     const logLevel = this.getLogLevel(statusCode);
 
@@ -191,6 +197,10 @@ export class LoggerService {
     }
   }
 
+  /**
+   * 获取队列统计信息
+   * @returns {Promise<Object>} 队列统计信息
+   */
   async getQueueStats() {
     return await this.logQueueService.getQueueStats();
   }

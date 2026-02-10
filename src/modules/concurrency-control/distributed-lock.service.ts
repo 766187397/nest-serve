@@ -25,6 +25,12 @@ export class DistributedLockService implements OnModuleDestroy {
     this.config = getConcurrencyControlConfig(new (require('@nestjs/config').ConfigService)()).distributedLock;
   }
 
+  /**
+   * 获取分布式锁
+   * @param {string} key 锁的键
+   * @param {LockOptions} options 锁的选项
+   * @returns {Promise<LockResult>} 锁获取结果
+   */
   async acquireLock(
     key: string,
     options: LockOptions = {}
@@ -66,6 +72,12 @@ export class DistributedLockService implements OnModuleDestroy {
     };
   }
 
+  /**
+   * 释放分布式锁
+   * @param {string} key 锁的键
+   * @param {string} lockId 锁的ID
+   * @returns {Promise<boolean>} 是否成功释放
+   */
   async releaseLock(key: string, lockId: string): Promise<boolean> {
     if (!this.config.enabled) {
       return true;
@@ -94,6 +106,13 @@ export class DistributedLockService implements OnModuleDestroy {
     }
   }
 
+  /**
+   * 延长锁的过期时间
+   * @param {string} key 锁的键
+   * @param {string} lockId 锁的ID
+   * @param {number} timeout 新的超时时间
+   * @returns {Promise<boolean>} 是否成功延长
+   */
   async extendLock(
     key: string,
     lockId: string,
@@ -166,6 +185,11 @@ export class DistributedLockService implements OnModuleDestroy {
     }
   }
 
+  /**
+   * 强制释放锁
+   * @param {string} key 锁的键
+   * @returns {Promise<boolean>} 是否成功释放
+   */
   async forceReleaseLock(key: string): Promise<boolean> {
     if (!this.config.enabled) {
       return true;

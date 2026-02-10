@@ -45,6 +45,12 @@ export class TraceService implements OnModuleInit {
     this.logger.log('TraceService initialized');
   }
 
+  /**
+   * 开始追踪
+   * @param {string} operationName 操作名称
+   * @param {Record<string, string>} tags 标签
+   * @returns {TraceContext} 追踪上下文
+   */
   startTrace(operationName: string, tags?: Record<string, string>): TraceContext {
     const traceId = this.generateTraceId();
     const spanId = this.generateSpanId();
@@ -77,6 +83,9 @@ export class TraceService implements OnModuleInit {
     return context;
   }
 
+  /**
+   * 结束追踪
+   */
   endTrace(): void {
     const context = this.storage.getStore();
     if (!context) {
@@ -190,10 +199,18 @@ export class TraceService implements OnModuleInit {
     }
   }
 
+  /**
+   * 获取活跃的追踪
+   * @returns {Span[]} 活跃追踪列表
+   */
   getActiveSpans(): Span[] {
     return Array.from(this.activeSpans.values());
   }
 
+  /**
+   * 获取已完成的追踪
+   * @returns {Span[]} 已完成追踪列表
+   */
   getCompletedSpans(): Span[] {
     return [...this.completedSpans];
   }
@@ -203,6 +220,10 @@ export class TraceService implements OnModuleInit {
     this.logger.log('Completed spans cleared');
   }
 
+  /**
+   * 清理过期的追踪
+   * @param {number} maxAge 最大存活时间（毫秒）
+   */
   cleanupExpiredSpans(maxAge: number = 300000): void {
     const now = Date.now();
     const expiredSpans: string[] = [];

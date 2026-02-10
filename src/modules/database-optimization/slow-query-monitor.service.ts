@@ -37,6 +37,14 @@ export class SlowQueryMonitorService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  /**
+   * 记录慢查询
+   * @param {string} query 查询语句
+   * @param {number} duration 执行时长（毫秒）
+   * @param {any[]} parameters 查询参数
+   * @param {string} connectionName 连接名称
+   * @param {string} entityType 实体类型
+   */
   recordSlowQuery(
     query: string,
     duration: number,
@@ -72,6 +80,11 @@ export class SlowQueryMonitorService implements OnModuleInit, OnModuleDestroy {
     this.updateQueryStatistics(query, duration);
   }
 
+  /**
+   * 获取慢查询列表
+   * @param {number} limit 返回数量限制
+   * @returns {SlowQuery[]} 慢查询列表
+   */
   getSlowQueries(limit?: number): SlowQuery[] {
     const queries = [...this.slowQueries].sort((a, b) => b.timestamp - a.timestamp);
     return limit ? queries.slice(0, limit) : queries;
@@ -133,6 +146,11 @@ export class SlowQueryMonitorService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
+  /**
+   * 获取指定查询的统计信息
+   * @param {string} query 查询语句
+   * @returns {Object} 统计信息
+   */
   getQueryStatistics(query: string): {
     count: number;
     averageDuration: number;
@@ -152,6 +170,9 @@ export class SlowQueryMonitorService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
+  /**
+   * 清除慢查询历史
+   */
   clearSlowQueries(): void {
     this.slowQueries.length = 0;
     this.queryDurations.clear();

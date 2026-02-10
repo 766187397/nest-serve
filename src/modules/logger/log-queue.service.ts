@@ -40,6 +40,10 @@ export class LogQueueService {
     }
   }
 
+  /**
+   * 获取队列统计信息
+   * @returns {Promise<Object>} 队列统计信息
+   */
   async getQueueStats() {
     const waiting = await this.logQueue.getWaiting();
     const active = await this.logQueue.getActive();
