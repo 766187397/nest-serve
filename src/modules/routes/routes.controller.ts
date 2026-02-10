@@ -8,14 +8,13 @@ import {
   Delete,
   Query,
   Req,
-  Res,
   Headers,
   HttpCode,
 } from '@nestjs/common';
 import { RoutesService } from './routes.service';
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from './dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { User } from '@/modules/users/entities/user.entity';
 import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
 import { HttpStatusCodes } from '@/common/constants/http-status';
@@ -51,16 +50,11 @@ export class RoutesController {
     type: () => RoleRoutesListResponseWrapperDto,
     description: '根据登录用户的角色ids获取路由成功',
   })
-  async getRoutesByRoleId(@Req() req: Request, @Res() res: Response) {
-    console.log('根据登录用户的角色ids获取路由成功', req);
+  async getRoutesByRoleId(@Req() req: Request) {
     const type = req.query.type as string;
-    console.log('type', type);
     const userInfo = req.userInfo as User;
-    console.log('userInfo', userInfo);
     const rolesIds = userInfo.roles.map((item) => item.id);
-    const data = await this.routesService.getRoutesByRoleId(rolesIds, userInfo.platform, type);
-    res.status(data.code).json(data);
-    return data;
+    return this.routesService.getRoutesByRoleId(rolesIds, userInfo.platform, type);
   }
 
   @Post()

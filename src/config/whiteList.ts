@@ -7,8 +7,6 @@ export class JWTWhiteList {
     '/swagger', // swagger 接口文档地址
     '/api/v1/large/files', // 大文件上传
     '/api/v1/large/tempFile', // 大文件上传取消
-    '/api/v1/auth/captcha', // 验证码接口
-    '/health/pool', // 连接池监控接口
   ];
   // 全匹配
   static whiteListExact: string[] = [
@@ -16,6 +14,7 @@ export class JWTWhiteList {
     '/services.json', // 网站图标
     '/json', // 获取 Swagger JSON
     '/download', // 下载 Swagger JSON
+    '/api/v1/auth/captcha', // 验证码接口
     '/api/v1/auth/login', // 账号密码登录接口
     '/api/v1/auth/login/set-cookie', // 账号密码登录接口，设置cookie
     '/api/v1/auth/verification-code-login', // 邮箱验证码登录接口
