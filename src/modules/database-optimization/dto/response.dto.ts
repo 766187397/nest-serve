@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+/** 慢查询响应DTO */
 export class SlowQueryResponseDto {
   @ApiProperty({ description: '查询ID' })
   id: string;
@@ -26,6 +27,7 @@ export class SlowQueryResponseDto {
   operation?: string;
 }
 
+/** 慢查询统计响应DTO */
 export class SlowQueryStatisticsResponseDto {
   @ApiProperty({ description: '慢查询总数' })
   totalSlowQueries: number;
@@ -46,6 +48,7 @@ export class SlowQueryStatisticsResponseDto {
   byEntityType: Record<string, number>;
 }
 
+/** 查询缓存统计响应DTO */
 export class QueryCacheStatsResponseDto {
   @ApiProperty({ description: '总查询数' })
   totalQueries: number;
@@ -66,6 +69,7 @@ export class QueryCacheStatsResponseDto {
   memoryUsage: number;
 }
 
+/** 读写分离统计响应DTO */
 export class ReadWriteStatsResponseDto {
   @ApiProperty({ description: '总查询数' })
   totalQueries: number;
@@ -83,6 +87,7 @@ export class ReadWriteStatsResponseDto {
   slaveRatio: number;
 }
 
+/** 数据库优化状态响应DTO */
 export class DatabaseOptimizationStatusResponseDto {
   @ApiProperty({ description: '慢查询总数' })
   slowQueriesCount: number;

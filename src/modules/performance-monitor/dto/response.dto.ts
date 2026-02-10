@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ApiResultWrapperDto } from '@/common/dto/base';
 import { PageApiResult } from '@/types/public';
 
+/** 指标响应DTO */
 export class MetricResponseDto {
   @ApiProperty({ description: '指标名称' })
   name: string;
@@ -19,6 +20,7 @@ export class MetricResponseDto {
   labels?: Record<string, string>;
 }
 
+/** 指标集合响应DTO */
 export class MetricsResponseDto {
   @ApiProperty({ description: 'Prometheus格式指标' })
   metrics: string;
@@ -33,6 +35,7 @@ export class MetricsResponseWrapperDto extends ApiResultWrapperDto<MetricsRespon
   declare data: MetricsResponseDto;
 }
 
+/** 追踪上下文响应DTO */
 export class TraceContextResponseDto {
   @ApiProperty({ description: '追踪ID' })
   traceId: string;
@@ -71,6 +74,7 @@ export class TraceContextResponseWrapperDto extends ApiResultWrapperDto<TraceCon
   declare data: TraceContextResponseDto;
 }
 
+/** Span响应DTO */
 export class SpanResponseDto {
   @ApiProperty({ description: '追踪ID' })
   traceId: string;
@@ -100,6 +104,7 @@ export class SpanResponseDto {
   logs: Array<{ timestamp: number; level: string; message: string }>;
 }
 
+/** 告警响应DTO */
 export class AlertResponseDto {
   @ApiProperty({ description: '告警ID' })
   id: string;
@@ -132,6 +137,7 @@ export class AlertResponseWrapperDto extends ApiResultWrapperDto<AlertResponseDt
   declare data: AlertResponseDto;
 }
 
+/** 告警规则响应DTO */
 export class AlertRuleResponseDto {
   @ApiProperty({ description: '规则名称' })
   name: string;
@@ -161,6 +167,7 @@ export class AlertRuleResponseWrapperDto extends ApiResultWrapperDto<AlertRuleRe
   declare data: AlertRuleResponseDto;
 }
 
+/** 性能状态响应DTO */
 export class PerformanceStatusResponseDto {
   @ApiProperty({ description: '活跃的追踪数量' })
   activeTraces: number;

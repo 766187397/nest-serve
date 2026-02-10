@@ -1,6 +1,7 @@
 import { IsString, IsOptional, IsObject, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
+/** 发布事件请求DTO */
 export class PublishEventDto {
   @IsString()
   eventName: string;
@@ -14,6 +15,7 @@ export class PublishEventDto {
   correlationId?: string;
 }
 
+/** 事件历史查询请求DTO */
 export class EventHistoryQueryDto {
   @IsString()
   @IsOptional()
