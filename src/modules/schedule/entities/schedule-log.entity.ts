@@ -9,7 +9,7 @@ export class ScheduleLog extends UUIDBaseEntity {
   @Column({ type: 'varchar', length: 36, comment: '关联的任务ID' })
   scheduleId: string;
 
-  @Column({ type: 'timestamp', comment: '执行时间' })
+  @Column({ type: 'datetime', comment: '执行时间' })
   @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
   executionTime: Date;
 

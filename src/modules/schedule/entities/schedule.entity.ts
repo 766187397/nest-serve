@@ -18,11 +18,11 @@ export class Schedule extends UUIDBaseEntity {
   @Column({ type: 'varchar', length: 100, comment: '内部任务标识' })
   jobName: string;
 
-  @Column({ type: 'timestamp', nullable: true, comment: '上次执行时间' })
+  @Column({ type: 'datetime', nullable: true, comment: '上次执行时间' })
   @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
   lastExecutionTime: Date;
 
-  @Column({ type: 'timestamp', nullable: true, comment: '下次执行时间' })
+  @Column({ type: 'datetime', nullable: true, comment: '下次执行时间' })
   @Transform(({ value }) => dayjs(value).format('YYYY-MM-DD HH:mm:ss'))
   nextExecutionTime: Date;
 
