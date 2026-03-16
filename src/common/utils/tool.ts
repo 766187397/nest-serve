@@ -27,13 +27,13 @@ export function calculatePagination(
   page = +page;
   pageSize = +pageSize;
   if (!Number.isInteger(page) || !Number.isInteger(pageSize)) {
-    throw new Error("page和pageSize必须为正整数或字符串形式的正整数");
+    throw new Error('page和pageSize必须为正整数或字符串形式的正整数');
   }
   if (page < 1) {
-    return new Error("page不能小于1");
+    return new Error('page不能小于1');
   }
   if (pageSize < 1) {
-    return new Error("pageSize不能小于1");
+    return new Error('pageSize不能小于1');
   }
   // 计算take和skip
   const take = pageSize;
@@ -49,9 +49,9 @@ export function calculatePagination(
  */
 export function generateRandomString(
   length: number,
-  chars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  chars: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 ): string {
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);
-  return Array.from(array, (byte) => chars[byte % chars.length]).join("");
+  return Array.from(array, (byte) => chars[byte % chars.length]).join('');
 }

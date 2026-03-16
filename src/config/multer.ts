@@ -1,25 +1,73 @@
-import { diskStorage } from "multer";
+import { diskStorage, Options, FileFilterCallback } from 'multer';
+import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
 
-export class FileUploadService {
-  /** 文件大小 */
-  static MB = 20;
-  /** 文件大小限制 计算结果 */
-  static size = 1024 * 1024 * this.MB;
-  /** 文件夹名称 */
-  static rootPath = "uploads";
-  /** 主文件访问路径 */
-  static serveRoot = "/" + this.rootPath;
-  static multerOptions = {
+export interface MulterConfig {
+  rootPath: string;
+  serveRoot: string;
+  maxSize: number;
+  allowedTypes: string[];
+}
+
+export const getMulterConfig = (configService: ConfigService): MulterConfig => {
+  const rootPath = configService.get<string>('UPLOAD_DIR') || 'uploads';
+  const maxSize = configService.get<number>('UPLOAD_MAX_SIZE') || 10 * 1024 * 1024;
+  const allowedTypesStr = configService.get<string>('UPLOAD_ALLOWED_TYPES') || '';
+  const allowedTypes = allowedTypesStr ? allowedTypesStr.split(',').map((type) => type.trim()) : [];
+
+  return {
+    rootPath,
+    serveRoot: '/' + rootPath,
+    maxSize,
+    allowedTypes,
+  };
+};
+
+export const getMulterOptions = (configService: ConfigService): Options => {
+  const config = getMulterConfig(configService);
+
+  return {
     storage: diskStorage({
-      destination: this.rootPath, // 设置保存上传文件的目录
+      destination: config.rootPath,
       filename: (req, file, cb) => {
-        // 保留中文
-        const safeFileName = Buffer.from(file.originalname, "latin1").toString("utf8"); // 处理非ASCII字符
+        const safeFileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
         cb(null, `${Date.now()}-${safeFileName}`);
       },
     }),
     limits: {
-      fileSize: this.size, // 限制文件大小
+      fileSize: config.maxSize,
+    },
+    fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
+      if (config.allowedTypes.length === 0) {
+        cb(null, true);
+        return;
+      }
+
+      const allowed = config.allowedTypes.includes(file.mimetype);
+      if (allowed) {
+        cb(null, true);
+      } else {
+        cb(new Error(`不支持的文件类型: ${file.mimetype}`));
+      }
+    },
+  };
+};
+
+export class FileUploadService {
+  MB = 20;
+  size = 1024 * 1024 * this.MB;
+  rootPath = 'uploads';
+  serveRoot = '/' + this.rootPath;
+  multerOptions = {
+    storage: diskStorage({
+      destination: this.rootPath,
+      filename: (req, file, cb) => {
+        const safeFileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
+        cb(null, `${Date.now()}-${safeFileName}`);
+      },
+    }),
+    limits: {
+      fileSize: this.size,
     },
   };
 }

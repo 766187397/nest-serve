@@ -1,4 +1,9 @@
-import * as XLSX from "xlsx";
+import * as XLSX from 'xlsx';
+
+interface ExcelExportResult {
+  buffer: Buffer;
+  fileName: string;
+}
 
 /**
  * 按key-value格式导出Excel
@@ -9,17 +14,17 @@ import * as XLSX from "xlsx";
  * @returns 包含文件名和Buffer的对象
  */
 export function exportWithKeyValueHeader(
-  data: any[],
+  data: Record<string, unknown>[],
   headerMap: Record<string, string>,
-  fileName: string = "export",
-  sheetName: string = "Sheet1"
-): { buffer: Buffer; fileName: string } {
+  fileName: string = 'export',
+  sheetName: string = 'Sheet1'
+): ExcelExportResult {
   // 添加.xlsx后缀（如果用户没有提供）
-  const finalFileName = fileName.endsWith(".xlsx") ? fileName : `${fileName}.xlsx`;
+  const finalFileName = fileName.endsWith('.xlsx') ? fileName : `${fileName}.xlsx`;
 
   // 转换数据格式
   const formattedData = data.map((item) => {
-    const newItem: Record<string, any> = {};
+    const newItem: Record<string, unknown> = {};
     Object.keys(headerMap).forEach((key) => {
       newItem[`${headerMap[key]}`] = item[key];
     });
@@ -32,7 +37,7 @@ export function exportWithKeyValueHeader(
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
   return {
-    buffer: XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }),
+    buffer: XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }),
     fileName: finalFileName,
   };
 }
@@ -48,7 +53,7 @@ export function importWithKeyValueHeader(
   fileBuffer: Buffer,
   headerMap: Record<string, string>,
   sheetName?: string
-): any[] {
+): Record<string, unknown>[] {
   // 读取Excel
   const workbook = XLSX.read(fileBuffer);
   const targetSheetName = sheetName || workbook.SheetNames[0];
@@ -58,11 +63,11 @@ export function importWithKeyValueHeader(
   const rawData = XLSX.utils.sheet_to_json(worksheet);
 
   // 转换数据格式
-  return rawData.map((item: any) => {
-    const newItem: Record<string, any> = {};
+  return rawData.map((item: Record<string, unknown>) => {
+    const newItem: Record<string, unknown> = {};
     Object.keys(item).forEach((key) => {
       // 提取原始字段名(去掉显示名称)
-      const [originalKey] = key.split(":");
+      const [originalKey] = key.split(':');
       const mappedKey = headerMap[originalKey] || originalKey;
       newItem[mappedKey] = item[key];
     });

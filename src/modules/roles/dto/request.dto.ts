@@ -1,0 +1,45 @@
+import { CreateBaseDto, FindByParameter, PageByParameter } from '@/common/dto/base';
+import { ApiProperty, IntersectionType, PartialType } from '@nestjs/swagger';
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+
+/** 创建角色请求DTO */
+export class CreateRoleDto extends CreateBaseDto {
+  @ApiProperty({ description: '角色名称', example: 'admin' })
+  @IsString({ message: '角色名称必须为字符串' })
+  @IsNotEmpty({ message: '角色名称不能为空' })
+  name: string;
+
+  @ApiProperty({ description: '角色描述', example: '管理员' })
+  @IsString({ message: '角色描述必须为字符串' })
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ description: '角色key', example: '0' })
+  @IsString({ message: '角色key必须为字符串' })
+  @IsOptional()
+  roleKey?: string;
+
+  @ApiProperty({ description: '路由id', required: false, example: [1] })
+  @IsOptional()
+  @IsArray({ message: '路由ids必须为数字数组' })
+  routeIds?: number[];
+}
+
+/** 更新角色信息请求DTO */
+export class UpdateRoleDto extends PartialType(CreateRoleDto) {}
+
+/** 查询所有角色信息请求DTO */
+export class FindRoleDto extends FindByParameter {
+  @ApiProperty({ description: '角色名称', example: 'admin' })
+  @IsString({ message: '角色名称必须为字符串' })
+  @IsOptional()
+  name?: string;
+
+  @ApiProperty({ description: '角色key', example: 'admin' })
+  @IsString({ message: '角色key必须为字符串' })
+  @IsOptional()
+  roleKey?: string;
+}
+
+/** 分页查询角色信息请求DTO */
+export class FindRoleDtoByPage extends PartialType(IntersectionType(FindRoleDto, PageByParameter)) {}

@@ -1,22 +1,33 @@
-import { HttpException } from "@nestjs/common";
-import { plainToInstance } from "class-transformer";
+import { HttpException } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
+import { HttpStatusCodes } from '@/common/constants/http-status';
 
 interface Result<T> {
   code?: number;
   message?: string;
   data?: T | null;
-  entities?: any;
+  entities?: new (...args: unknown[]) => T;
+  timestamp?: string;
+  details?: Record<string, unknown>;
 }
+
 export class ApiResult<T> {
   readonly __isApiResult = true;
 
   constructor(
-    public code: number = 200,
-    public message: string = "操作成功",
-    public data: T | null = null
+    public code: number = HttpStatusCodes.OK,
+    public message: string = '操作成功',
+    public data: T | null = null,
+    public timestamp: string = new Date().toISOString(),
+    public details?: Record<string, unknown>
   ) {}
 
-  static success<T>({ data = null, message = "操作成功", code = 200, entities }: Result<T> = {}): ApiResult<T> {
+  static success<T>({
+    data = null,
+    message = '操作成功',
+    code = HttpStatusCodes.OK,
+    entities,
+  }: Result<T> = {}): ApiResult<T> {
     if (entities) {
       data = plainToInstance(entities, data);
     }
@@ -24,17 +35,19 @@ export class ApiResult<T> {
   }
 
   static error<T>(param: Error | string | Result<T> = {}): ApiResult<T> {
-    let message = "操作失败",
-      code = 400,
-      data: T | null = null;
+    let message = '操作失败',
+      code = HttpStatusCodes.BAD_REQUEST,
+      data: T | null = null,
+      details: Record<string, unknown> | undefined;
     if (param instanceof HttpException) {
       // 获取 HttpException 的响应内容和状态码
       const response = param.getResponse();
       // 如果是对象，直接使用其中的 message 字段，否则使用默认的 message
-      const errorMessage = typeof response === "object" && response["message"] ? response["message"] : message;
+      const errorMessage =
+        typeof response === 'object' && response['message'] ? response['message'] : message;
       const statusCode = param.getStatus() || code; // 获取 HttpException 的状态码，默认使用传入的 code
       return new ApiResult<T>(statusCode, errorMessage, null);
-    } else if (typeof param === "string") {
+    } else if (typeof param === 'string') {
       // 如果是字符串类型，认为它是错误消息
       message = param;
     } else if (param instanceof Error) {
@@ -46,7 +59,8 @@ export class ApiResult<T> {
       if (param.code) code = param.code;
       if (param.message) message = param.message;
       if (param.data) data = param.data;
+      if (param.details) details = param.details;
     }
-    return new ApiResult<T>(code, message, data);
+    return new ApiResult<T>(code, message, data, undefined, details);
   }
 }
