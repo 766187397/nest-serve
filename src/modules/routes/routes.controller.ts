@@ -16,7 +16,7 @@ import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from './dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 import { User } from '@/modules/users/entities/user.entity';
-import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
+import { FilterEmptyPipe } from '@/common/pipes/filterEmptyPipe';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import {
   RouteResponseWrapperDto,

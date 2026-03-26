@@ -2,7 +2,7 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } fr
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Request } from 'express';
-import { CacheService } from '@/common/service/cache.service';
+import { CacheService } from '@/modules/cache/cache.service';
 import { getConcurrencyControlConfig, RateLimitConfig } from '@/config/concurrency-control';
 
 interface TokenBucket {

@@ -1,5 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { CacheService } from '@/common/service/cache.service';
+import { CacheService } from './cache.service';
 import { initCacheInstances } from '@/config/nodeCache';
 
 @Module({})

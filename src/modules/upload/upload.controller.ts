@@ -19,9 +19,9 @@ import {
   ApiTags,
   ApiOkResponse,
 } from '@nestjs/swagger';
-import { MulterConfigInterceptor } from '@/common/interceptor/multer-config.interceptor';
+import { MulterConfigInterceptor } from '@/common/interceptors/multer-config.interceptor';
 import { FindFileDto, FindFileDtoByPage } from './dto';
-import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
+import { FilterEmptyPipe } from '@/common/pipes/filterEmptyPipe';
 import * as https from 'https';
 import * as http from 'http';
 import { URL } from 'url';

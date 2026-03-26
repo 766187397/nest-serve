@@ -42,21 +42,39 @@ node版本>=20
 >
 > 平台：当前平台的配置只写了这几个（admin、web、mini、app），如果需要增加修改jwt中的getPlatformJwtConfig
 
-/api/v1/admin/*
+### 接口路径规范
 
-- api：表示请求的接口
-- v1：接口版本
-- admin：平台
-  - admin：后台
-  - web：web端
-  - mini：小程序
-  - app：安卓/iOS等
-- *：具体的模块接口
-- 特殊后缀：后台还需要查询其他平台的数据，后台的大部分接口需要加上平台标识
-  - all/:platform
-  - info/:platform/:id
-    - platform少见，一般使用id不会怎么使用platform
-  - platform：admin/web/mini/app等
+```
+/api/v1/{platform}/{module}
+```
+
+### 路径组成
+
+- **api**：表示请求的接口
+- **v1**：接口版本号
+- **platform**：平台标识
+  - `admin`：后台管理系统
+  - `web`：Web端应用
+  - `mini`：小程序应用
+  - `app`：移动端应用（Android/iOS）
+- **module**：具体的模块接口
+
+### 特殊接口标识
+
+后台管理需要查询其他平台数据时，接口需要加上平台标识：
+
+- `all/:platform` - 查询指定平台的所有数据
+- `info/:platform/:id` - 查询指定平台的指定数据（较少使用）
+- `platform` 参数值：admin/web/mini/app
+
+### 示例
+
+```
+POST   /api/v1/admin/users          # 创建用户（后台管理）
+GET    /api/v1/admin/users          # 查询用户列表（后台管理）
+GET    /api/v1/admin/users/all/web  # 查询Web端所有用户（后台管理）
+GET    /api/v1/web/users/profile    # 获取当前用户信息（Web端）
+```
 
 
 
@@ -153,53 +171,68 @@ GitHub：https://github.com/766187397/admin-vue3-ts
 
 ```
 nest-serve
-├── knife4j/												knife4j接口文档静态页面
-├── logs/														日志存储地址
-├── sqlitedata/											sqlite数据文件
+├── doc/                          # 项目文档
+├── knife4j/                      # knife4j接口文档静态页面
+├── logs/                         # 日志存储地址
+├── sqlitedata/                   # sqlite数据文件
 ├── src/
-│   ├── common/											公共模块
-│   │   ├── decorator/							装饰器
-│   │   ├── dto/										Dto
-│   │   ├── entities/								entities
-│   │   ├── filter/									过滤器
-│   │   ├── interceptor/						拦截器
-│   │   ├── middlewares/						中间件
-│   │   ├── pipeTransform/					管道
-│   │   ├── service/								服务
-│   │   └── utils/									工具函数抽离文件夹
-│   ├── config/
-│   │   ├── jwt.ts									jwt配置
-│   │   ├── logger.ts								日志配置
-│   │   ├── multer.ts								文件上传配置
-│   │   ├── swagger.ts							接口文档API
-│   │   └── whiteList.ts						白名单文档
-│   ├── module/
-│   │   ├── auth/										授权模块
-│   │   ├── default-data/						默认数据（生成默认数据方便使用）
-│   │   ├── dictionary/							数据字典
-│   │   ├── knife4j/								knife4j接口文档
-│   │   ├── logger/									日志接口
-│   │   ├── notice/									通知公告
-│   │   ├── roles/									角色
-│   │   ├── routes/									路由
-│   │   ├── upload/									文件上传
-│   │   └── users/									用户
-│   ├── types/											类型抽离文件夹
-│   ├── app.module.ts
-│   └── main.ts
-├── types/
+│   ├── common/                   # 公共模块
+│   │   ├── constants/            # 常量定义
+│   │   ├── decorators/           # 自定义装饰器
+│   │   ├── dto/                  # 通用DTO
+│   │   ├── entities/             # 通用实体
+│   │   ├── exceptions/           # 自定义异常
+│   │   ├── filters/              # 异常过滤器
+│   │   ├── guards/               # 守卫
+│   │   ├── interceptors/         # 拦截器
+│   │   ├── pipes/                # 管道
+│   │   └── utils/                # 工具函数
+│   ├── config/                   # 配置文件
+│   │   ├── db.ts                 # 数据库配置
+│   │   ├── jwt.ts                # JWT配置
+│   │   ├── logger.ts             # 日志配置
+│   │   ├── multer.ts             # 文件上传配置
+│   │   ├── redis.ts              # Redis配置
+│   │   ├── swagger.ts            # 接口文档配置
+│   │   ├── whiteList.ts          # 白名单配置
+│   │   └── winston.ts            # Winston日志配置
+│   ├── modules/                  # 业务模块
+│   │   ├── auth/                 # 认证授权模块
+│   │   ├── cache/                # 缓存模块
+│   │   ├── concurrency-control/  # 并发控制模块
+│   │   ├── config-management/    # 配置管理模块
+│   │   ├── connection-pool-monitor/ # 连接池监控模块
+│   │   ├── database-optimization/ # 数据库优化模块
+│   │   ├── defaultData/          # 默认数据模块
+│   │   ├── dictionary/           # 数据字典模块
+│   │   ├── doc/                  # 文档模块
+│   │   ├── email/                # 邮箱管理模块
+│   │   ├── event-driven/         # 事件驱动模块
+│   │   ├── exception-test/       # 异常测试模块
+│   │   ├── logger/               # 日志管理模块
+│   │   ├── notice/               # 通知公告模块
+│   │   ├── performance-monitor/  # 性能监控模块
+│   │   ├── roles/                # 角色管理模块
+│   │   ├── routes/               # 路由管理模块
+│   │   ├── schedule/             # 定时任务模块
+│   │   ├── upload/               # 文件上传模块
+│   │   └── users/                # 用户管理模块
+│   ├── types/                    # 类型定义
+│   ├── app.module.ts             # 根模块
+│   └── main.ts                   # 入口文件
+├── types/                        # 全局类型定义
 │   └── global.d.ts
-├── uploads/												文件上传存储位置
-├── .env.dev
-├── .env.prod
-├── .env.sqlitedb
-├── eslint.config.mjs
-├── nest-cli.json
+├── uploads/                      # 文件上传存储位置
+├── .env.dev                      # 开发环境配置
+├── .env.prod                     # 生产环境配置
+├── .env.sqlitedb                 # SQLite环境配置
+├── eslint.config.mjs             # ESLint配置
+├── nest-cli.json                 # NestJS CLI配置
 ├── package-lock.json
 ├── package.json
 ├── README.md
-├── tsconfig.build.json
-└── tsconfig.json
+├── tsconfig.build.json           # TypeScript构建配置
+└── tsconfig.json                 # TypeScript配置
 ```
 
 

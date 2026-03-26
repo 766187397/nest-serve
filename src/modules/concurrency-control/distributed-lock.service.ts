@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { CacheService } from '@/common/service/cache.service';
+import { CacheService } from '@/modules/cache/cache.service';
 import { getConcurrencyControlConfig, DistributedLockConfig } from '@/config/concurrency-control';
 import { v4 as uuidv4 } from 'uuid';
 

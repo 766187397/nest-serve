@@ -19,7 +19,7 @@ import {
   UpdateNoticeDto,
 } from './dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
-import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
+import { FilterEmptyPipe } from '@/common/pipes/filterEmptyPipe';
 import { Request } from 'express';
 import { User } from '../users/entities/user.entity';
 import { NoticeWS } from './notice.ws';

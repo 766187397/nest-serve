@@ -3,8 +3,8 @@ import { SlowQueryMonitorService } from './slow-query-monitor.service';
 import { QueryCacheService } from './query-cache.service';
 import { ReadWriteSplitService } from './read-write-split.service';
 import { DatabaseOptimizationController } from './database-optimization.controller';
-import { DatabaseOptimizationInterceptor } from '@/common/interceptor/database-optimization.interceptor';
-import { CacheModule } from '@/common/module/cache.module';
+import { DatabaseOptimizationInterceptor } from '@/common/interceptors/database-optimization.interceptor';
+import { CacheModule } from '@/modules/cache/cache.module';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({

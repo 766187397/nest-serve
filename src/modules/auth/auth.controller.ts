@@ -7,7 +7,7 @@ import {
   CaptchaDto,
 } from '@/modules/users/dto/index';
 import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
-import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
+import { FilterEmptyPipe } from '@/common/pipes/filterEmptyPipe';
 import { Request, Response } from 'express';
 import {
   CaptchaResponseWrapperDto,

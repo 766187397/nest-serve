@@ -14,7 +14,7 @@ import {
 import { EmailService } from './email.service';
 import { CreateEmailDto, FindEmailDto, FindEmailtoByPage, SendEmail, UpdateEmailDto } from './dto';
 import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
-import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
+import { FilterEmptyPipe } from '@/common/pipes/filterEmptyPipe';
 import { Request } from 'express';
 import { User } from '@/modules/users/entities/user.entity';
 import { HttpStatusCodes } from '@/common/constants/http-status';

@@ -5,7 +5,7 @@ import { AlertService } from './alert.service';
 import { PerformanceMonitorController } from './performance-monitor.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from '@/modules/email/email.module';
-import { PerformanceMonitorInterceptor } from '@/common/interceptor/performance-monitor.interceptor';
+import { PerformanceMonitorInterceptor } from '@/common/interceptors/performance-monitor.interceptor';
 
 @Module({
   imports: [ScheduleModule.forRoot(), EmailModule],

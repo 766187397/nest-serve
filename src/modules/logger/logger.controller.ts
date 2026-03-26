@@ -1,9 +1,9 @@
 import { Controller, Get, Query, Headers } from '@nestjs/common';
 import { LoggerService } from './logger.service';
 import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
-import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
+import { FilterEmptyPipe } from '@/common/pipes/filterEmptyPipe';
 import { FindLogDtoByPage } from './dto';
-import { Roles } from '@/common/decorator/roles.decorator';
+import { Roles } from '@/common/decorators/roles.decorator';
 import { LogListResponseWrapperDto } from './dto/response.dto';
 
 @ApiTags('日志')

@@ -20,12 +20,12 @@ import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from '@n
 import * as cookieParser from 'cookie-parser';
 import { LoggerService } from './modules/logger/logger.service';
 import { LoggerInterceptor } from './modules/logger/logger.interceptor';
-import { ApiResultInterceptor } from './common/interceptor/api-result.interceptor';
-import { PerformanceMonitorInterceptor } from './common/interceptor/performance-monitor.interceptor';
+import { ApiResultInterceptor } from './common/interceptors/api-result.interceptor';
+import { PerformanceMonitorInterceptor } from './common/interceptors/performance-monitor.interceptor';
 import { PrometheusService } from './modules/performance-monitor/prometheus.service';
 import { TraceService } from './modules/performance-monitor/trace.service';
-import { GlobalExceptionFilter } from './common/filter/global-exception.filter';
-import { RouteNotFoundFilter } from './common/filter/route-not-found.filter';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { RouteNotFoundFilter } from './common/filters/route-not-found.filter';
 import { ConfigService } from '@nestjs/config';
 import Knife4jDoc from 'node-knife4j-ui';
 import * as express from 'express';

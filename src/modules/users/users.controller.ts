@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Query, Res, Headers, Header } from 
 import { UsersService } from './users.service';
 import { CreateUserDto, FindUserDto, FindUserDtoByPage } from './dto/index';
 import { ApiOperation, ApiResponse, ApiTags, ApiOkResponse } from '@nestjs/swagger';
-import { FilterEmptyPipe } from '@/common/pipeTransform/filterEmptyPipe';
+import { FilterEmptyPipe } from '@/common/pipes/filterEmptyPipe';
 import { Response } from 'express';
 import { HttpStatusCodes } from '@/common/constants/http-status';
 import {

@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { CacheService } from '@/common/service/cache.service';
+import { CacheService } from '@/modules/cache/cache.service';
 import { getDatabaseOptimizationConfig, DatabaseOptimizationConfig } from '@/config/database-optimization';
 import * as crypto from 'crypto';
 
