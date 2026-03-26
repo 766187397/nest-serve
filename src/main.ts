@@ -60,6 +60,14 @@ async function bootstrap() {
   // 暴露静态文件服务
   app.use('/doc.html', knife4jDoc.serveExpress('/doc.html'), express.static(knife4jDocPath));
 
+  // 根路径重定向到 Knife4j 文档
+  app.use('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (req.path === '/') {
+      return res.redirect('/doc.html');
+    }
+    next();
+  });
+
   // 启用全局校验管道
   app.useGlobalPipes(
     new ValidationPipe({
