@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateRouteDto, FindRouteDto, UpdateRouteDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Route } from './entities/route.entity';
-import { In, Not, Repository, TreeRepository } from 'typeorm';
+import { In, Not, Repository, TreeRepository, FindOperator } from 'typeorm';
 import { buildCommonSort } from '@/common/utils/service.util';
 import { ApiResult } from '@/common/utils/result';
 import { Role } from '@/modules/roles/entities/role.entity';
@@ -132,9 +132,13 @@ export class RoutesService {
    */
   async findOne(id: string, platform?: string): Promise<ApiResult<Route | null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
       const data: RouteInfo = await this.routeRepository.findOne({
-        where: { id, platform: finalPlatform },
+        where: whereCondition,
         relations: ['children', 'parent'],
       });
       if (data && data.parent) {
@@ -155,46 +159,56 @@ export class RoutesService {
    */
   async update(id: string, updateRouteDto: UpdateRouteDto, platform?: string): Promise<ApiResult<null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      // 查询当前路由是否存在
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
       const route = await this.routeRepository.findOne({
-        where: { id, platform: finalPlatform },
+        where: whereCondition,
         relations: ['children', 'parent'],
       });
       if (!route) {
         return ApiResult.error('路由不存在');
       }
+      const existWhere: { id: FindOperator<string>; name: string; platform?: string | FindOperator<string> } = { 
+        id: Not(id), 
+        name: route.name 
+      };
+      if (finalPlatform !== undefined) {
+        existWhere.platform = finalPlatform;
+      }
       const exist = await this.routeRepository.findOne({
-        where: { id: Not(id), name: route.name, platform: finalPlatform },
+        where: existWhere,
       });
       if (exist) {
         return ApiResult.error<null>(`路由${exist.name}已存在`);
       }
 
-      // 如果有新的 parent，查询对应的父级路由
       if (updateRouteDto.parentId) {
         if (updateRouteDto.parentId == route.id) {
           return ApiResult.error('父级路由不能为当前路由');
         }
+        const parentWhere: { id: string; platform?: string | FindOperator<string> } = {
+          id: updateRouteDto.parentId,
+        };
+        if (finalPlatform !== undefined) {
+          parentWhere.platform = finalPlatform;
+        }
         const parentRoute = await this.routeRepository.findOne({
-          where: {
-            id: updateRouteDto.parentId,
-            platform: finalPlatform,
-          },
+          where: parentWhere,
         });
         if (!parentRoute) {
           return ApiResult.error('父级路由不存在');
         }
-        route.parent = parentRoute || null; // 如果 parent 为 null，则设置为 null
+        route.parent = parentRoute || null;
       }
 
-      // 更新其他字段
       Object.assign(route, {
         ...updateRouteDto,
-        parent: route.parent, // 确保 parent 类型一致
+        parent: route.parent,
       });
 
-      // 保存更新后的路由
       await this.routeRepository.save(route);
       return ApiResult.success<null>();
     } catch (error) {
@@ -202,16 +216,14 @@ export class RoutesService {
     }
   }
 
-  /**
-   * 删除路由信息
-   * @param {string} id 路由id
-   * @param {string} platform 请求头中的平台标识
-   * @returns {Promise<ApiResult<null>>} 统一返回结果
-   */
   async remove(id: string, platform?: string): Promise<ApiResult<null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      await this.routeRepository.softDelete({ id, platform: finalPlatform });
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const deleteCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        deleteCondition.platform = finalPlatform;
+      }
+      await this.routeRepository.softDelete(deleteCondition);
       return ApiResult.success<null>();
     } catch (error) {
       return ApiResult.error<null>((error as Error)?.message || '路由删除失败，请稍后再试');

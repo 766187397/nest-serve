@@ -3,7 +3,7 @@ import { CreateRoleDto, FindRoleDto, FindRoleDtoByPage, UpdateRoleDto } from './
 import { buildCommonQuery, buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 import { Role } from './entities/role.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, ILike, In, Not, Repository, UpdateResult } from 'typeorm';
+import { Brackets, ILike, In, Not, Repository, UpdateResult, FindOperator } from 'typeorm';
 import { ApiResult } from '@/common/utils/result';
 import { PageApiResult } from '@/types/public';
 import { Route } from '@/modules/routes/entities/route.entity';
@@ -146,8 +146,13 @@ export class RolesService {
    */
   async findOne(id: string, platform: string = 'admin'): Promise<ApiResult<Role | null>> {
     try {
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
       const data = await this.roleRepository.findOne({
-        where: { id, platform: handlePlatformQuery(platform, undefined) },
+        where: whereCondition,
         relations: ['routes'],
       });
       if (!data) {
@@ -168,23 +173,31 @@ export class RolesService {
    */
   async update(id: string, updateRoleDto: UpdateRoleDto, platform?: string): Promise<ApiResult<null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      const role = await this.roleRepository.findOne({ where: { id, platform: finalPlatform } });
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
+      const role = await this.roleRepository.findOne({ where: whereCondition });
       if (!role) {
         return ApiResult.error('角色不存在');
       }
 
+      const existWhere: Array<{ id: FindOperator<string>; name?: string; roleKey?: string; platform?: string | FindOperator<string> }> = [
+        { id: Not(id), name: role.name },
+        { id: Not(id), roleKey: role.roleKey },
+      ];
+      if (finalPlatform !== undefined) {
+        existWhere[0].platform = finalPlatform;
+        existWhere[1].platform = finalPlatform;
+      }
       const exist = await this.roleRepository.find({
-        where: [
-          { id: Not(id), name: role.name, platform: finalPlatform },
-          { id: Not(id), roleKey: role.roleKey, platform: finalPlatform },
-        ],
+        where: existWhere,
       });
       if (exist && exist.length > 0) {
         return ApiResult.error('角色名称或角色标识已存在');
       }
 
-      // role = { ...role, ...updateRoleDto };
       Object.assign(role, updateRoleDto);
       if (updateRoleDto.routeIds) {
         role.routes = await this.routeRepository.find({
@@ -198,16 +211,14 @@ export class RolesService {
     }
   }
 
-  /**
-   * 删除角色
-   * @param {string} id 角色ID
-   * @param {string} platform 请求头中的平台标识
-   * @returns {Promise<ApiResult<UpdateResult | null>>} 统一返回结果
-   */
   async remove(id: string, platform?: string): Promise<ApiResult<UpdateResult | null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      const data = await this.roleRepository.softDelete({ id, platform: finalPlatform });
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const deleteCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        deleteCondition.platform = finalPlatform;
+      }
+      const data = await this.roleRepository.softDelete(deleteCondition);
       return ApiResult.success<UpdateResult>({ data });
     } catch (error) {
       return ApiResult.error<null>(error || '角色删除失败，请稍后再试');

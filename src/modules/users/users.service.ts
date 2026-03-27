@@ -3,7 +3,7 @@ import { CreateUserDto, FindUserDto, FindUserDtoByPage, UpdateUserDto } from './
 import { ApiResult } from '@/common/utils/result';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Brackets, ILike, In, Not, Repository, UpdateResult } from 'typeorm';
+import { Brackets, ILike, In, Not, Repository, UpdateResult, FindOperator } from 'typeorm';
 import { buildCommonSort, buildCommonPaging } from '@/common/utils/service.util';
 import { bcryptService } from '@/common/utils/bcrypt-hash';
 import { PageApiResult } from '@/types/public';
@@ -147,8 +147,12 @@ export class UsersService {
    */
   async findOne(id: string, platform?: string): Promise<ApiResult<User | null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      const data = await this.userRepository.findOne({ where: { id, platform: finalPlatform } });
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
+      const data = await this.userRepository.findOne({ where: whereCondition });
       if (!data) {
         return ApiResult.error<null>('用户不存在');
       }

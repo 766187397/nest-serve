@@ -9,7 +9,7 @@ import {
 import { ApiResult } from '@/common/utils/result';
 import { Notice } from './entities/notice.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, In, IsNull, LessThan, Like, Not, Repository } from 'typeorm';
+import { ILike, In, IsNull, LessThan, Like, Not, Repository, FindOperator } from 'typeorm';
 import { PageApiResult } from '@/types/public';
 import { JwtService } from '@nestjs/jwt';
 import { getPlatformJwtConfig, JwtConfig } from '@/config/jwt';
@@ -175,8 +175,12 @@ export class NoticeService {
    */
   async findOne(id: string, platform?: string): Promise<ApiResult<Notice | null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      const data = await this.noticeRepository.findOne({ where: { id, platform: finalPlatform } });
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
+      const data = await this.noticeRepository.findOne({ where: whereCondition });
       return ApiResult.success<Notice | null>({ data });
     } catch (error) {
       return ApiResult.error<null>(error);

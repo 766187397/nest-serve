@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
-import { Repository, LessThan } from 'typeorm';
+import { Repository, LessThan, FindOperator } from 'typeorm';
 import * as dayjs from 'dayjs';
 import { CronJob } from 'cron';
 import { Schedule } from './entities/schedule.entity';
@@ -159,8 +159,12 @@ export class ScheduleService {
    */
   async findOne(id: string, platform?: string): Promise<ApiResult<Schedule | null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      const data = await this.scheduleRepository.findOne({ where: { id, platform: finalPlatform } });
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
+      const data = await this.scheduleRepository.findOne({ where: whereCondition });
       if (!data) {
         return ApiResult.error<null>('定时任务不存在');
       }
@@ -183,18 +187,26 @@ export class ScheduleService {
     platform?: string
   ): Promise<ApiResult<null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      const schedule = await this.scheduleRepository.findOne({ where: { id, platform: finalPlatform } });
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
+      const schedule = await this.scheduleRepository.findOne({ where: whereCondition });
       if (!schedule) {
         return ApiResult.error<null>('定时任务不存在');
       }
 
       if (updateScheduleDto.jobName && updateScheduleDto.jobName !== schedule.jobName) {
+        const existingWhere: { jobName: string; platform?: string | FindOperator<string> } = {
+          jobName: updateScheduleDto.jobName,
+        };
+        const queryPlatform = handlePlatformQuery(platform, schedule.platform);
+        if (queryPlatform !== undefined) {
+          existingWhere.platform = queryPlatform;
+        }
         const existingSchedule = await this.scheduleRepository.findOne({
-          where: {
-            jobName: updateScheduleDto.jobName,
-            platform: handlePlatformQuery(platform, schedule.platform),
-          },
+          where: existingWhere,
         });
         if (existingSchedule) {
           return ApiResult.error<null>('任务标识已存在');
@@ -223,16 +235,14 @@ export class ScheduleService {
     }
   }
 
-  /**
-   * 删除定时任务
-   * @param {string} id 任务ID
-   * @param {string} platform 请求头中的平台标识
-   * @returns {Promise<ApiResult<null>>} 统一返回结果
-   */
   async remove(id: string, platform?: string): Promise<ApiResult<null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      const schedule = await this.scheduleRepository.findOne({ where: { id, platform: finalPlatform } });
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
+      const schedule = await this.scheduleRepository.findOne({ where: whereCondition });
       if (!schedule) {
         return ApiResult.error<null>('定时任务不存在');
       }
@@ -242,24 +252,25 @@ export class ScheduleService {
         this.schedulerRegistry.deleteCronJob(jobName);
       }
 
-      await this.scheduleRepository.softDelete({ id, platform: finalPlatform });
+      const deleteCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        deleteCondition.platform = finalPlatform;
+      }
+      await this.scheduleRepository.softDelete(deleteCondition);
       return ApiResult.success<null>();
     } catch (error) {
       return ApiResult.error<null>((error as Error)?.message || '定时任务删除失败');
     }
   }
 
-  /**
-   * 启用/禁用定时任务
-   * @param {string} id 任务ID
-   * @param {number} status 状态 1-启用 2-禁用
-   * @param {string} platform 请求头中的平台标识
-   * @returns {Promise<ApiResult<null>>} 统一返回结果
-   */
   async toggleStatus(id: string, status: number, platform?: string): Promise<ApiResult<null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      const schedule = await this.scheduleRepository.findOne({ where: { id, platform: finalPlatform } });
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
+      const schedule = await this.scheduleRepository.findOne({ where: whereCondition });
       if (!schedule) {
         return ApiResult.error<null>('定时任务不存在');
       }
@@ -284,16 +295,14 @@ export class ScheduleService {
     }
   }
 
-  /**
-   * 手动执行定时任务
-   * @param {string} id 任务ID
-   * @param {string} platform 请求头中的平台标识
-   * @returns {Promise<ApiResult<null>>} 统一返回结果
-   */
   async executeManually(id: string, platform?: string): Promise<ApiResult<null>> {
     try {
-      const finalPlatform = handlePlatformQuery(platform, undefined);
-      const schedule = await this.scheduleRepository.findOne({ where: { id, platform: finalPlatform } });
+      const finalPlatform = handlePlatformQuery(platform, undefined, true);
+      const whereCondition: { id: string; platform?: string | FindOperator<string> } = { id };
+      if (finalPlatform !== undefined) {
+        whereCondition.platform = finalPlatform;
+      }
+      const schedule = await this.scheduleRepository.findOne({ where: whereCondition });
       if (!schedule) {
         return ApiResult.error<null>('定时任务不存在');
       }
