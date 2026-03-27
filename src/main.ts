@@ -34,12 +34,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // CORS配置
-  const corsOrigins = process.env.CORS_ORIGIN
-    ? process.env.CORS_ORIGIN.split(',')
-    : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'];
+  const corsOriginEnv = process.env.CORS_ORIGIN || '';
+  const isAllowAll = corsOriginEnv === '*' || corsOriginEnv.includes('*');
 
   app.enableCors({
-    origin: corsOrigins,
+    origin: isAllowAll ? true : corsOriginEnv.split(',').filter(Boolean),
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   });
