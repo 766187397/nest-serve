@@ -58,6 +58,8 @@ async function bootstrap() {
   const knife4jDocPath = knife4jDoc.getKnife4jUiPath();
   // 暴露静态文件服务
   app.use('/doc.html', knife4jDoc.serveExpress('/doc.html'), express.static(knife4jDocPath));
+  // 处理根路径的 /services.json 请求（Knife4j 前端固定请求此路径）
+  app.use(knife4jDoc.serveRootServices('/doc.html'));
 
   // 根路径重定向到 Knife4j 文档
   app.use('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
